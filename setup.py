@@ -53,6 +53,7 @@ CLASSIFIERS = (
 INSTALL_REQUIRES = (
     'setuptools',
     'numpy',
+    'scipy',
 )
 
 SETUP_REQUIRES = (
