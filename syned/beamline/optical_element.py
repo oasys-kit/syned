@@ -1,5 +1,5 @@
 class OpticalElement(object):
-    def __init__(self, name, boundary_shape=None):
+    def __init__(self, name="Undefined", boundary_shape=None):
         self._name = name
         self._boundary_shape = boundary_shape
 

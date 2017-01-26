@@ -11,8 +11,8 @@ class BeamlineElement(object):
         self._optical_element = optical_element
         self._coordinates = coordinates
 
-    def getOpticalElement(self):
+    def get_optical_element(self):
         return self._optical_element
 
-    def getCoordinates(self):
+    def get_coordinates(self):
         return self._coordinates

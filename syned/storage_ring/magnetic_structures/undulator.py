@@ -4,7 +4,7 @@ Implement an undulator with vertical and horizontal magnetic fields.
 import numpy as np
 import scipy.constants.codata
 
-from syned.beamline.light_sources.insertion_device import InsertionDevice
+from syned.storage_ring.magnetic_structures.insertion_device import InsertionDevice
 
 class Undulator(InsertionDevice):
 
