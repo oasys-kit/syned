@@ -2,7 +2,7 @@
 Position of a beamline component within a beamline.
 """
 
-class BeamlinePosition(object):
+class ElementCoordinates(object):
     def __init__(self, z, x=0.0,y=0.0, angle_radial=0.0, angle_azimuthal=0.0):
         """
 

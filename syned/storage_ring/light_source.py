@@ -3,8 +3,9 @@ Base class for all radiation sources: bending magnet or insertion devices (wiggl
 Every source can attach settings, i.e. inherits from DriverSettingsManager.
 """
 
-from syned.beamline.beamline_component import BeamlineComponent
-
-class LightSource(BeamlineComponent):
+class LightSource(object):
     def __init__(self, name="Undefined"):
-        BeamlineComponent.__init__(self, name)
+        self._name = name
+
+    def name(self):
+        return self._name

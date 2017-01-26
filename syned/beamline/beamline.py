@@ -5,67 +5,31 @@ BeamlineComponents can be attached at positions(BeamlinePosition), i.e. longitud
 We can iterate of the components, find their positions or look for a specific component.
 """
 
+from syned.storage_ring.light_source import LightSource
+from syned.beamline.beamline_element import BeamlineElement
+
 class Beamline(object):
     def __init__(self):
-        self._components = []
-        self._positions = []
+        self._light_source = None
+        self._beamline_elements = []
 
-    def _findComponentInsertionIndex(self, beamline_position):
-        insert_index = 0
+    def get_light_source(self):
+        return self._light_source
 
-        for position in self._positions:
-            if position.z()>beamline_position.z():
-                break
+    def get_beamline_elements(self):
+        return self._beamline_elements
 
-            insert_index += 1
+    def set_light_source(self, light_source=LightSource()):
+        self._light_source = light_source
 
-        return insert_index
+    def append_beamline_element(self, beamline_element=BeamlineElement()):
+        self._beamline_elements.append(beamline_element)
 
-    def attach_component_at(self, beamline_component, beamline_position):
+    def get_beamline_elements_number(self):
+        return len(self._beamline_elements)
 
-        insert_index = self._findComponentInsertionIndex(beamline_position)
+    def get_beamline_element_at(self, index):
+        if index >= len(self._beamline_elements):
+            raise IndexError("Index " + str(index) + " out of bounds")
 
-        self._components.insert(insert_index,beamline_component)
-        self._positions.insert(insert_index,beamline_position)
-
-    def position_of(self, beamline_component):
-        component_index = self._components.index(beamline_component)
-        position = self._positions[component_index]
-
-        return position
-
-    def component_by_index(self, index):
-        if index < len(self._components):
-            return self._components[index]
-
-        return None
-
-    def component_by_name(self, component_name):
-        for component in self._components:
-            if component.name() == component_name:
-                return component
-
-        return None
-
-    def next_component(self, component):
-        component_index = self._components.index(component)
-
-        if len(self._components) <= component_index+1:
-            next_component = None
-        else:
-            next_component = self._components[component_index+1]
-
-        return next_component
-
-    def previous_component(self, component):
-        component_index = self._components.index(component)
-
-        if component_index == 0:
-            previous_component = None
-        else:
-            previous_component = self._components[component_index-1]
-
-        return previous_component
-
-    def __iter__(self):
-        return iter(self._components)
+        return self._beamline_elements[index]

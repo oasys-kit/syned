@@ -1,7 +1,7 @@
 """
 Represents an ideal lens.
 """
-from syned.beamline.optical_elements import OpticalElement
+from syned.beamline.optical_element import OpticalElement
 
 from collections import OrderedDict
 
@@ -11,7 +11,7 @@ class IdealLens(OpticalElement):
         self._focal_x = focal_x
         self._focal_y = focal_y
 
-    def focalX(self): 
+    def focalX(self):
         return self._focal_x
 
     def focalY(self):

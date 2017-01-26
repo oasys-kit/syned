@@ -9,9 +9,17 @@ Usually we would need to consider also the electron distribution within the beam
 from collections import OrderedDict
 
 class ElectronBeam(object):
-    def __init__(self, energy_in_GeV, energy_spread, current, electrons_per_bunch,
-                 moment_xx, moment_xxp, moment_xpxp,
-                 moment_yy, moment_yyp, moment_ypyp):
+    def __init__(self,
+                 energy_in_GeV = 1.0,
+                 energy_spread = 0.0,
+                 current = 0.1,
+                 electrons_per_bunch = 400,
+                 moment_xx=0.0,
+                 moment_xxp=0.0,
+                 moment_xpxp=0.0,
+                 moment_yy=0.0,
+                 moment_yyp=0.0,
+                 moment_ypyp=0.0):
 
 
         self._energy_in_GeV       = energy_in_GeV
@@ -44,3 +52,10 @@ class ElectronBeam(object):
                     ("moment_yyp"         ,( self._moment_yyp          ,"m"  ,  "Moment (spatial-angular, vertical)"     ) ),
                     ("moment_ypyp"        ,( self._moment_ypyp         ,""   ,  "Moment (angular^2, vertical)"           ) )]
         return(OrderedDict(mytuple))
+
+    @classmethod
+    def initialize_as_pencil_beam(cls, energy_in_GeV = 1.0, energy_spread = 0.0, current = 0.1):
+        return ElectronBeam(energy_in_GeV=energy_in_GeV,
+                            energy_spread=energy_spread,
+                            current=current,
+                            electrons_per_bunch=1)
