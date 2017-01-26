@@ -1,25 +1,15 @@
 
 from syned.beamline.optical_element import OpticalElement
-from syned.beamline.optical_elements.shape import Shape
+from syned.beamline.optical_elements.shape import BoundaryShape
 
 
 class Slit(OpticalElement):
-    def __init__(self, name="Undefined", shape=Shape()):
-        OpticalElement.__init__(self, name=name)
-        self._shape = shape
-
-    def get_shape(self):
-        return self._shape
-
+    def __init__(self, name="Undefined", boundary_shape=BoundaryShape()):
+        OpticalElement.__init__(self, name=name, boundary_shape=boundary_shape)
 
 class BeamStopper(OpticalElement):
-    def __init__(self, name="Undefined", shape=Shape()):
-        OpticalElement.__init__(self, name=name)
-        self._shape = shape
-
-    def get_shape(self):
-        return self._shape
-
+    def __init__(self, name="Undefined", boundary_shape=BoundaryShape()):
+        OpticalElement.__init__(self, name=name, boundary_shape=boundary_shape)
 
 class Filter(OpticalElement):
     def __init__(self,
