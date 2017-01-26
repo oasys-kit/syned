@@ -5,16 +5,15 @@ Base class for all insertion devices: wiggler, undulator
 from numpy import pi
 import scipy.constants.codata
 
-from syned.storage_ring.light_source import LightSource
+from syned.storage_ring.magnetic_structure import MagneticStructure
 
-class InsertionDevice(LightSource):
+class InsertionDevice(MagneticStructure):
     def __init__(self,
-                 name="Undefined",
                  K_vertical = 0.0,
                  K_horizontal = 0.0,
                  period_length = 0.0,
                  periods_number = 1):
-        LightSource.__init__(self, name)
+        MagneticStructure.__init__(self)
 
         self._K_vertical = K_vertical
         self._K_horizontal = K_horizontal

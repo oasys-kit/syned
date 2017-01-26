@@ -1,16 +1,16 @@
 
-from syned.storage_ring.light_source import LightSource
+from syned.storage_ring.magnetic_structure import MagneticStructure
 from collections import OrderedDict
 
-class BendingMagnet(LightSource):
-    def __init__(self, name, radius, magnetic_field, length):
+class BendingMagnet(MagneticStructure):
+    def __init__(self, radius, magnetic_field, length):
         """
         Constructor.
         :param radius: Physical Radius/curvature of the magnet in m
         :param magnetic_field: Magnetic field strength in T
         :param length: physical length of the bending magnet (along the arc) in m.
         """
-        LightSource.__init__(self, name)
+        MagneticStructure.__init__(self)
         self._radius         = radius
         self._magnetic_field = magnetic_field
         self._length         = length
