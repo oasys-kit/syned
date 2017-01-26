@@ -1,4 +1,4 @@
-from syned.beamline.optical_element import OpticalElement
+from syned.beamline.optical_elements import OpticalElement
 
 class Slits(OpticalElement):
     def __init__(self, name):
