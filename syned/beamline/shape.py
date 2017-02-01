@@ -1,13 +1,13 @@
-from syned.beamline.optical_element import OpticalElement
-import numpy
 
+import numpy
+from syned.syned_object import SynedObject
 
 #
 # main shape subclasses:
 #      SurfaceShape to caracterize the shape (sphere etc.) of the optical element surface
 #      BoundaryShape to characterize the optical element dimensions (rectangle, etc.)
 #
-class Shape(object):
+class Shape(SynedObject):
     def __init__(self):
         super().__init__()
 
@@ -74,10 +74,18 @@ class Rectangle(BoundaryShape):
     def __init__(self, x_left=-0.010, x_right=0.010, y_bottom=-0.020, y_top=0.020):
         super().__init__()
 
-        self._x_left = x_left
-        self._x_right = x_right
+        self._x_left   = x_left
+        self._x_right  = x_right
         self._y_bottom = y_bottom
-        self._y_top = y_top
+        self._y_top    = y_top
+
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("x_left    "      , "x (width) minimum (signed)   ", "m" ),
+                    ("x_right   "      , "x (width) maximum (signed)   ", "m" ),
+                    ("y_bottom  "      , "y (length) minimum (signed)  ", "m" ),
+                    ("y_top     "      , "y (length) maximum (signed)  ", "m" ),
+            ] )
 
     def get_boundaries(self):
         return self._x_left, self._x_right, self._y_bottom, self._y_top
@@ -100,10 +108,17 @@ class Ellipse(BoundaryShape):
     def __init__(self, min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top):
         super().__init__()
 
-        self._min_ax_left = min_ax_left
-        self._min_ax_right = min_ax_right
+        self._min_ax_left   = min_ax_left
+        self._min_ax_right  = min_ax_right
         self._maj_ax_bottom = maj_ax_bottom
-        self._maj_ax_top = maj_ax_top
+        self._maj_ax_top    = maj_ax_top
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("min_ax_left   "      , "x (width) semiaxis starts (signed)  ", "m" ),
+                    ("min_ax_right  "      , "x (width) semiaxis ends (signed)    ", "m" ),
+                    ("maj_ax_bottom "      , "y (length) semiaxis starts (signed) ", "m" ),
+                    ("maj_ax_top    "      , "y (length) semiaxis ends (signed)   ", "m" ),
+            ] )
 
     def get_boundaries(self):
         return self._min_ax_left, self._min_ax_right, self._maj_ax_bottom, self._maj_ax_top

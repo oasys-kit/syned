@@ -1,4 +1,5 @@
-from syned.beamline.shape import SurfaceShape, OpticalElementsWithSurfaceShape
+from syned.beamline.shape import SurfaceShape
+from syned.beamline.optical_element_with_surface_shape import OpticalElementsWithSurfaceShape
 
 class Crystal(OpticalElementsWithSurfaceShape):
     def __init__(self,

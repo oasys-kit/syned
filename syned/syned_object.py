@@ -30,10 +30,15 @@ class SynedObject(object):
 
     def to_dictionary(self):
         dict_to_save = OrderedDict()
-
+        dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
         try:
             for key in self.keys():
-                exec("dict_to_save['%s'] = self._%s" % (key, key))
+                tmp1 = eval("self._%s" % (key) )
+                if isinstance(tmp1,SynedObject):
+                    dict_to_save[key] = tmp1.to_dictionary()
+                else:
+                    dict_to_save[key] = tmp1
+                    # exec("dict_to_save['%s'] = self._%s" % (key, key))
         except:
             pass
 
@@ -41,7 +46,6 @@ class SynedObject(object):
 
     def to_json(self,file_name=None):
         dict1 = OrderedDict()
-        dict1.update({"ELEMENT_TYPE":self.__class__.__name__})
         dict1.update(self.to_dictionary())
 
         jsn1 = json.dumps(dict1, indent=4, separators=(',', ': '))

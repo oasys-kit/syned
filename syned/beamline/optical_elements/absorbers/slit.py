@@ -13,3 +13,4 @@ class Slit(OpticalElement):
 
     def set_circle(self,radius=3e-3):
         self._boundary_shape=Ellipse(-0.5*radius,0.5*radius,-0.5*radius,0.5*radius)
+

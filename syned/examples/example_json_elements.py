@@ -7,9 +7,11 @@ from syned.beamline.optical_elements.absorbers.filter import Filter
 from syned.beamline.optical_elements.absorbers.slit import Slit
 from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
 from syned.beamline.optical_elements.mirrors.mirror import Mirror
+from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
 
 from syned.beamline.shape import Rectangle
+from syned.storage_ring.light_source import LightSource
 
 import json
 
@@ -26,9 +28,9 @@ def from_json(input_variable,double_check=True):
 
     # print(jsn)
 
-    if "ELEMENT_TYPE" in jsn.keys():
+    if "CLASS_NAME" in jsn.keys():
         # print("eval: tmp1 = ",jsn["ELEMENT_TYPE"]+"()")
-        tmp1 = eval(jsn["ELEMENT_TYPE"]+"()")
+        tmp1 = eval(jsn["CLASS_NAME"]+"()")
         if tmp1.keys() is not None:
             for key in tmp1.keys():
                 if key in jsn.keys():
@@ -41,7 +43,7 @@ def from_json(input_variable,double_check=True):
         print(tmp1.info())
 
         for key in jsn.keys():
-            if key != "ELEMENT_TYPE":
+            if key != "CLASS_NAME":
                 if key in tmp1.keys():
                     print(key,"  file: ",repr(jsn[key]), "object: ",repr(tmp1.get_value_from_key_name(key)) )
                 else:
@@ -64,11 +66,13 @@ if __name__ == "__main__":
     filter1 = Filter("filter1","H2O",3.0e-6)
     slit1 = Slit(name="slit1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
     stopper1 = BeamStopper(name="stopper1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
-    mirror1 = Mirror(name="mirror1")
-    crystal1 = Grating(name="crystal1")
+    mirror1 = Mirror(name="mirror1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
+    crystal1 = Crystal(name="crystal1")
     grating1 = Grating(name="grating1")
+    lightsource1 = LightSource("test_source",src1,src2)
 
-    mylist = [src1,src2,screen1,lens1,filter1,stopper1,mirror1,crystal1]
+    mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1,crystal1,lightsource1]
+    # mylist = [slit1]
 
     for i,element in enumerate(mylist):
         element.to_json("tmp_%d.json"%i)
