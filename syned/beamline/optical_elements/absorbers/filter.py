@@ -10,6 +10,12 @@ class Filter(OpticalElement):
         self._material = material
         self._thickness = thickness
 
+
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("material"      , "Material (symbol, formula or name)",    "" ),
+                    ("thickness"     , "Thickness ",                            "m" ),
+            ] )
     def get_material(self):
         return self._material
 

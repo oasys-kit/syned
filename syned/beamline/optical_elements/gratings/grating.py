@@ -1,5 +1,17 @@
-from syned.beamline.optical_elements.shape import SurfaceShape, BoundaryShape, OpticalElementsWithSurfaceShape
+from syned.beamline.shape import SurfaceShape, BoundaryShape
+from syned.beamline.optical_element_with_surface_shape import OpticalElementsWithSurfaceShape
 
 class Grating(OpticalElementsWithSurfaceShape):
-    def __init__(self, name, boundary_shape=BoundaryShape(), surface_shape=SurfaceShape()):
-        super().__init__(name, boundary_shape, surface_shape)
+    def __init__(self,
+                 name="Undefined",
+                 surface_shape=SurfaceShape(),
+                 boundary_shape=BoundaryShape(),
+                 ruling = 800e3
+                 ):
+        super().__init__(name, surface_shape, boundary_shape)
+        self._ruling = ruling
+
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("ruling",            "Ruling at center" ,       "lines/m^3" ),
+            ] )

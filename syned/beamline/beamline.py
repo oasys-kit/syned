@@ -20,10 +20,16 @@ class Beamline(object):
         return self._beamline_elements
 
     def set_light_source(self, light_source=LightSource()):
-        self._light_source = light_source
+        if not isinstance(light_source,LightSource):
+            raise Exception("Input class must be of type: "+LightSource.__name__)
+        else:
+            self._light_source = light_source
 
     def append_beamline_element(self, beamline_element=BeamlineElement()):
-        self._beamline_elements.append(beamline_element)
+        if not isinstance(beamline_element,BeamlineElement):
+            raise Exception("Input class must be of type: "+BeamlineElement.__name__)
+        else:
+            self._beamline_elements.append(beamline_element)
 
     def get_beamline_elements_number(self):
         return len(self._beamline_elements)

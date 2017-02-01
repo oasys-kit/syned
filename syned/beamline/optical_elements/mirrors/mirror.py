@@ -1,8 +1,20 @@
-from syned.beamline.optical_elements.shape import SurfaceShape, OpticalElementsWithSurfaceShape
+from syned.beamline.shape import SurfaceShape
+from syned.beamline.optical_element_with_surface_shape import OpticalElementsWithSurfaceShape
 
 class Mirror(OpticalElementsWithSurfaceShape):
     def __init__(self,
-                 name,
+                 name="Undefined",
+                 surface_shape=SurfaceShape(),
                  boundary_shape=None,
-                 surface_shape=SurfaceShape()):
-        super().__init__(name, boundary_shape, surface_shape)
+                 coating=None,
+                 coating_thickness=None):
+
+        super().__init__(name, surface_shape, boundary_shape)
+        self._coating = coating
+        self._coating_thickness = coating_thickness
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("coating",             "Coating (element, compound or name)" , "" ),
+                    ("coating_thickness",   "Coating thickness", "m"    ),
+            ] )
+

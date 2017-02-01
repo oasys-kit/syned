@@ -11,38 +11,35 @@ class SynedObject(object):
         self._support_dictionary = ordered_support_dict
 
 
+    #
+    # this is the common interface to allow json file input/output and info mechanism
+    #
+    # standard methods are:
+    #   keys
+    #   to_dictionary
+    #   to_json
+    #   info
+    #   set_value_from_key_name
+    #   get_value_from_key_name
+    #
     def keys(self):
-        return self._support_dictionary.keys()
+        try:
+            return self._support_dictionary.keys()
+        except:
+            return None
 
     def to_dictionary(self):
         dict_to_save = OrderedDict()
-        for key in self.keys():
-            exec("dict_to_save['%s'] = self._%s" % (key, key))
+
+        try:
+            for key in self.keys():
+                exec("dict_to_save['%s'] = self._%s" % (key, key))
+        except:
+            pass
+
         return dict_to_save
 
-    def info(self):
-        fd = self.to_dictionary()
-        text = str(self.__class__.__name__) + "\n"
-        for key in self.keys():
-            text += '    %s (%s): %f \n' %(key, self._support_dictionary[key][1],fd[key])
-        return text
-
-    def set_value_from_key_name(self,key,value):
-        try:
-            exec("self._%s = value" % (key))
-            print("Set variable %s to value: "%key + repr(value))
-        except:
-            raise ValueError("Cannot set variable %s to value: "%key + repr(value) )
-
-    def get_value_from_key_name(self,key):
-        try:
-            value = 0
-            exec("value = self._%s" % (key))
-            return value
-        except:
-            raise ValueError("Cannot get variable %s: "%key)
-
-    def dump_json(self,file_name=None):
+    def to_json(self,file_name=None):
         dict1 = OrderedDict()
         dict1.update({"ELEMENT_TYPE":self.__class__.__name__})
         dict1.update(self.to_dictionary())
@@ -53,5 +50,32 @@ class SynedObject(object):
             f.write(jsn1)
             f.close()
             print("File written to disk: %s"%(file_name))
-        print(jsn1 )
         return jsn1
+
+    def info(self):
+        text = str(self.__class__.__name__) + "\n"
+
+        try:
+            fd = self.to_dictionary()
+            for key in self.keys():
+                text += '    %s (%s): ' %(key, self._support_dictionary[key][1]) + repr(fd[key]) + "\n"
+        except:
+            pass
+
+        return text
+
+    def set_value_from_key_name(self,key,value):
+        try:
+            exec("self._%s = value" % (key))
+            # print("Set variable %s to value: "%key + repr(value))
+        except:
+            raise ValueError("Cannot set variable %s to value: "%key + repr(value) )
+
+    def get_value_from_key_name(self,key):
+        try:
+            value = eval("self._%s" % (key))
+            return value
+        except:
+            raise ValueError("Cannot get variable %s: "%key)
+
+
