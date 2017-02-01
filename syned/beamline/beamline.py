@@ -9,7 +9,7 @@ from syned.storage_ring.light_source import LightSource
 from syned.beamline.beamline_element import BeamlineElement
 
 class Beamline(object):
-    def __init__(self):
+    def __init__(self, light_source=LightSource(), ):
         self._light_source = None
         self._beamline_elements = []
 

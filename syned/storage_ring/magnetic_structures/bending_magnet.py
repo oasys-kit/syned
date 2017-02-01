@@ -1,6 +1,9 @@
+"""
+Base class for a Bending Magnet
 
+
+"""
 from syned.storage_ring.magnetic_structure import MagneticStructure
-from collections import OrderedDict
 
 class BendingMagnet(MagneticStructure):
     def __init__(self, radius, magnetic_field, length):
@@ -15,15 +18,15 @@ class BendingMagnet(MagneticStructure):
         self._magnetic_field = magnetic_field
         self._length         = length
 
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("radius"          , "Radius of bending magnet" , "m"    ),
+                    ("magnetic_field"  , "Magnetic field",            "T"    ),
+                    ("length"          , "Bending magnet length",     "m"   ),
+            ] )
+
     #
     #methods for practical calculations
     #
     def horizontal_divergence(self):
         return self.length()/self.radius()
-
-    def to_dictionary(self):
-        #returns a dictionary with the variable names as keys, and a tuple with value, unit and doc string
-        mytuple = [ ("radius"              ,( self._radius              ,"m",  "Bending magnet physical radius" ) ),
-                    ("magnetic_field"      ,( self._magnetic_field      ,"T",  "Bending magnet magnetic field"  ) ),
-                    ("length"              ,( self._length              ,"m",  "Bending magnet arc length"      ) )]
-        return(OrderedDict(mytuple))

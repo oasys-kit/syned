@@ -1,33 +1,34 @@
 """
+
 Base class for all insertion devices: wiggler, undulator
+
 """
 
 from numpy import pi
-import scipy.constants.codata
+import scipy.constants as codata
 
 from syned.storage_ring.magnetic_structure import MagneticStructure
 
 class InsertionDevice(MagneticStructure):
     def __init__(self,
-                 K_vertical = 0.0,
-                 K_horizontal = 0.0,
-                 period_length = 0.0,
-                 periods_number = 1):
+                 K_vertical       = 0.0,
+                 K_horizontal      = 0.0,
+                 period_length     = 0.0,
+                 number_of_periods = 1):
         MagneticStructure.__init__(self)
 
         self._K_vertical = K_vertical
         self._K_horizontal = K_horizontal
         self._period_length = period_length
-        self._periods_number = periods_number
+        self._number_of_periods = number_of_periods
 
-    def periodLength(self):
-        return self._period_length
-
-    def periodNumber(self):
-        return self._periods_number
-
-    def length(self):
-        return self.periodNumber() * self.periodLength()
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("K_vertical"          , "K value (vertical)"  , ""    ),
+                    ("K_horizontal"        , "K value (horizontal)", ""    ),
+                    ("period_length"       , "Period length"       , "m"   ),
+                    ("number_of_periods"   , "Number of periods"   , ""    ),
+            ] )
 
     def K_vertical(self):
         return self._K_vertical
@@ -35,18 +36,30 @@ class InsertionDevice(MagneticStructure):
     def K_horizontal(self):
         return self._K_horizontal
 
-    def _magneticFieldStrengthFromK(self, K):
-        codata = scipy.constants.codata.physical_constants
-        speed_of_light = codata["speed of light in vacuum"][0]
-        mass_electron = codata["electron mass"][0]
-        elementary_charge=codata["elementary charge"][0]
+    def period_length(self):
+        return self._period_length
 
-        B = K * 2 * pi * mass_electron * speed_of_light / (elementary_charge * self.periodLength())
+    def number_of_periods(self):
+        return self._number_of_periods
 
-        return B
 
-    def B_vertical(self):
+    #
+    # some easy calculations
+    #
+
+    def K(self):
+        return self.K_vertical()
+
+    def length(self):
+        return self.periodNumber() * self.periodLength()
+
+    def _magnetic_field_from_K(self, K):
+        return K * 2 * pi * codata.m_e * codata.c / (codata.e * self.periodLength())
+
+    def magnetic_field_vertical(self):
         return self._magneticFieldStrengthFromK(self.K_vertical())
 
-    def B_horizontal(self):
+    def magnetic_field_horizontal(self):
         return self._magneticFieldStrengthFromK(self.K_horizontal())
+
+

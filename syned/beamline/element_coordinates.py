@@ -25,8 +25,8 @@ class ElementCoordinates(object):
     def q(self):
         return self._q
 
-    def angleRadial(self):
+    def angle_radial(self):
         return self._angle_radial
 
-    def angleAzimuthal(self):
+    def angle_azimuthal(self):
         return self._angle_azimuthal

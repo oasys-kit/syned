@@ -12,10 +12,11 @@ class Undulator(InsertionDevice):
                  K_vertical = 0.0,
                  K_horizontal = 0.0,
                  period_length = 0.0,
-                 periods_number = 1):
-        InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, periods_number)
+                 number_of_periods = 1):
+        InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, number_of_periods)
 
-    def resonanceWavelength(self, gamma, theta_x, theta_z):
+
+    def resonance_wavelength(self, gamma, theta_x, theta_z):
         wavelength = (self.periodLength() / (2.0*gamma **2)) * \
                      (1 + self.K_vertical()**2 / 2.0 + self.K_horizontal()**2 / 2.0 + \
                       gamma**2 * (theta_x**2 + theta_z ** 2))
@@ -26,11 +27,11 @@ class Undulator(InsertionDevice):
         codata = scipy.constants.codata.physical_constants
         codata_c = codata["speed of light in vacuum"][0]
 
-        frequency = codata_c / self.resonanceWavelength(gamma, theta_x, theta_z)
+        frequency = codata_c / self.resonance_wavelength(gamma, theta_x, theta_z)
 
         return frequency
 
-    def resonanceEnergy(self, gamma, theta_x, theta_y, harmonic=1):
+    def resonance_energy(self, gamma, theta_x, theta_y, harmonic=1):
         codata = scipy.constants.codata.physical_constants
         energy_in_ev = codata["Planck constant"][0] * self.resonanceFrequency(gamma, theta_x, theta_y) / codata["elementary charge"][0]
 
@@ -39,10 +40,27 @@ class Undulator(InsertionDevice):
     def gaussianCentralConeDivergence(self, gamma, n=1):
         return (1/gamma)*np.sqrt((1.0/(2.0*n*self.periodNumber())) * (1.0 + self.K_horizontal()**2/2.0 + self.K_vertical()**2/2.0))
 
-
     @classmethod
     def initialize_as_vertical_undulator(cls, K = 0.0, period_length = 0.0, periods_number = 1):
         return Undulator(K_vertical=K,
                          K_horizontal=0.0,
                          period_length=period_length,
-                         periods_number=periods_number)
+                         number_of_periods=periods_number)
+
+if __name__ == "__main__":
+
+    a = Undulator()
+
+    fd = a.to_full_dictionary()
+    dict = a.to_dictionary()
+
+    print(dict)
+
+    for key in fd:
+        print(key,fd[key][0])
+
+    for key in fd:
+        print(key,dict[key])
+
+    print(a.keys())
+    print(a.info())

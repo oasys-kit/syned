@@ -1,6 +1,9 @@
 """
-Base class for all radiation sources: bending magnet or insertion devices (wiggler, undulator)
-Every source can attach settings, i.e. inherits from DriverSettingsManager.
+Base class for LighSource, which contains:
+    - a name
+    - an electron beam
+    - a magnetic structure
+
 """
 
 from syned.storage_ring.magnetic_structure import MagneticStructure
@@ -20,3 +23,6 @@ class LightSource(object):
 
     def get_magnetic_structure(self):
         return self._magnetic_structure
+
+    def info(self):
+        return self._electron_beam.info() + self._magnetic_structure.info()
