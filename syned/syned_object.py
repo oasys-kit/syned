@@ -53,7 +53,10 @@ class SynedObject(object):
                 if isinstance(tmp1,SynedObject):
                     dict_to_save[key] = tmp1.to_full_dictionary()
                 else:
-                    dict_to_save[key] = [tmp1,self._support_dictionary[key]]
+                    mylist = []
+                    mylist.append(tmp1)
+                    mylist.append(self._support_dictionary[key])
+                    dict_to_save[key] = mylist # [tmp1,self._support_dictionary[key]]
         except:
             pass
 
@@ -71,42 +74,27 @@ class SynedObject(object):
             print("File written to disk: %s"%(file_name))
         return jsn1
 
-    # def deserialize(self,fd):
-    #     text = ""
-    #     for key in fd.keys():
-    #         if isinstance(fd[key],OrderedDict):
-    #             text += '>>>>>>>>>>>>>>>>>>>>\n'
-    #             #print(self.deserialize(fd[key]))
-    #         else:
-    #             text += '    %s (%s): ' %(key, self._support_dictionary[key][1]) + repr(fd[key]) + "\n"
-    #     return text
+
+    def info_recurrent(self,fd,prefix="    "):
+        text = ""
+        for key in fd.keys():
+            if isinstance(fd[key],OrderedDict):
+                text += prefix + self.info_recurrent(fd[key])
+            elif isinstance(fd[key],str):
+                text += prefix + "-------%s---------\n"%fd[key]
+            elif isinstance(fd[key],list):
+                if isinstance(fd[key][0],OrderedDict):
+                    for element in fd[key]:
+                        text += self.info_recurrent(element,prefix="    ")
+                else:
+                    text += prefix + '    %s: %s %s # %s\n' %(key,  repr(fd[key][0]), fd[key][1][1], fd[key][1][0])
+            else:
+                pass
+        return text
 
     def info(self):
-        text = str(self.__class__.__name__) + "\n"
+        return self.info_recurrent( self.to_full_dictionary() )
 
-        try:
-            fd = self.to_full_dictionary()
-            print(fd.keys())
-            # text += self.deserialize(fd)
-
-            # for key in self.keys():
-            #     print("------------------------------------ key:",key)
-                #text += '    %s (%s): ' %(key, self._support_dictionary[key][1]) + repr(fd[key][0]) + "\n"
-
-            for key in fd.keys():
-                if isinstance(fd[key],OrderedDict):
-                    #text += '    ----------------------- skipped %s (%s): ' %(key, self._support_dictionary[key][1]) + repr(fd[key]) + "\n"
-                    obj = self.get_value_from_key_name(key)
-                    text += " { " + obj.info() +" } \n"
-                else:
-                    try:
-                        text += '    %s (%s): ' %(key, self._support_dictionary[key][1]) + repr(fd[key][0]) + "\n"
-                    except:
-                        pass
-        except:
-            pass
-
-        return text
 
     def set_value_from_key_name(self,key,value):
         if key in self.keys():
@@ -117,7 +105,6 @@ class SynedObject(object):
                 raise ValueError("Cannot set variable %s to value: "%key + repr(value) )
         else:
             print("Key %s not accepted by class %s"%(key,self.__class__.__name__))
-
 
 
     def get_value_from_key_name(self,key):

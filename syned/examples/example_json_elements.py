@@ -28,10 +28,36 @@ def load_from_json_file(file_name):
 
 
 def load_from_json_text(text):
-    return load_from_json_dictionary(json.loads(text))
+    return load_from_json_dictionary_recurrent(json.loads(text))
 
 
-def load_from_json_dictionary(jsn,double_check=False,verbose=False):
+def load_from_json_dictionary_recurrent(jsn):
+
+    # print(jsn)
+    if "CLASS_NAME" in jsn.keys():
+        # print("eval: tmp1 = ",jsn["ELEMENT_TYPE"]+"()")
+        tmp1 = eval(jsn["CLASS_NAME"]+"()")
+        print(">>>>",jsn["CLASS_NAME"],type(tmp1))
+        if tmp1.keys() is not None:
+
+            for key in tmp1.keys():
+                print(">>>>processing",key ,type(jsn[key]))
+                if isinstance(jsn[key],dict):
+                    tmp2 = load_from_json_dictionary_recurrent(jsn[key])
+                    print(">>>>2",key,type(tmp2))
+                    tmp1.set_value_from_key_name(key,tmp2)
+                elif isinstance(jsn[key],list):
+                    #todo
+                    pass
+                    # for element in jsn[key]:
+                    #     print(element)
+                    #     tmp3 = load_from_json_dictionary_recurrent(element)
+                    #     # print(">>>>3",type(tmp3))
+                    #     # tmp1.set_value_from_key_name(key,tmp3)
+                else:
+                    tmp1.set_value_from_key_name(key,jsn[key])
+
+def load_from_json_dictionary(jsn,double_check=False,verbose=True):
 
     # print(jsn)
 
@@ -44,7 +70,8 @@ def load_from_json_dictionary(jsn,double_check=False,verbose=False):
                     if verbose: print("---------- setting: ",key, "to ",jsn[key])
                     if isinstance(jsn[key],dict):
                         tmp1.set_value_from_key_name(key,load_from_json_dictionary(jsn[key]))
-
+                    elif isinstance(jsn[key],list):
+                        pass
                     else:
                         tmp1.set_value_from_key_name(key,jsn[key])
 
@@ -82,33 +109,33 @@ if __name__ == "__main__":
     crystal1 = Crystal(name="crystal1")
     grating1 = Grating(name="grating1")
 
+    # #
+    # mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1,crystal1]
+    # # mylist = [mirror1]
+    # #
+    # for i,element in enumerate(mylist):
+    #     element.to_json("tmp_%d.json"%i)
     #
-    mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1,crystal1]
-    # mylist = [mirror1]
+    # for i,element in enumerate(mylist):
+    #     print("loading element %d"%i)
+    #     tmp = load_from_json_file("tmp_%d.json"%i)
+    #     print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
     #
-    for i,element in enumerate(mylist):
-        element.to_json("tmp_%d.json"%i)
-
-    for i,element in enumerate(mylist):
-        print("loading element %d"%i)
-        tmp = load_from_json_file("tmp_%d.json"%i)
-        print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
-
-    # print(src1.to_full_dictionary())
-
+    # # print(src1.to_full_dictionary())
     #
-    # test lightsource
+    # #
+    # # test lightsource
+    # #
     #
-
     lightsource1 = LightSource("test_source",src1,src2)
-    lightsource1.to_json("tmp_100.json")
-    print(lightsource1.info())
-
-    tmp = load_from_json_file("tmp_100.json")
-    print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
-
-    print( tmp.get_electron_beam().info() )
-    print( tmp.get_magnetic_structure().info() )
+    # lightsource1.to_json("tmp_100.json")
+    # print(lightsource1.info())
+    #
+    # tmp = load_from_json_file("tmp_100.json")
+    # print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+    #
+    # print( tmp.get_electron_beam().info() )
+    # print( tmp.get_magnetic_structure().info() )
 
     #
     # test full beamline
@@ -127,13 +154,17 @@ if __name__ == "__main__":
 
 
 
-    SCREEN1.to_json("tmp_101.json")
+    # SCREEN1.to_json("tmp_101.json")
 
     BL = Beamline(lightsource1,[SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1])
-    print(BL.to_dictionary())
+    # print(BL.to_dictionary())
     BL.to_json("tmp_102.json")
-    # #
-    print(BL.info())
+    # print(BL.info())
 
+    BL_LOADED = load_from_json_file("tmp_102.json")
+    print(type(BL_LOADED))
+    # print(BL_LOADED.get_light_source().info())
+    # for element in BL_LOADED.get_beamline_elements():
+    #     print(element.__class__.__name__)
 
 

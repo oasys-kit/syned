@@ -16,8 +16,8 @@ class LightSource(SynedObject):
         self._magnetic_structure = magnetic_structure
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("name              ","name              ",""),
-                    ("electron_beam     ","Electron Beam     ",""),
+                    ("name",              "Name",""),
+                    ("electron_beam",     "Electron Beam",""),
                     ("magnetic_structure","Magnetic Strtructure",""),
             ] )
 
