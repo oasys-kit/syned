@@ -5,6 +5,7 @@ class OpticalElement(SynedObject):
         self._name = name
         self._boundary_shape = boundary_shape
 
+        # TODO check name
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
                     # ("name"      ,           "to define ", "" ),

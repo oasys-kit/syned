@@ -11,20 +11,27 @@ from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
 
 from syned.beamline.shape import Rectangle
+from syned.beamline.shape import SurfaceShape
 from syned.storage_ring.light_source import LightSource
+
+from syned.beamline.beamline import Beamline
+from syned.beamline.beamline_element import BeamlineElement
+from syned.beamline.element_coordinates import ElementCoordinates
 
 import json
 
-def from_json(input_variable,double_check=True):
-    if isinstance(input_variable,str):
-        f = open(input_variable)
-        text = f.read()
-        f.close()
-    else:
-        text = input_variable
+def load_from_json_file(file_name):
+    f = open(file_name)
+    text = f.read()
+    f.close()
+    return load_from_json_text(text)
 
 
-    jsn = json.loads(text)
+def load_from_json_text(text):
+    return load_from_json_dictionary(json.loads(text))
+
+
+def load_from_json_dictionary(jsn,double_check=False,verbose=False):
 
     # print(jsn)
 
@@ -34,7 +41,12 @@ def from_json(input_variable,double_check=True):
         if tmp1.keys() is not None:
             for key in tmp1.keys():
                 if key in jsn.keys():
-                    tmp1.set_value_from_key_name(key,jsn[key])
+                    if verbose: print("---------- setting: ",key, "to ",jsn[key])
+                    if isinstance(jsn[key],dict):
+                        tmp1.set_value_from_key_name(key,load_from_json_dictionary(jsn[key]))
+
+                    else:
+                        tmp1.set_value_from_key_name(key,jsn[key])
 
 
 
@@ -69,17 +81,59 @@ if __name__ == "__main__":
     mirror1 = Mirror(name="mirror1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
     crystal1 = Crystal(name="crystal1")
     grating1 = Grating(name="grating1")
-    lightsource1 = LightSource("test_source",src1,src2)
 
-    mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1,crystal1,lightsource1]
-    # mylist = [slit1]
-
+    #
+    mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1,crystal1]
+    # mylist = [mirror1]
+    #
     for i,element in enumerate(mylist):
         element.to_json("tmp_%d.json"%i)
 
     for i,element in enumerate(mylist):
         print("loading element %d"%i)
-        tmp = from_json("tmp_%d.json"%i,double_check=True)
+        tmp = load_from_json_file("tmp_%d.json"%i)
+        print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+
+    # print(src1.to_full_dictionary())
+
+    #
+    # test lightsource
+    #
+
+    lightsource1 = LightSource("test_source",src1,src2)
+    lightsource1.to_json("tmp_100.json")
+    print(lightsource1.info())
+
+    tmp = load_from_json_file("tmp_100.json")
+    print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+
+    print( tmp.get_electron_beam().info() )
+    print( tmp.get_magnetic_structure().info() )
+
+    #
+    # test full beamline
+    #
+
+    SCREEN1     = BeamlineElement(screen1,      coordinates=ElementCoordinates(p=11.0))
+    LENS1       = BeamlineElement(lens1,        coordinates=ElementCoordinates(p=12.0))
+    FILTER1     = BeamlineElement(filter1,      coordinates=ElementCoordinates(p=13.0))
+    SLIT1       = BeamlineElement(slit1,        coordinates=ElementCoordinates(p=15.0))
+    STOPPER1    = BeamlineElement(stopper1,     coordinates=ElementCoordinates(p=16.0))
+    MIRROR1     = BeamlineElement(mirror1,      coordinates=ElementCoordinates(p=17.0))
+    GRATING1    = BeamlineElement(grating1,     coordinates=ElementCoordinates(p=18.0))
+    CRYSTAL1    = BeamlineElement(crystal1,     coordinates=ElementCoordinates(p=19.0))
+
+
+
+
+
+    SCREEN1.to_json("tmp_101.json")
+
+    BL = Beamline(lightsource1,[SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1])
+    print(BL.to_dictionary())
+    BL.to_json("tmp_102.json")
+    # #
+    print(BL.info())
 
 
 
