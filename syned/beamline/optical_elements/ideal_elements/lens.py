@@ -1,24 +1,24 @@
 """
+
 Represents an ideal lens.
+
 """
 from syned.beamline.optical_element import OpticalElement
 
-from collections import OrderedDict
 
 class IdealLens(OpticalElement):
-    def __init__(self, name, focal_x, focal_y):
+    def __init__(self, name="Undefined", focal_y=1.0, focal_x=None, ):
         OpticalElement.__init__(self, name=name)
-        self._focal_x = focal_x
         self._focal_y = focal_y
+        self._focal_x = focal_x
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("focal_y"      , "Focal length in y[vertical]",    "m" ),
+                    ("focal_x"      , "Focal length in x [horizontal]", "m" ),
+            ] )
 
-    def focalX(self):
+    def focal_x(self):
         return self._focal_x
 
-    def focalY(self):
+    def focal_y(self):
         return self._focal_y
-
-    def to_dictionary(self):
-        #returns a dictionary with the variable names as keys, and a tuple with value, unit and doc string
-        mytuple = [ ("focal_x"   ,( self._focal_x ,"m",  "Ideal lens focal length (horizontal)" ) ),
-                    ("focal_y"   ,( self._focal_y ,"m",  "Ideal lens focal length (vertical)"  ) )]
-        return(OrderedDict(mytuple))

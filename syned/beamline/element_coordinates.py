@@ -2,7 +2,9 @@
 Position of a beamline component within a beamline.
 """
 
-class ElementCoordinates(object):
+from syned.syned_object import SynedObject
+
+class ElementCoordinates(SynedObject):
     def __init__(self, p = 0.0, q = 0.0, angle_radial=0.0, angle_azimuthal=0.0):
         """
 
@@ -12,12 +14,18 @@ class ElementCoordinates(object):
         :param angle_azimuthal: Azimuthal inclination angle.
         :return:
         """
-        self._p = p
-        self._q = q
-
-        self._angle_radial = angle_radial
+        self._p               = p
+        self._q               = q
+        self._angle_radial    = angle_radial
         self._angle_azimuthal = angle_azimuthal
 
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("p",                "distane from previous continuation plane", "m"    ),
+                    ("q",                "distance to next continuation plane",      "m"    ),
+                    ("angle_radial",     "incident angle [to normal]",               "rad"  ),
+                    ("angle_azimuthal",  "rotation along beam axis",                 "rad"  ),
+                ])
 
     def p(self):
         return self._p
@@ -25,8 +33,8 @@ class ElementCoordinates(object):
     def q(self):
         return self._q
 
-    def angleRadial(self):
+    def angle_radial(self):
         return self._angle_radial
 
-    def angleAzimuthal(self):
+    def angle_azimuthal(self):
         return self._angle_azimuthal
