@@ -33,14 +33,6 @@ class Beamline(SynedObject):
 
         return dict_to_save
 
-    def to_full_dictionary(self):
-        dict_to_save = OrderedDict()
-        dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
-
-        dict_to_save["light_source"] = self._light_source.to_full_dictionary()
-        dict_to_save["beamline_elements"] = [ el.to_full_dictionary() for el in self._beamline_elements ]
-
-        return dict_to_save
 
 
     def get_light_source(self):

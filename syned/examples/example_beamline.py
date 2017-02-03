@@ -118,16 +118,21 @@ if __name__ == "__main__":
     #
 
     mirror1 = Mirror(name="mirror1")
+
     mirror1.keys()
     print(mirror1.info())
     print(mirror1.to_json())
 
+
     crystal1 = Grating(name="crystal1")
+
     crystal1.keys()
     print(crystal1.info())
     print(crystal1.to_json())
 
+
     grating1 = Grating(name="grating1")
+
     grating1.keys()
     print(grating1.info())
     print(grating1.to_json())
@@ -138,3 +143,5 @@ if __name__ == "__main__":
     beamline1 = Beamline()
     beamline1.set_light_source(src)
     beamline1.append_beamline_element(BeamlineElement(screen1,coordinates=ElementCoordinates(100.0)))
+
+    print(beamline1.info())

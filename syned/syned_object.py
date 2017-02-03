@@ -17,6 +17,7 @@ class SynedObject(object):
     # standard methods are:
     #   keys
     #   to_dictionary
+    #   to_full_dictionary
     #   to_json
     #   info
     #   set_value_from_key_name
@@ -38,7 +39,6 @@ class SynedObject(object):
                     dict_to_save[key] = tmp1.to_dictionary()
                 else:
                     dict_to_save[key] = tmp1
-                    # exec("dict_to_save['%s'] = self._%s" % (key, key))
         except:
             pass
 
@@ -86,6 +86,9 @@ class SynedObject(object):
                 if isinstance(fd[key][0],OrderedDict):
                     for element in fd[key]:
                         text += self.info_recurrent(element,prefix="    ")
+                elif isinstance(fd[key][0],list):
+                    for i,element in enumerate(fd[key][0]):
+                        text += element.info()
                 else:
                     text += prefix + '    %s: %s %s # %s\n' %(key,  repr(fd[key][0]), fd[key][1][1], fd[key][1][0])
             else:
@@ -104,7 +107,7 @@ class SynedObject(object):
             except:
                 raise ValueError("Cannot set variable %s to value: "%key + repr(value) )
         else:
-            print("Key %s not accepted by class %s"%(key,self.__class__.__name__))
+            raise ValueError("Key %s not accepted by class %s"%(key,self.__class__.__name__))
 
 
     def get_value_from_key_name(self,key):
