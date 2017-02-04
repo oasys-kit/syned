@@ -31,27 +31,32 @@ class Conic(SurfaceShape):
     def __init__(self, conic_coefficients=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
         self._conic_coefficients = conic_coefficients
 
-class Plane(Conic):
+class Plane(SurfaceShape):
     def __init__(self):
         super().__init__()
 
-class Sphere(Conic):
+
+class Sphere(SurfaceShape):
     def __init__(self, radius):
-        super().__init__([1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2])
+        super().__init__()
+
+    def to_conic(self):
+        #TODO not correct, it is for centered sphere only
+        return Conic([1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2])
 
     def get_radius(self):
         #TODO: this is not generic
         return numpy.sqrt(-self._conic_coefficients[9])
 
-class Ellipsoid(Conic):
+class Ellipsoid(SurfaceShape):
     def __init__(self):
         super().__init__()
 
-class Paraboloid(Conic):
+class Paraboloid(SurfaceShape):
     def __init__(self):
         super().__init__()
 
-class Hyperboloid(Conic):
+class Hyperboloid(SurfaceShape):
     def __init__(self):
         super().__init__()
 

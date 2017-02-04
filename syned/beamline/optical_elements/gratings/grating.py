@@ -13,5 +13,9 @@ class Grating(OpticalElementsWithSurfaceShape):
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("ruling",            "Ruling at center" ,       "lines/m^3" ),
+                    ("name",                "Name" ,                  "" ),
+                    ("surface_shape",       "Surface Shape" ,         "" ),
+                    ("boundary_shape",      "Boundary Shape" ,        "" ),
+                    ("ruling",              "Ruling at center" ,      "lines/m^3" ),
             ] )
+

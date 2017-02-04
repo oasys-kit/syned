@@ -14,9 +14,10 @@ class Mirror(OpticalElementsWithSurfaceShape):
         self._coating_thickness = coating_thickness
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("surface_shape",       "Surface shape                      ", "" ),
-                    ("boundary_shape",      "Boundary shape                     ", ""    ),
+                    ("name",                "Name" ,                               "" ),
+                    ("surface_shape",       "Surface shape",                       "" ),
+                    ("boundary_shape",      "Boundary shape",                      "" ),
                     ("coating",             "Coating (element, compound or name)", "" ),
-                    ("coating_thickness",   "Coating thickness                  ", "m"    ),
+                    ("coating_thickness",   "Coating thickness",                   "m"),
             ] )
 
