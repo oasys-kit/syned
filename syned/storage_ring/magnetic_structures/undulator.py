@@ -2,7 +2,9 @@
 Implement an undulator with vertical and horizontal magnetic fields.
 """
 import numpy as np
-import scipy.constants.codata
+import scipy.constants.codata as codata
+
+cte = codata.e/(2*np.pi*codata.electron_mass*codata.c)
 
 from syned.storage_ring.magnetic_structures.insertion_device import InsertionDevice
 
@@ -15,6 +17,12 @@ class Undulator(InsertionDevice):
                  number_of_periods = 1):
         InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, number_of_periods)
 
+
+    def B_vertical(self):
+        return self._K_vertical/self._period_length/cte
+
+    def B_horizontal(self):
+        return self._K_horizontal/self._period_length/cte
 
     def resonance_wavelength(self, gamma, theta_x, theta_z):
         wavelength = (self.periodLength() / (2.0*gamma **2)) * \

@@ -108,6 +108,8 @@ class ElectronBeam(SynedObject):
         self._moment_yy = sigma_y**2
         self._moment_ypyp = sigma_yp**2
 
+    def set_energy_from_gamma(self, gamma):
+        self._energy_in_GeV = (gamma / 1e9) * (codata.m_e *  codata.c**2 / codata.e)
 
     #
     # some easy calculations
@@ -120,6 +122,7 @@ class ElectronBeam(SynedObject):
 
     def electron_speed(self):
         return numpy.sqrt(1.0 - 1.0 / self.lorentz_factor() ** 2)
+
 
 
     #
