@@ -2,7 +2,7 @@
 Implement an undulator with vertical and horizontal magnetic fields.
 """
 import numpy as np
-import scipy.constants.codata as codata
+import scipy.constants as codata
 
 cte = codata.e/(2*np.pi*codata.electron_mass*codata.c)
 
