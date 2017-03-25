@@ -9,8 +9,6 @@ from syned.syned_object import SynedObject
 import scipy.constants as codata
 import numpy
 
-
-
 class ElectronBeam(SynedObject):
     def __init__(self,
                  energy_in_GeV = 1.0,

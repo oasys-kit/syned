@@ -19,20 +19,19 @@ class Undulator(InsertionDevice):
 
 
     def B_vertical(self):
-        return self._K_vertical/self._period_length/cte
+        return self.K_vertical()/self.period_length()/cte
 
     def B_horizontal(self):
-        return self._K_horizontal/self._period_length/cte
+        return self.K_horizontal()/self.period_length()/cte
 
     def resonance_wavelength(self, gamma, theta_x, theta_z):
-        wavelength = (self.periodLength() / (2.0*gamma **2)) * \
+        wavelength = (self.period_length() / (2.0*gamma **2)) * \
                      (1 + self.K_vertical()**2 / 2.0 + self.K_horizontal()**2 / 2.0 + \
                       gamma**2 * (theta_x**2 + theta_z ** 2))
 
         return wavelength
 
-    def resonanceFrequency(self, gamma, theta_x, theta_z):
-        codata = scipy.constants.codata.physical_constants
+    def resonance_frequency(self, gamma, theta_x, theta_z):
         codata_c = codata["speed of light in vacuum"][0]
 
         frequency = codata_c / self.resonance_wavelength(gamma, theta_x, theta_z)
@@ -40,13 +39,12 @@ class Undulator(InsertionDevice):
         return frequency
 
     def resonance_energy(self, gamma, theta_x, theta_y, harmonic=1):
-        codata = scipy.constants.codata.physical_constants
-        energy_in_ev = codata["Planck constant"][0] * self.resonanceFrequency(gamma, theta_x, theta_y) / codata["elementary charge"][0]
+        energy_in_ev = codata["Planck constant"][0] * self.resonance_frequency(gamma, theta_x, theta_y) / codata["elementary charge"][0]
 
         return energy_in_ev*harmonic
 
     def gaussianCentralConeDivergence(self, gamma, n=1):
-        return (1/gamma)*np.sqrt((1.0/(2.0*n*self.periodNumber())) * (1.0 + self.K_horizontal()**2/2.0 + self.K_vertical()**2/2.0))
+        return (1/gamma)*np.sqrt((1.0/(2.0*n*self.number_of_periods())) * (1.0 + self.K_horizontal()**2/2.0 + self.K_vertical()**2/2.0))
 
     @classmethod
     def initialize_as_vertical_undulator(cls, K = 0.0, period_length = 0.0, periods_number = 1):
