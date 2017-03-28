@@ -51,15 +51,15 @@ class InsertionDevice(MagneticStructure):
         return self.K_vertical()
 
     def length(self):
-        return self.periodNumber() * self.periodLength()
+        return self.number_of_periods() * self.period_length()
 
     def _magnetic_field_from_K(self, K):
-        return K * 2 * pi * codata.m_e * codata.c / (codata.e * self.periodLength())
+        return K * 2 * pi * codata.m_e * codata.c / (codata.e * self.period_length())
 
     def magnetic_field_vertical(self):
-        return self._magneticFieldStrengthFromK(self.K_vertical())
+        return self._magnetic_field_from_K(self.K_vertical())
 
     def magnetic_field_horizontal(self):
-        return self._magneticFieldStrengthFromK(self.K_horizontal())
+        return self._magnetic_field_from_K(self.K_horizontal())
 
 

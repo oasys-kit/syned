@@ -17,13 +17,6 @@ class Undulator(InsertionDevice):
                  number_of_periods = 1):
         InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, number_of_periods)
 
-
-    def B_vertical(self):
-        return self.K_vertical()/self.period_length()/cte
-
-    def B_horizontal(self):
-        return self.K_horizontal()/self.period_length()/cte
-
     def resonance_wavelength(self, gamma, theta_x, theta_z):
         wavelength = (self.period_length() / (2.0*gamma **2)) * \
                      (1 + self.K_vertical()**2 / 2.0 + self.K_horizontal()**2 / 2.0 + \

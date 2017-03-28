@@ -15,3 +15,5 @@ class Wiggler(InsertionDevice):
                                  K_horizontal=K_horizontal,
                                  period_length=period_length,
                                  number_of_periods=number_of_periods)
+
+
