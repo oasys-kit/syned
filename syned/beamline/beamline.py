@@ -14,7 +14,7 @@ from collections import OrderedDict
 class Beamline(SynedObject):
     def __init__(self, light_source=LightSource(), beamline_elements_list=[]):
         self._light_source = light_source
-        self._beamline_elements = beamline_elements_list
+        self._beamline_elements_list = beamline_elements_list
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
@@ -29,7 +29,7 @@ class Beamline(SynedObject):
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
 
         dict_to_save["light_source"] = self._light_source.to_dictionary()
-        dict_to_save["beamline_elements"] = [ el.to_dictionary() for el in self._beamline_elements ]
+        dict_to_save["beamline_elements"] = [el.to_dictionary() for el in self._beamline_elements_list]
 
         return dict_to_save
 
@@ -39,7 +39,7 @@ class Beamline(SynedObject):
         return self._light_source
 
     def get_beamline_elements(self):
-        return self._beamline_elements
+        return self._beamline_elements_list
 
     def set_light_source(self, light_source=LightSource()):
         if not isinstance(light_source,LightSource):
@@ -51,13 +51,13 @@ class Beamline(SynedObject):
         if not isinstance(beamline_element,BeamlineElement):
             raise Exception("Input class must be of type: "+BeamlineElement.__name__)
         else:
-            self._beamline_elements.append(beamline_element)
+            self._beamline_elements_list.append(beamline_element)
 
     def get_beamline_elements_number(self):
-        return len(self._beamline_elements)
+        return len(self._beamline_elements_list)
 
     def get_beamline_element_at(self, index):
-        if index >= len(self._beamline_elements):
+        if index >= len(self._beamline_elements_list):
             raise IndexError("Index " + str(index) + " out of bounds")
 
-        return self._beamline_elements[index]
+        return self._beamline_elements_list[index]

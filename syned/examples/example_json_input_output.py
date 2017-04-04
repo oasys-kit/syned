@@ -1,7 +1,5 @@
 
-#TODO change directory
-from syned.beamline.json_tools import load_from_json_file
-
+from syned.util.json_tools import load_from_json_file
 
 from syned.storage_ring.electron_beam import ElectronBeam
 from syned.storage_ring.magnetic_structures.undulator import Undulator
