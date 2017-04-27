@@ -17,7 +17,7 @@ class Undulator(InsertionDevice):
                  number_of_periods = 1):
         InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, number_of_periods)
 
-    def resonance_wavelength(self, gamma, theta_x, theta_z):
+    def resonance_wavelength(self, gamma, theta_x=0.0, theta_z=0.0):
         wavelength = (self.period_length() / (2.0*gamma **2)) * \
                      (1 + self.K_vertical()**2 / 2.0 + self.K_horizontal()**2 / 2.0 + \
                       gamma**2 * (theta_x**2 + theta_z ** 2))
@@ -36,7 +36,7 @@ class Undulator(InsertionDevice):
 
         return energy_in_ev*harmonic
 
-    def gaussianCentralConeDivergence(self, gamma, n=1):
+    def gaussian_central_cone_aperture(self, gamma, n=1):
         return (1/gamma)*np.sqrt((1.0/(2.0*n*self.number_of_periods())) * (1.0 + self.K_horizontal()**2/2.0 + self.K_vertical()**2/2.0))
 
     @classmethod

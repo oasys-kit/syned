@@ -14,7 +14,7 @@ class ElectronBeam(SynedObject):
                  energy_in_GeV = 1.0,
                  energy_spread = 0.0,
                  current = 0.1,
-                 electrons_per_bunch = 400,
+                 number_of_bunches = 400,
                  moment_xx=0.0,
                  moment_xxp=0.0,
                  moment_xpxp=0.0,
@@ -26,7 +26,7 @@ class ElectronBeam(SynedObject):
         self._energy_in_GeV       = energy_in_GeV
         self._energy_spread       = energy_spread
         self._current             = current
-        self._electrons_per_bunch = electrons_per_bunch
+        self._number_of_bunches   = number_of_bunches
 
         self._moment_xx           = moment_xx
         self._moment_xxp          = moment_xxp
@@ -40,7 +40,7 @@ class ElectronBeam(SynedObject):
                     ("energy_in_GeV"      , "Electron beam energy"                  , "GeV" ),
                     ("energy_spread"      , "Electron beam energy spread (relative)", ""    ),
                     ("current"            , "Electron beam current"                 , "A"   ),
-                    ("electrons_per_bunch", "Number of electrons per bunch"         , ""    ),
+                    ("number_of_bunches"  , "Number of bunches"                     , ""    ),
                     ("moment_xx"          , "Moment (spatial^2, horizontal)"        , "m^2" ),
                     ("moment_xxp"         , "Moment (spatial-angular, horizontal)"  , "m"   ),
                     ("moment_xpxp"        , "Moment (angular^2, horizontal)"        , ""    ),
@@ -59,7 +59,7 @@ class ElectronBeam(SynedObject):
         return ElectronBeam(energy_in_GeV=energy_in_GeV,
                             energy_spread=energy_spread,
                             current=current,
-                            electrons_per_bunch=1)
+                            number_of_bunches=1)
 
 
     #
@@ -79,7 +79,6 @@ class ElectronBeam(SynedObject):
 
     def get_sigmas_all(self):
         return numpy.sqrt(self._moment_xx),numpy.sqrt(self._moment_xpxp),numpy.sqrt(self._moment_yy),numpy.sqrt(self._moment_ypyp)
-
 
     #
     # setters
