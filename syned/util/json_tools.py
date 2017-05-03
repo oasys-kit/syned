@@ -11,7 +11,10 @@ from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
 
 from syned.beamline.shape import Rectangle
+from syned.beamline.shape import Conic
+from syned.beamline.shape import Plane
 from syned.beamline.shape import SurfaceShape
+from syned.beamline.shape import BoundaryShape
 from syned.storage_ring.light_source import LightSource
 
 from syned.beamline.beamline import Beamline
@@ -20,13 +23,23 @@ from syned.beamline.element_coordinates import ElementCoordinates
 
 from collections import OrderedDict
 
+
 import json
+from urllib.request import urlopen
+
+
 
 def load_from_json_file(file_name):
     f = open(file_name)
     text = f.read()
     f.close()
     return load_from_json_text(text)
+
+def load_from_json_url(file_url):
+    u = urlopen(file_url)
+    ur = u.read()
+    url = ur.decode(encoding='UTF-8')
+    return load_from_json_text(url)
 
 
 def load_from_json_text(text):
@@ -108,3 +121,13 @@ def load_from_json_dictionary_recurrent(jsn,verbose=False):
 #     return tmp1
 #
 #
+
+if __name__ == "__main__":
+    file_in = "/scisoft/xop2.4/extensions/shadowvui/shadow3-scripts/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
+    syned_obj = load_from_json_file(file_in)
+    print(syned_obj.info())
+
+    file_url = "https://raw.githubusercontent.com/srio/shadow3-scripts/master/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
+    syned_obj = load_from_json_url(file_url)
+    print(syned_obj.info())
+
