@@ -24,15 +24,13 @@ class Undulator(InsertionDevice):
 
         return wavelength
 
-    def resonance_frequency(self, gamma, theta_x, theta_z):
-        codata_c = codata["speed of light in vacuum"][0]
-
-        frequency = codata_c / self.resonance_wavelength(gamma, theta_x, theta_z)
+    def resonance_frequency(self, gamma, theta_x=0.0, theta_z=0.0):
+        frequency = codata.c / self.resonance_wavelength(gamma, theta_x, theta_z)
 
         return frequency
 
-    def resonance_energy(self, gamma, theta_x, theta_y, harmonic=1):
-        energy_in_ev = codata["Planck constant"][0] * self.resonance_frequency(gamma, theta_x, theta_y) / codata["elementary charge"][0]
+    def resonance_energy(self, gamma, theta_x=0.0, theta_z=0.0, harmonic=1):
+        energy_in_ev = codata.h * self.resonance_frequency(gamma, theta_x, theta_z) / codata.e
 
         return energy_in_ev*harmonic
 
