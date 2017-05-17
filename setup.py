@@ -6,14 +6,12 @@ import subprocess
 
 try:
     from setuptools import find_packages, setup
-except ImportError:
-    import ez_setup
-    ez_setup.use_setuptools()
+except AttributeError:
     from setuptools import find_packages, setup
 
 NAME = 'syned'
 
-VERSION = '1.0.3'
+VERSION = '1.0.4'
 ISRELEASED = False
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'
