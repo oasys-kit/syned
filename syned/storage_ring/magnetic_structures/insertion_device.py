@@ -11,7 +11,7 @@ from syned.storage_ring.magnetic_structure import MagneticStructure
 
 class InsertionDevice(MagneticStructure):
     def __init__(self,
-                 K_vertical       = 0.0,
+                 K_vertical        = 0.0,
                  K_horizontal      = 0.0,
                  period_length     = 0.0,
                  number_of_periods = 1):
