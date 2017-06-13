@@ -35,34 +35,44 @@ class Plane(SurfaceShape):
     def __init__(self):
         super().__init__()
 
-
-class Sphere(SurfaceShape):
+class Sphere(Conic):
     def __init__(self, radius):
         super().__init__()
 
-    def to_conic(self):
         #TODO not correct, it is for centered sphere only
-        return Conic([1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2])
+        self._conic_coefficients = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -self.radius**2]
 
     def get_radius(self):
         #TODO: this is not generic
         return numpy.sqrt(-self._conic_coefficients[9])
 
 class Ellipsoid(SurfaceShape):
-    def __init__(self):
+    def __init__(self, min_axis=0.0, maj_axis=0.0):
         super().__init__()
+
+        self._min_axis = min_axis
+        self._maj_axis = maj_axis
+
 
 class Paraboloid(SurfaceShape):
-    def __init__(self):
+    def __init__(self, paraboloid_parameter):
         super().__init__()
+
+        self._paraboloid_parameter = paraboloid_parameter
 
 class Hyperboloid(SurfaceShape):
-    def __init__(self):
+    def __init__(self, min_axis=0.0, maj_axis=0.0):
         super().__init__()
 
+        self._min_axis = min_axis
+        self._maj_axis = maj_axis
+
 class Torus(SurfaceShape):
-    def __init__(self):
+    def __init__(self, min_radius=0.0, maj_radius=0.0):
         super().__init__()
+
+        self._min_radius = min_radius
+        self._maj_radius = maj_radius
 
 class NumbericalMesh(SurfaceShape):
     def __init__(self):

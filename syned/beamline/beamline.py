@@ -61,3 +61,11 @@ class Beamline(SynedObject):
             raise IndexError("Index " + str(index) + " out of bounds")
 
         return self._beamline_elements_list[index]
+
+    def duplicate(self):
+        beamline_elements_list = []
+        for beamline_element in self._beamline_elements_list:
+            beamline_elements_list.append(beamline_element)
+
+        return Beamline(light_source=self._light_source,
+                        beamline_elements_list = beamline_elements_list)

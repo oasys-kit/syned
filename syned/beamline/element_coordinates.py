@@ -21,7 +21,7 @@ class ElementCoordinates(SynedObject):
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("p",                "distane from previous continuation plane", "m"    ),
+                    ("p",                "distance from previous continuation plane", "m"    ),
                     ("q",                "distance to next continuation plane",      "m"    ),
                     ("angle_radial",     "incident angle [to normal]",               "rad"  ),
                     ("angle_azimuthal",  "rotation along beam axis",                 "rad"  ),

@@ -13,7 +13,7 @@ class IdealLens(OpticalElement):
         self._focal_x = focal_x
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("focal_y"      , "Focal length in y[vertical]",    "m" ),
+                    ("focal_y"      , "Focal length in y [vertical]",    "m" ),
                     ("focal_x"      , "Focal length in x [horizontal]", "m" ),
             ] )
 
