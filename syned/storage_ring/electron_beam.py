@@ -80,6 +80,14 @@ class ElectronBeam(SynedObject):
     def get_sigmas_all(self):
         return numpy.sqrt(self._moment_xx),numpy.sqrt(self._moment_xpxp),numpy.sqrt(self._moment_yy),numpy.sqrt(self._moment_ypyp)
 
+    def energy(self):
+        return self._energy_in_GeV
+
+    def current(self):
+        return self._current
+
+
+
     #
     # setters
     #
