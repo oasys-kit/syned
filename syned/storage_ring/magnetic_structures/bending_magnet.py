@@ -30,3 +30,17 @@ class BendingMagnet(MagneticStructure):
     #
     def horizontal_divergence(self):
         return self.length()/self.radius()
+
+    def get_magnetic_field(self, electron_energy_in_GeV):
+        return BendingMagnet.calculate_magnetic_field(self._radius, electron_energy_in_GeV)
+
+    def get_magnetic_radius(self, electron_energy_in_GeV):
+        return BendingMagnet.calculate_magnetic_radius(self._magnetic_field, electron_energy_in_GeV)
+
+    @classmethod
+    def calculate_magnetic_field(cls, magnetic_radius, electron_energy_in_GeV):
+        return 3.334728*electron_energy_in_GeV/magnetic_radius
+
+    @classmethod
+    def calculate_magnetic_radius(cls, magnetic_field, electron_energy_in_GeV):
+        return 3.334728*electron_energy_in_GeV/magnetic_field
