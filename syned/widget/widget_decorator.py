@@ -7,5 +7,10 @@ class WidgetDecorator(object):
     def syned_input_data(cls):
         return [("Syned Beamline", Beamline, "receive_syned_data")]
 
+    @classmethod
+    def append_syned_input_data(cls, inputs):
+        for input in WidgetDecorator.syned_input_data():
+            inputs.append(input)
+
     def receive_syned_data(self, data):
         raise NotImplementedError("Should be implemented")
