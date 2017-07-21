@@ -7,7 +7,7 @@ from syned.beamline.optical_element import OpticalElement
 
 
 class IdealLens(OpticalElement):
-    def __init__(self, name="Undefined", focal_x=None, focal_y=1.0, ):
+    def __init__(self, name="Undefined", focal_x=1.0, focal_y=1.0):
         OpticalElement.__init__(self, name=name)
         self._focal_x = focal_x
         self._focal_y = focal_y
