@@ -53,6 +53,29 @@ class Ellipsoid(SurfaceShape):
         self._min_axis = min_axis
         self._maj_axis = maj_axis
 
+    def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
+        self._min_axis, self._maj_axis = Ellipsoid.get_axis_from_p_q(p, q, grazing_angle)
+
+    def get_p_q(self, grazing_angle=0.003):
+        return Ellipsoid.get_p_q_from_axis(self._min_axis, self._maj_axis, grazing_angle)
+
+    @classmethod
+    def get_axis_from_p_q(cls, p=2.0, q=1.0, grazing_angle=0.003):
+        # see calculation of ellipse axis in shadow_kernel.f90 row 3605
+        min_axis = 2*numpy.sqrt(p*q)*numpy.cos((0.5*numpy.pi) - grazing_angle)
+        maj_axis = (p + q)
+
+        return min_axis, maj_axis
+
+    @classmethod
+    def get_p_q_from_axis(cls, min_axis=2.0, maj_axis=1.0, grazing_angle=0.003):
+        a = maj_axis/2
+        b = min_axis/2
+        p = a + numpy.sqrt(a**2 - (b/numpy.sin(grazing_angle))**2)
+        q = maj_axis - p
+
+        return p, q
+
 
 class Paraboloid(SurfaceShape):
     def __init__(self, paraboloid_parameter):
@@ -137,3 +160,17 @@ class Ellipse(BoundaryShape):
 
     def get_boundaries(self):
         return self._min_ax_left, self._min_ax_right, self._maj_ax_bottom, self._maj_ax_top
+
+    def get_axis(self):
+        return numpy.abs(self._min_ax_right-self._min_ax_left), numpy.abs(self._maj_ax_top-self._maj_ax_bottom)
+
+if __name__=="__main__":
+
+    ell = Ellipsoid()
+    ell.initialize_from_p_q(20, 10, 0.2618)
+
+    print (ell._min_axis/2, ell._maj_axis/2)
+
+    ell = Ellipsoid(min_axis=ell._min_axis, maj_axis=ell._maj_axis)
+
+    print(ell.get_p_q(0.2618))
