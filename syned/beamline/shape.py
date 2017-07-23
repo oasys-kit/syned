@@ -21,17 +21,17 @@ class Side:
 #
 class Shape(SynedObject):
     def __init__(self):
-        super().__init__()
+        SynedObject.__init__(self)
 
 class SurfaceShape(Shape):
     def __init__(self, convexity = Convexity.UPWARD):
-        super().__init__()
+        Shape.__init__(self)
 
         self._convexity = convexity
 
 class BoundaryShape(Shape):
     def __init__(self):
-        super().__init__()  
+        Shape.__init__(self)
         
     def get_boundaries(self):
         raise NotImplementedError()
@@ -48,23 +48,24 @@ class Conic(SurfaceShape):
     def __init__(self, 
                  conic_coefficients=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 
                  convexity=Convexity.UPWARD):
-        super(SurfaceShape, self).__init__(convexity)
+        SurfaceShape.__init__(self, convexity)
 
         self._conic_coefficients = conic_coefficients
 
 class Plane(SurfaceShape):
     def __init__(self):
-        super(SurfaceShape, self).__init__(convexity=Convexity.NONE)
+        SurfaceShape.__init__(self, convexity=Convexity.NONE)
 
 class Sphere(Conic):
     def __init__(self, radius=1.0, convexity=Convexity.UPWARD):
-        super(Conic, self).__init__(conic_coefficients=[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2],
-                                    convexity=convexity)
+        Conic.__init__(self,
+                       conic_coefficients=[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2],
+                       convexity=convexity)
     def get_radius(self):
         return numpy.sqrt(-self._conic_coefficients[9])
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
-        self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
+        self._conic_coefficients[9] = -Sphere.get_radius_from_p_q(p, q, grazing_angle)**2
 
     @classmethod
     def get_radius_from_p_q(cls, p=2.0, q=1.0, grazing_angle=0.003):
@@ -76,23 +77,23 @@ class SphericalCylinder(Sphere, Cylinder):
                  radius=1.0, 
                  convexity=Convexity.UPWARD, 
                  cylinder_direction=Direction.TANGENTIAL):
-        super(Sphere, self).__init__(radius, convexity)
-        super(Cylinder, self).__init__(cylinder_direction)
+        Sphere.__init__(self, radius, convexity)
+        Cylinder.__init__(self, cylinder_direction)
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
         if self._cylinder_direction == Direction.TANGENTIAL:
-            self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
+            self._conic_coefficients[9] = -Sphere.get_radius_from_p_q(p, q, grazing_angle)**2
         elif self._cylinder_direction == Direction.SAGITTAL:
-            self._radius = SphericalCylinder.get_radius_from_p_q_sagittal(p, q, grazing_angle)
+            self._conic_coefficients[9] = -SphericalCylinder.get_radius_from_p_q_sagittal(p, q, grazing_angle)**2
 
     @classmethod
-    def get_radius_from_p_q_sagittal(p=2.0, q=1.0, grazing_angle=0.003):
+    def get_radius_from_p_q_sagittal(cls, p=2.0, q=1.0, grazing_angle=0.003):
         # 1/p + 1/q = 2 cos(pi/2 - gr.a.)/r
         return (2*p*q/(p+q))*numpy.sin(grazing_angle)
 
 class Ellipsoid(SurfaceShape):
     def __init__(self, min_axis=0.0, maj_axis=0.0, convexity=Convexity.UPWARD):
-        super(SurfaceShape, self).__init__(convexity)
+        SurfaceShape.__init__(self, convexity)
 
         self._min_axis = min_axis
         self._maj_axis = maj_axis
@@ -126,8 +127,8 @@ class EllipticalCylinder(Ellipsoid, Cylinder):
                  maj_axis=0.0, 
                  convexity=Convexity.UPWARD, 
                  cylinder_direction=Direction.TANGENTIAL):
-        super(Ellipsoid, self).__init__(min_axis, maj_axis, convexity)
-        super(Cylinder, self).__init__(cylinder_direction)
+        Ellipsoid.__init__(self, min_axis, maj_axis, convexity)
+        Cylinder.__init__(self, cylinder_direction)
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
         if self._cylinder_direction == Direction.SAGITTAL:
@@ -145,7 +146,7 @@ class Paraboloid(SurfaceShape):
     def __init__(self, 
                  parabola_parameter=0.0, 
                  convexity=Convexity.UPWARD):
-        super(SurfaceShape, self).__init__(convexity)
+        SurfaceShape.__init__(self, convexity)
 
         self._parabola_parameter = parabola_parameter
 
@@ -165,8 +166,8 @@ class ParabolicCylinder(Paraboloid, Cylinder):
                  parabola_parameter=0.0, 
                  convexity=Convexity.UPWARD, 
                  cylinder_direction=Direction.TANGENTIAL):
-        super(Paraboloid, self).__init__(parabola_parameter, convexity)
-        super(Cylinder, self).__init__(cylinder_direction)
+        Paraboloid.__init__(self, parabola_parameter, convexity)
+        Cylinder.__init__(self, cylinder_direction)
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003, at_infinity=Side.SOURCE):
         if self._cylinder_direction == Direction.SAGITTAL:
@@ -176,7 +177,7 @@ class ParabolicCylinder(Paraboloid, Cylinder):
 
 class Hyperboloid(SurfaceShape):
     def __init__(self, min_axis=0.0, maj_axis=0.0, convexity=Convexity.UPWARD):
-        super(SurfaceShape, self).__init__(convexity)
+        SurfaceShape.__init__(self, convexity)
 
         self._min_axis = min_axis
         self._maj_axis = maj_axis
@@ -193,12 +194,12 @@ class HyperbolicCylinder(Hyperboloid, Cylinder):
                  maj_axis=0.0, 
                  convexity=Convexity.UPWARD, 
                  cylinder_direction=Direction.TANGENTIAL):
-        super(Hyperboloid, self).__init__(min_axis, maj_axis, convexity)
-        super(Cylinder, self).__init__(cylinder_direction)
+        Hyperboloid.__init__(self, min_axis, maj_axis, convexity)
+        Cylinder.__init__(self, cylinder_direction)
 
 class Torus(SurfaceShape):
     def __init__(self, min_radius=0.0, maj_radius=0.0):
-        super(SurfaceShape, self).__init__(convexity=Convexity.NONE)
+        SurfaceShape.__init__(self, convexity=Convexity.NONE)
         
         self._min_radius = min_radius
         self._maj_radius = maj_radius
@@ -217,7 +218,7 @@ class Torus(SurfaceShape):
 
 class NumbericalMesh(SurfaceShape):
     def __init__(self):
-        super(SurfaceShape, self).__init__(convexity=Convexity.NONE)
+        SurfaceShape.__init__(self, convexity=Convexity.NONE)
 
 
 #
@@ -256,8 +257,6 @@ class Rectangle(BoundaryShape):
         self._x_right = 0.5 * width
         self._y_bottom = -0.5 * length
         self._y_top = 0.5 * length
-
-
 
 class Ellipse(BoundaryShape):
     def __init__(self, min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top):
