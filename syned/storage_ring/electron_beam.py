@@ -66,27 +66,32 @@ class ElectronBeam(SynedObject):
     # useful getters
     #
     def get_sigmas_real_space(self):
-        return numpy.sqrt(self._moment_xx),numpy.sqrt(self._moment_yy)
+        return numpy.sqrt(self._moment_xx),\
+               numpy.sqrt(self._moment_yy)
 
     def get_sigmas_divergence_space(self):
-        return numpy.sqrt(self._moment_xpxp),numpy.sqrt(self._moment_ypyp)
+        return numpy.sqrt(self._moment_xpxp),\
+               numpy.sqrt(self._moment_ypyp)
 
     def get_sigmas_horizontal(self):
-        return numpy.sqrt(self._moment_xx),numpy.sqrt(self._moment_xpxp)
+        return numpy.sqrt(self._moment_xx),\
+               numpy.sqrt(self._moment_xpxp)
 
     def get_sigmas_vertical(self):
-        return numpy.sqrt(self._moment_yy),numpy.sqrt(self._moment_ypyp)
+        return numpy.sqrt(self._moment_yy),\
+               numpy.sqrt(self._moment_ypyp)
 
     def get_sigmas_all(self):
-        return numpy.sqrt(self._moment_xx),numpy.sqrt(self._moment_xpxp),numpy.sqrt(self._moment_yy),numpy.sqrt(self._moment_ypyp)
+        return numpy.sqrt(self._moment_xx),\
+               numpy.sqrt(self._moment_xpxp),\
+               numpy.sqrt(self._moment_yy),\
+               numpy.sqrt(self._moment_ypyp)
 
     def energy(self):
         return self._energy_in_GeV
 
     def current(self):
         return self._current
-
-
 
     #
     # setters
