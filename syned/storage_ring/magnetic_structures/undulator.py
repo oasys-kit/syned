@@ -46,7 +46,9 @@ class Undulator(InsertionDevice):
 
 if __name__ == "__main__":
 
-    a = Undulator()
+    a = Undulator(K_vertical=0.187782, number_of_periods=61.5, period_length=0.057)
+
+    print (a.resonance_energy(gamma=5870.8540997356595))
 
     fd = a.to_full_dictionary()
     dict = a.to_dictionary()
