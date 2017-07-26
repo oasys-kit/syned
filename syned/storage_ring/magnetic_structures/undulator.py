@@ -46,7 +46,10 @@ class Undulator(InsertionDevice):
 
 if __name__ == "__main__":
 
-    a = Undulator(K_vertical=0.187782, number_of_periods=61.5, period_length=0.057)
+    a = Undulator(number_of_periods=61.5, period_length=0.057)
+    a.set_K_vertical_from_magnetic_field(0.187782)
+
+    print(a._K_vertical)
 
     print (a.resonance_energy(gamma=5870.8540997356595))
 
