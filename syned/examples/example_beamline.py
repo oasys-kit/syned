@@ -2,7 +2,7 @@
 from syned.storage_ring.electron_beam import ElectronBeam
 from syned.storage_ring.magnetic_structures.undulator import Undulator
 from syned.storage_ring.light_source import LightSource
-
+from syned.beamline.shape import *
 
 from syned.beamline.optical_elements.ideal_elements.screen import Screen
 from syned.beamline.optical_elements.ideal_elements.lens import IdealLens
@@ -85,7 +85,6 @@ if __name__ == "__main__":
     # print(filter1._support_dictionary)
 
     #slit1 = Slit.initialize_as_rectangle("slit1",2e-3,4e-3)
-    from syned.beamline.shape import Rectangle
     slit1 = Slit(name="slit1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
 
     slit1.keys()
@@ -145,3 +144,24 @@ if __name__ == "__main__":
     beamline1.append_beamline_element(BeamlineElement(screen1,coordinates=ElementCoordinates(100.0)))
 
     print(beamline1.info())
+
+    beamline = Beamline()
+
+    mirror = Mirror(name="mirror1",
+                    boundary_shape=Rectangle(x_left=-0.1,
+                                             x_right=0.1,
+                                             y_bottom=-0.6,
+                                             y_top=0.6),
+                    surface_shape=SphericalCylinder(radius=2500.0,
+                                                    convexity=Convexity.UPWARD,
+                                                    cylinder_direction=Direction.TANGENTIAL),
+                    coating="Pt",
+                    coating_thickness=1e-4)
+
+    mirror_coordinates = ElementCoordinates(p=2.5,
+                                            q=10.0,
+                                            angle_radial=89.828,
+                                            angle_azimuthal=180.0)
+
+    beamline.append_beamline_element(beamline_element=BeamlineElement(optical_element=mirror,
+                                                                      coordinates=mirror_coordinates))

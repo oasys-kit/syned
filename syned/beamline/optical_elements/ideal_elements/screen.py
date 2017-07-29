@@ -1,8 +1,8 @@
 """
 Represents an ideal lens.
 """
-from syned.beamline.optical_element import OpticalElement
+from syned.beamline.optical_elements.ideal_elements.ideal_element import IdealElement
 
-class Screen(OpticalElement):
+class Screen(IdealElement):
     def __init__(self, name="Undefined"):
-        OpticalElement.__init__(self, name=name)
+        IdealElement.__init__(self, name=name)

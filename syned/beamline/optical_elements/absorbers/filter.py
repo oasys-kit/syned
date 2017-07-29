@@ -1,12 +1,12 @@
 
-from syned.beamline.optical_element import OpticalElement
+from syned.beamline.optical_elements.absorbers.absorber import Absorber
 
-class Filter(OpticalElement):
+class Filter(Absorber):
     def __init__(self,
                  name="Undefined",
                  material="Be",
                  thickness=1e-3):
-        OpticalElement.__init__(self, name=name)
+        Absorber.__init__(self, name=name)
         self._material = material
         self._thickness = thickness
 
