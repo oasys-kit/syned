@@ -197,7 +197,7 @@ class HyperbolicCylinder(Hyperboloid, Cylinder):
         Hyperboloid.__init__(self, min_axis, maj_axis, convexity)
         Cylinder.__init__(self, cylinder_direction)
 
-class Torus(SurfaceShape):
+class Toroidal(SurfaceShape):
     def __init__(self, min_radius=0.0, maj_radius=0.0):
         SurfaceShape.__init__(self, convexity=Convexity.NONE)
         
