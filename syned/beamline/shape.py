@@ -280,13 +280,47 @@ class Ellipse(BoundaryShape):
     def get_axis(self):
         return numpy.abs(self._min_ax_right-self._min_ax_left), numpy.abs(self._maj_ax_top-self._maj_ax_bottom)
 
+class Circle(BoundaryShape):
+    def __init__(self, radius, x_center=0.0, y_center=0.0):
+        super().__init__()
+
+        self._radius = radius
+        self._x_center = x_center
+        self._y_center = y_center
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("radius        "      , "radius  ", "m" ),
+                    ("x_center      "      , "x center (signed)    ", "m" ),
+                    ("y_center      "      , "y center (signed)    ", "m" ),
+            ] )
+
+    def get_boundaries(self):
+        return self._radius, self._x_center, self._y_center
+
+    def set_boundaries(self, radius=1.0, x_center=0.0, y_center=0.0):
+        self._radius = radius
+        self._x_center = x_center
+        self._y_center = y_center
+
+    def get_radius(self):
+        return self._radius
+
+    def get_center(self):
+        return [self._x_center,self._y_center]
+
 if __name__=="__main__":
 
-    ell = Ellipsoid()
-    ell.initialize_from_p_q(20, 10, 0.2618)
+    # ell = Ellipsoid()
+    # ell.initialize_from_p_q(20, 10, 0.2618)
+    #
+    # print (ell._min_axis/2, ell._maj_axis/2)
+    #
+    # ell = Ellipsoid(min_axis=ell._min_axis, maj_axis=ell._maj_axis)
+    #
+    # print(ell.get_p_q(0.2618))
 
-    print (ell._min_axis/2, ell._maj_axis/2)
 
-    ell = Ellipsoid(min_axis=ell._min_axis, maj_axis=ell._maj_axis)
+    circle = Circle(3.0)
 
-    print(ell.get_p_q(0.2618))
+    print(circle.get_radius(),circle.get_center())
+    print(circle.get_boundaries())
