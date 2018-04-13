@@ -56,16 +56,16 @@ class Plane(SurfaceShape):
     def __init__(self):
         SurfaceShape.__init__(self, convexity=Convexity.NONE)
 
-class Sphere(Conic):
+class Sphere(SurfaceShape):
     def __init__(self, radius=1.0, convexity=Convexity.UPWARD):
-        Conic.__init__(self,
-                       conic_coefficients=[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -radius**2],
-                       convexity=convexity)
+        SurfaceShape.__init__(self, convexity=Convexity.NONE)
+        self._radius = radius
+
     def get_radius(self):
-        return numpy.sqrt(-self._conic_coefficients[9])
+        return self._radius
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
-        self._conic_coefficients[9] = -Sphere.get_radius_from_p_q(p, q, grazing_angle)**2
+        self.self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
 
     @classmethod
     def get_radius_from_p_q(cls, p=2.0, q=1.0, grazing_angle=0.003):
