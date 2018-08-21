@@ -17,17 +17,17 @@ class Undulator(InsertionDevice):
                  number_of_periods = 1):
         InsertionDevice.__init__(self, K_vertical, K_horizontal, period_length, number_of_periods)
 
-    def resonance_wavelength(self, gamma, theta_x=0.0, theta_z=0.0):
+    def resonance_wavelength(self, gamma, theta_x=0.0, theta_z=0.0, harmonic=1):
         wavelength = (self.period_length() / (2.0*gamma **2)) * \
                      (1 + self.K_vertical()**2 / 2.0 + self.K_horizontal()**2 / 2.0 + \
                       gamma**2 * (theta_x**2 + theta_z ** 2))
 
-        return wavelength
+        return wavelength/harmonic
 
-    def resonance_frequency(self, gamma, theta_x=0.0, theta_z=0.0):
+    def resonance_frequency(self, gamma, theta_x=0.0, theta_z=0.0, harmonic=1):
         frequency = codata.c / self.resonance_wavelength(gamma, theta_x, theta_z)
 
-        return frequency
+        return frequency*harmonic
 
     def resonance_energy(self, gamma, theta_x=0.0, theta_z=0.0, harmonic=1):
         energy_in_ev = codata.h * self.resonance_frequency(gamma, theta_x, theta_z) / codata.e

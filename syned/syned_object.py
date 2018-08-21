@@ -95,6 +95,7 @@ class SynedObject(object):
                 pass
         return text
 
+    # TODO: not working correctly for beamline
     def info(self):
         return self.info_recurrent( self.to_full_dictionary() )
 

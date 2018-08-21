@@ -165,3 +165,6 @@ if __name__ == "__main__":
 
     beamline.append_beamline_element(beamline_element=BeamlineElement(optical_element=mirror,
                                                                       coordinates=mirror_coordinates))
+
+    print(beamline.to_dictionary())
+    print(beamline.to_full_dictionary())

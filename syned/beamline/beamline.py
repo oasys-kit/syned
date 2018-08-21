@@ -7,6 +7,7 @@ We can iterate of the components, find their positions or look for a specific co
 
 from syned.syned_object import SynedObject
 from syned.storage_ring.light_source import LightSource
+from syned.storage_ring.empty_light_source import EmptyLightSource
 from syned.beamline.beamline_element import BeamlineElement
 
 from collections import OrderedDict
@@ -19,7 +20,7 @@ class Beamline(SynedObject):
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
                     ("light_source",       "Light Source",      ""),
-                    ("beamline_elements",  "Beamline Elements", ""),
+                    ("beamline_elements_list",  "Beamline Elements", ""),
             ] )
 
 
@@ -29,7 +30,7 @@ class Beamline(SynedObject):
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
 
         dict_to_save["light_source"] = self._light_source.to_dictionary()
-        dict_to_save["beamline_elements"] = [el.to_dictionary() for el in self._beamline_elements_list]
+        dict_to_save["beamline_elements_list"] = [el.to_dictionary() for el in self._beamline_elements_list]
 
         return dict_to_save
 
@@ -42,8 +43,8 @@ class Beamline(SynedObject):
         return self._beamline_elements_list
 
     def set_light_source(self, light_source=LightSource()):
-        if not isinstance(light_source,LightSource):
-            raise Exception("Input class must be of type: "+LightSource.__name__)
+        if not (isinstance(light_source,LightSource) or isinstance(light_source,EmptyLightSource)):
+            raise Exception("Input class must be of type: "+LightSource.__name__+" or "+EmptyLightSource.__name__)
         else:
             self._light_source = light_source
 

@@ -1,6 +1,7 @@
 
 from syned.storage_ring.electron_beam import ElectronBeam
 from syned.storage_ring.magnetic_structures.undulator import Undulator
+from syned.storage_ring.magnetic_structure import MagneticStructure
 from syned.beamline.optical_elements.ideal_elements.screen import Screen
 from syned.beamline.optical_elements.ideal_elements.lens import IdealLens
 from syned.beamline.optical_elements.absorbers.filter import Filter
@@ -16,6 +17,7 @@ from syned.beamline.shape import Plane
 from syned.beamline.shape import SurfaceShape
 from syned.beamline.shape import BoundaryShape
 from syned.storage_ring.light_source import LightSource
+from syned.storage_ring.empty_light_source import EmptyLightSource
 
 from syned.beamline.beamline import Beamline
 from syned.beamline.beamline_element import BeamlineElement
@@ -23,9 +25,24 @@ from syned.beamline.element_coordinates import ElementCoordinates
 
 from collections import OrderedDict
 
-
 import json
 from urllib.request import urlopen
+
+#
+# this allows to load wofry-elements (e.g. WOSlit) in addition to syned elements (Slit)
+#
+try:
+    from wofry.beamline.optical_elements.ideal_elements.screen import WOScreen
+    from wofry.beamline.optical_elements.ideal_elements.lens import WOIdealLens
+    # from wofry.beamline.optical_elements.absorbers.filter import WOFilter
+    from wofry.beamline.optical_elements.absorbers.slit import WOSlit
+    from wofry.beamline.optical_elements.absorbers.beam_stopper import WOBeamStopper
+    # from wofry.beamline.optical_elements.mirrors.mirror import WOMirror
+    # from wofry.beamline.optical_elements.crystals.crystal import WOCrystal
+    # from wofry.beamline.optical_elements.gratings.grating import WOGrating
+except:
+    pass
+
 
 
 
@@ -123,11 +140,11 @@ def load_from_json_dictionary_recurrent(jsn,verbose=False):
 #
 
 if __name__ == "__main__":
-    file_in = "/scisoft/xop2.4/extensions/shadowvui/shadow3-scripts/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
-    syned_obj = load_from_json_file(file_in)
-    print(syned_obj.info())
+    # file_in = "/scisoft/xop2.4/extensions/shadowvui/shadow3-scripts/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
+    # syned_obj = load_from_json_file(file_in)
+    # print(syned_obj.info())
 
-    file_url = "https://raw.githubusercontent.com/srio/shadow3-scripts/master/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
+    file_url = "http://ftp.esrf.eu/pub/scisoft/syned/lightsources/ESRF_ID01_EBS_ppu27_11.json"
     syned_obj = load_from_json_url(file_url)
     print(syned_obj.info())
 
