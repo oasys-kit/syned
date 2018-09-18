@@ -237,10 +237,10 @@ class Rectangle(BoundaryShape):
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("x_left    "      , "x (width) minimum (signed)   ", "m" ),
-                    ("x_right   "      , "x (width) maximum (signed)   ", "m" ),
-                    ("y_bottom  "      , "y (length) minimum (signed)  ", "m" ),
-                    ("y_top     "      , "y (length) maximum (signed)  ", "m" ),
+                    ("x_left"          , "x (width) minimum (signed)   ", "m" ),
+                    ("x_right"         , "x (width) maximum (signed)   ", "m" ),
+                    ("y_bottom"        , "y (length) minimum (signed)  ", "m" ),
+                    ("y_top"           , "y (length) maximum (signed)  ", "m" ),
             ] )
 
     def get_boundaries(self):
@@ -268,10 +268,10 @@ class Ellipse(BoundaryShape):
         self._maj_ax_top    = maj_ax_top
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("min_ax_left   "      , "x (width) semiaxis starts (signed)  ", "m" ),
-                    ("min_ax_right  "      , "x (width) semiaxis ends (signed)    ", "m" ),
-                    ("maj_ax_bottom "      , "y (length) semiaxis starts (signed) ", "m" ),
-                    ("maj_ax_top    "      , "y (length) semiaxis ends (signed)   ", "m" ),
+                    ("min_ax_left"         , "x (width) semiaxis starts (signed)  ", "m" ),
+                    ("min_ax_right"        , "x (width) semiaxis ends (signed)    ", "m" ),
+                    ("maj_ax_bottom"       , "y (length) semiaxis starts (signed) ", "m" ),
+                    ("maj_ax_top"          , "y (length) semiaxis ends (signed)   ", "m" ),
             ] )
 
     def get_boundaries(self):
@@ -289,9 +289,9 @@ class Circle(BoundaryShape):
         self._y_center = y_center
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("radius        "      , "radius  ", "m" ),
-                    ("x_center      "      , "x center (signed)    ", "m" ),
-                    ("y_center      "      , "y center (signed)    ", "m" ),
+                    ("radius"              , "radius  ", "m" ),
+                    ("x_center"            , "x center (signed)    ", "m" ),
+                    ("y_center"            , "y center (signed)    ", "m" ),
             ] )
 
     def get_boundaries(self):
