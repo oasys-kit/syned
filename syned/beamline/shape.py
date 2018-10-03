@@ -263,23 +263,23 @@ class Ellipse(BoundaryShape):
     def __init__(self, a_axis_min=-10e-6, a_axis_max=10e-6, b_axis_min=-5e-6, b_axis_max=5e-6):
         super().__init__()
 
-        self._min_ax_left   = a_axis_min
-        self._min_ax_right  = a_axis_max
-        self._maj_ax_bottom = b_axis_min
-        self._maj_ax_top    = b_axis_max
+        self._a_axis_min   = a_axis_min
+        self._a_axis_max  = a_axis_max
+        self._b_axis_min = b_axis_min
+        self._b_axis_max    = b_axis_max
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("min_ax_left"         , "x (width) axis starts (signed)  ", "m" ),
-                    ("min_ax_right"        , "x (width) axis ends (signed)    ", "m" ),
-                    ("maj_ax_bottom"       , "y (length) axis starts (signed) ", "m" ),
-                    ("maj_ax_top"          , "y (length) axis ends (signed)   ", "m" ),
+                    ("a_axis_min"         , "x (width) axis starts (signed)  ", "m" ),
+                    ("a_axis_max"        , "x (width) axis ends (signed)    ", "m" ),
+                    ("b_axis_min"       , "y (length) axis starts (signed) ", "m" ),
+                    ("b_axis_max"          , "y (length) axis ends (signed)   ", "m" ),
             ] )
 
     def get_boundaries(self):
-        return self._min_ax_left, self._min_ax_right, self._maj_ax_bottom, self._maj_ax_top
+        return self._a_axis_min, self._a_axis_max, self._b_axis_min, self._b_axis_max
 
     def get_axis(self):
-        return numpy.abs(self._min_ax_right-self._min_ax_left), numpy.abs(self._maj_ax_top-self._maj_ax_bottom)
+        return numpy.abs(self._a_axis_max - self._a_axis_min), numpy.abs(self._b_axis_max - self._b_axis_min)
 
 class Circle(BoundaryShape):
     def __init__(self,radius=50e-6,x_center=0.0,y_center=0.0):
@@ -351,8 +351,8 @@ class MultiplePatch(BoundaryShape):
     def append_circle(self,radius, x_center=0.0, y_center=0.0):
         self.append_patch(Circle(radius, x_center=x_center, y_center=y_center))
 
-    def append_ellipse(self,min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top):
-        self.append_patch(Ellipse(min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top))
+    def append_ellipse(self,a_axis_min, a_axis_max, b_axis_min, b_axis_max):
+        self.append_patch(Ellipse(a_axis_min, a_axis_max, b_axis_min, b_axis_max))
 
     def get_patches(self):
         return self._patch_list
