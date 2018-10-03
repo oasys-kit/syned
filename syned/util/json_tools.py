@@ -11,11 +11,14 @@ from syned.beamline.optical_elements.mirrors.mirror import Mirror
 from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
 
-from syned.beamline.shape import Rectangle
-from syned.beamline.shape import Conic
-from syned.beamline.shape import Plane
-from syned.beamline.shape import SurfaceShape
 from syned.beamline.shape import BoundaryShape
+from syned.beamline.shape import Rectangle, Circle, Ellipse
+from syned.beamline.shape import MultiplePatch
+
+from syned.beamline.shape import SurfaceShape
+from syned.beamline.shape import Conic, Sphere, SphericalCylinder, Toroidal
+from syned.beamline.shape import Plane
+
 from syned.storage_ring.light_source import LightSource
 from syned.storage_ring.empty_light_source import EmptyLightSource
 

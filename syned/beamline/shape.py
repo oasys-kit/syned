@@ -1,6 +1,7 @@
 
 import numpy
 from syned.syned_object import SynedObject
+from collections import OrderedDict
 
 class Convexity:
     NONE = -1
@@ -259,19 +260,19 @@ class Rectangle(BoundaryShape):
         self._y_top = 0.5 * length
 
 class Ellipse(BoundaryShape):
-    def __init__(self, min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top):
+    def __init__(self, a_axis_min=-10e-6, a_axis_max=10e-6, b_axis_min=-5e-6, b_axis_max=5e-6):
         super().__init__()
 
-        self._min_ax_left   = min_ax_left
-        self._min_ax_right  = min_ax_right
-        self._maj_ax_bottom = maj_ax_bottom
-        self._maj_ax_top    = maj_ax_top
+        self._min_ax_left   = a_axis_min
+        self._min_ax_right  = a_axis_max
+        self._maj_ax_bottom = b_axis_min
+        self._maj_ax_top    = b_axis_max
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("min_ax_left"         , "x (width) semiaxis starts (signed)  ", "m" ),
-                    ("min_ax_right"        , "x (width) semiaxis ends (signed)    ", "m" ),
-                    ("maj_ax_bottom"       , "y (length) semiaxis starts (signed) ", "m" ),
-                    ("maj_ax_top"          , "y (length) semiaxis ends (signed)   ", "m" ),
+                    ("min_ax_left"         , "x (width) axis starts (signed)  ", "m" ),
+                    ("min_ax_right"        , "x (width) axis ends (signed)    ", "m" ),
+                    ("maj_ax_bottom"       , "y (length) axis starts (signed) ", "m" ),
+                    ("maj_ax_top"          , "y (length) axis ends (signed)   ", "m" ),
             ] )
 
     def get_boundaries(self):
@@ -281,7 +282,7 @@ class Ellipse(BoundaryShape):
         return numpy.abs(self._min_ax_right-self._min_ax_left), numpy.abs(self._maj_ax_top-self._maj_ax_bottom)
 
 class Circle(BoundaryShape):
-    def __init__(self, radius, x_center=0.0, y_center=0.0):
+    def __init__(self,radius=50e-6,x_center=0.0,y_center=0.0):
         super().__init__()
 
         self._radius = radius
@@ -308,6 +309,101 @@ class Circle(BoundaryShape):
     def get_center(self):
         return [self._x_center,self._y_center]
 
+
+class MultiplePatch(BoundaryShape):
+    def __init__(self, patch_list=[]):
+        super().__init__()
+
+        self._patch_list = patch_list
+        self._set_support_text([
+                    ("multiple_patch_list",  "Multiple Patch", ""),
+            ])
+
+
+    # overwrites the SynedObject method for dealing with list
+    def to_dictionary(self):
+        dict_to_save = OrderedDict()
+        dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
+
+        dict_to_save["multiple_patch_list"] = [el.to_dictionary() for el in self._patch_list]
+
+        return dict_to_save
+
+
+    def reset(self):
+        self._patch_list = []
+
+    def get_number_of_patches(self):
+        return len(self._patch_list)
+
+    def get_boundaries(self):
+        boundaries_list = []
+        for i in range(self.get_number_of_patches()):
+            boundaries_list.extend(list(self._patch_list[i].get_boundaries()))
+        return tuple(boundaries_list)
+
+    def append_patch(self,patch=BoundaryShape()):
+        self._patch_list.append(patch)
+
+    def append_rectangle(self,x_left=-0.010,x_right=0.010,y_bottom=-0.020,y_top=0.020):
+        self.append_patch(Rectangle(x_left=x_left, x_right=x_right, y_bottom=y_bottom, y_top=y_top))
+
+    def append_circle(self,radius, x_center=0.0, y_center=0.0):
+        self.append_patch(Circle(radius, x_center=x_center, y_center=y_center))
+
+    def append_ellipse(self,min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top):
+        self.append_patch(Ellipse(min_ax_left, min_ax_right, maj_ax_bottom, maj_ax_top))
+
+    def get_patches(self):
+        return self._patch_list
+
+    def get_patch(self,index):
+        return self.get_patches()[index]
+
+    def get_name_of_patch(self,index):
+        return self._patch_list[index].__class__.__name__
+
+class DoubleRectangle(MultiplePatch):
+    def __init__(self, x_left1=-0.010, x_right1=0.0, y_bottom1=-0.020, y_top1=0.0,
+                        x_left2=-0.010, x_right2=0.010, y_bottom2=-0.001, y_top2=0.020):
+        super().__init__()
+        self.reset()
+        self.append_patch(Rectangle(x_left=x_left1, x_right=x_right1, y_bottom=y_bottom1, y_top=y_top1))
+        self.append_patch(Rectangle(x_left=x_left2, x_right=x_right2, y_bottom=y_bottom2, y_top=y_top2))
+
+    def set_boundaries(self,x_left1=-0.010, x_right1=0.0, y_bottom1=-0.020, y_top1=0.0,
+                        x_left2=-0.010, x_right2=0.010, y_bottom2=-0.001, y_top2=0.020):
+        self._patch_list[0].set_boundaries(x_left1, x_right1, y_bottom1, y_top1)
+        self._patch_list[1].set_boundaries(x_left2, x_right2, y_bottom2, y_top2)
+
+class DoubleEllipse(MultiplePatch):
+    def __init__(self, a_axis_min1=-0.010, a_axis_max1=0.0,   b_axis_min1=-0.020, b_axis_max1=0.0,
+                       a_axis_min2=-0.010, a_axis_max2=0.010, b_axis_min2=-0.001, b_axis_max2=0.020):
+        super().__init__()
+        self.reset()
+        self.append_patch(Ellipse(a_axis_min1, a_axis_max1, b_axis_min1, b_axis_max1))
+        self.append_patch(Ellipse(a_axis_min2, a_axis_max2, b_axis_min2, b_axis_max2))
+
+    def set_boundaries(self,a_axis_min1=-0.010, a_axis_max1=0.0,   b_axis_min1=-0.020, b_axis_max1=0.0,
+                            a_axis_min2=-0.010, a_axis_max2=0.010, b_axis_min2=-0.001, b_axis_max2=0.020):
+        self._patch_list[0].set_boundaries(a_axis_min1,a_axis_max1,b_axis_min1,b_axis_max1)
+        self._patch_list[1].set_boundaries(a_axis_min2,a_axis_max2,b_axis_min2,b_axis_max2)
+
+class DoubleCircle(MultiplePatch):
+    def __init__(self, radius1=50e-6,x_center1=0.0,y_center1=0.0,
+                       radius2=50e-6,x_center2=100e-6,y_center2=100e-6):
+        super().__init__()
+        self.reset()
+        self.append_patch(Circle(radius1,x_center1,y_center1))
+        self.append_patch(Circle(radius2,x_center2,y_center2))
+
+    def set_boundaries(self,radius1=50e-6,x_center1=0.0,y_center1=0.0,
+                            radius2=50e-6,x_center2=100e-6,y_center2=100e-6):
+        self._patch_list[0].set_boundaries(radius1,x_center1,y_center1)
+        self._patch_list[1].set_boundaries(radius2,x_center2,y_center2)
+
+
+
 if __name__=="__main__":
 
     # ell = Ellipsoid()
@@ -320,7 +416,30 @@ if __name__=="__main__":
     # print(ell.get_p_q(0.2618))
 
 
-    circle = Circle(3.0)
+    # circle = Circle(3.0)
+    #
+    # print(circle.get_radius(),circle.get_center())
+    # print(circle.get_boundaries())
 
-    print(circle.get_radius(),circle.get_center())
-    print(circle.get_boundaries())
+
+
+
+    # patches = MultiplePatch()
+    #
+    # patches.append_rectangle(-0.02,-0.01,-0.001,0.001)
+    # patches.append_rectangle(0.01,0.02,-0.001,0.001)
+    #
+    # print(patches.get_number_of_patches(),patches.get_boundaries())
+    #
+    # for patch in patches.get_patches():
+    #     print(patch.info())
+    #
+    # print("Patch 0 is: ",patches.get_name_of_patch(0))
+    # print("Patch 1 is: ",patches.get_name_of_patch(1))
+    # print(patches.get_boundaries())
+
+    double_rectangle = DoubleRectangle()
+    double_rectangle.set_boundaries(-0.02,-0.01,-0.001,0.001,0.01,0.02,-0.001,0.001)
+    print("Rectangle 0 is: ",double_rectangle.get_name_of_patch(0))
+    print("Rectangle 1 is: ",double_rectangle.get_name_of_patch(1))
+    print(double_rectangle.get_boundaries())
