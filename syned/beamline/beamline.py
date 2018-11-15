@@ -13,9 +13,12 @@ from syned.beamline.beamline_element import BeamlineElement
 from collections import OrderedDict
 
 class Beamline(SynedObject):
-    def __init__(self, light_source=LightSource(), beamline_elements_list=[]):
+    def __init__(self, light_source=LightSource(), beamline_elements_list=None):
         self._light_source = light_source
-        self._beamline_elements_list = beamline_elements_list
+        if beamline_elements_list is None:
+            self._beamline_elements_list = []
+        else:
+            self._beamline_elements_list = beamline_elements_list
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
