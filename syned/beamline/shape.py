@@ -311,10 +311,13 @@ class Circle(BoundaryShape):
 
 
 class MultiplePatch(BoundaryShape):
-    def __init__(self, patch_list=[]):
+    def __init__(self, patch_list=None):
         super().__init__()
 
-        self._patch_list = patch_list
+        if patch_list is None:
+            self._patch_list = []
+        else:
+            self._patch_list = patch_list
         self._set_support_text([
                     ("multiple_patch_list",  "Multiple Patch", ""),
             ])
@@ -437,6 +440,7 @@ if __name__=="__main__":
     # print("Patch 0 is: ",patches.get_name_of_patch(0))
     # print("Patch 1 is: ",patches.get_name_of_patch(1))
     # print(patches.get_boundaries())
+
 
     double_rectangle = DoubleRectangle()
     double_rectangle.set_boundaries(-0.02,-0.01,-0.001,0.001,0.01,0.02,-0.001,0.001)
