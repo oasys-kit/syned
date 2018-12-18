@@ -1,6 +1,12 @@
 
+#
+# note that even the elements are not explicitely used in the code that follows, they MUST be imported
+# here in order to define the objects at run time.
+#
 from syned.storage_ring.electron_beam import ElectronBeam
 from syned.storage_ring.magnetic_structures.undulator import Undulator
+from syned.storage_ring.magnetic_structures.wiggler import Wiggler
+from syned.storage_ring.magnetic_structures.bending_magnet import BendingMagnet
 from syned.storage_ring.magnetic_structure import MagneticStructure
 from syned.beamline.optical_elements.ideal_elements.screen import Screen
 from syned.beamline.optical_elements.ideal_elements.lens import IdealLens
@@ -33,6 +39,7 @@ from urllib.request import urlopen
 
 #
 # this allows to load wofry-elements (e.g. WOSlit) in addition to syned elements (Slit)
+# The commented items are not yet implemented
 #
 try:
     from wofry.beamline.optical_elements.ideal_elements.screen import WOScreen
@@ -105,47 +112,9 @@ def load_from_json_dictionary_recurrent(jsn,verbose=False):
                     tmp1.set_value_from_key_name(key,jsn[key])
 
         return tmp1
-# def load_from_json_dictionary(jsn,double_check=False,verbose=True):
-#
-#     # print(jsn)
-#
-#     if "CLASS_NAME" in jsn.keys():
-#         # print("eval: tmp1 = ",jsn["ELEMENT_TYPE"]+"()")
-#         tmp1 = eval(jsn["CLASS_NAME"]+"()")
-#         if tmp1.keys() is not None:
-#             for key in tmp1.keys():
-#                 if key in jsn.keys():
-#                     if verbose: print("---------- setting: ",key, "to ",jsn[key])
-#                     if isinstance(jsn[key],dict):
-#                         tmp1.set_value_from_key_name(key,load_from_json_dictionary(jsn[key]))
-#                     elif isinstance(jsn[key],list):
-#                         pass
-#                     else:
-#                         tmp1.set_value_from_key_name(key,jsn[key])
-#
-#
-#
-#     if double_check:
-#         print("\n------------------------------------------------------------------------------\n")
-#         print(tmp1.info())
-#
-#         for key in jsn.keys():
-#             if key != "CLASS_NAME":
-#                 if key in tmp1.keys():
-#                     print(key,"  file: ",repr(jsn[key]), "object: ",repr(tmp1.get_value_from_key_name(key)) )
-#                 else:
-#                     raise ValueError("Warning: Key %s in json cannot be set to object %s"%(key,tmp1.__class__.__name__))
-#
-#         print("\n------------------------------------------------------------------------------\n")
-#
-#     return tmp1
-#
-#
+
 
 if __name__ == "__main__":
-    # file_in = "/scisoft/xop2.4/extensions/shadowvui/shadow3-scripts/ESRF-LIGHTSOURCES/ESRF_ID1_EBS_ppu27_9.json"
-    # syned_obj = load_from_json_file(file_in)
-    # print(syned_obj.info())
 
     file_url = "http://ftp.esrf.eu/pub/scisoft/syned/lightsources/ESRF_ID01_EBS_ppu27_11.json"
     syned_obj = load_from_json_url(file_url)
