@@ -52,6 +52,7 @@ INSTALL_REQUIRES = (
     'setuptools',
     'numpy',
     'scipy',
+    'pytest'
 )
 
 SETUP_REQUIRES = (
