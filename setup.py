@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import imp
+from importlib.machinery import SourceFileLoader
 import os
 import subprocess
 
@@ -11,11 +11,11 @@ except AttributeError:
 
 NAME = 'syned'
 
-VERSION = '1.0.12'
+VERSION = '1.0.13'
 ISRELEASED = False
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'
-README_FILE = os.path.join(os.path.dirname(__file__), 'README.txt')
+README_FILE = os.path.join(os.path.dirname(__file__), 'README.md')
 LONG_DESCRIPTION = open(README_FILE).read()
 AUTHOR = 'Manuel Sanchez del Rio, Luca Rebuffi'
 AUTHOR_EMAIL = 'srio@esrf.eu'
@@ -107,7 +107,7 @@ if not release:
         GIT_REVISION = git_version()
     elif os.path.exists('syned/version.py'):
         # must be a source distribution, use existing version file
-        version = imp.load_source("syned.version", "syned/version.py")
+        version = SourceFileLoader('syned.version', 'syned/version.py').load_module()
         GIT_REVISION = version.git_revision
     else:
         GIT_REVISION = "Unknown"
