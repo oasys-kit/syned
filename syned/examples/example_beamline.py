@@ -11,6 +11,7 @@ from syned.beamline.optical_elements.absorbers.slit import Slit
 from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
 
 from syned.beamline.optical_elements.mirrors.mirror import Mirror
+from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
 
 from syned.beamline.beamline import BeamlineElement, Beamline
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     print(mirror1.to_json())
 
 
-    crystal1 = Grating(name="crystal1")
+    crystal1 = Crystal(name="crystal1")
 
     crystal1.keys()
     print(crystal1.info())

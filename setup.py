@@ -11,7 +11,7 @@ except AttributeError:
 
 NAME = 'syned'
 
-VERSION = '1.0.13'
+VERSION = '1.0.14'
 ISRELEASED = False
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'

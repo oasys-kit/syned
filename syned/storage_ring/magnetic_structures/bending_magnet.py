@@ -8,7 +8,7 @@ import numpy
 import scipy.constants as codata
 
 class BendingMagnet(MagneticStructure):
-    def __init__(self, radius, magnetic_field, length):
+    def __init__(self, radius=1.0, magnetic_field=1.0, length=1.0):
         """
         Constructor.
         :param radius: Physical Radius/curvature of the magnet in m

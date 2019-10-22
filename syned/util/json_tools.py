@@ -16,14 +16,22 @@ from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
 from syned.beamline.optical_elements.mirrors.mirror import Mirror
 from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
+from syned.beamline.optical_elements.gratings.grating import GratingBlaze
+from syned.beamline.optical_elements.gratings.grating import GratingLamellar
 
 from syned.beamline.shape import BoundaryShape
-from syned.beamline.shape import Rectangle, Circle, Ellipse
+from syned.beamline.shape import Rectangle, Ellipse, Circle
 from syned.beamline.shape import MultiplePatch
+from syned.beamline.shape import DoubleRectangle, DoubleEllipse, DoubleCircle
 
 from syned.beamline.shape import SurfaceShape
-from syned.beamline.shape import Conic, Sphere, SphericalCylinder, Toroidal
-from syned.beamline.shape import Plane
+from syned.beamline.shape import Conic, Plane, Sphere, SphericalCylinder
+from syned.beamline.shape import Ellipsoid, EllipticalCylinder
+from syned.beamline.shape import Paraboloid, ParabolicCylinder
+from syned.beamline.shape import Hyperboloid, HyperbolicCylinder
+from syned.beamline.shape import Toroidal, NumbericalMesh
+
+
 
 from syned.storage_ring.light_source import LightSource
 from syned.storage_ring.empty_light_source import EmptyLightSource
@@ -116,7 +124,16 @@ def load_from_json_dictionary_recurrent(jsn,verbose=False):
 
 if __name__ == "__main__":
 
-    file_url = "http://ftp.esrf.eu/pub/scisoft/syned/lightsources/ESRF_ID01_EBS_ppu27_11.json"
-    syned_obj = load_from_json_url(file_url)
-    print(syned_obj.info())
+    # file_url = "http://ftp.esrf.eu/pub/scisoft/syned/lightsources/ESRF_ID01_EBS_ppu27_11.json"
+    # syned_obj = load_from_json_url(file_url)
+    # print(syned_obj.info())
 
+
+    #
+    # file_url = "/home/manuel/Oasys/ALSU-IR-BM.json"
+    # syned_obj = load_from_json_file(file_url)
+    # print(syned_obj.info())
+
+    file_url = "/home/manuel/Oasys/bl.json"
+    syned_obj = load_from_json_file(file_url)
+    print(syned_obj.info())

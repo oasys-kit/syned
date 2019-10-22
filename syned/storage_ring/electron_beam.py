@@ -87,6 +87,32 @@ class ElectronBeam(SynedObject):
                numpy.sqrt(self._moment_yy),\
                numpy.sqrt(self._moment_ypyp)
 
+    def get_moments_horizontal(self):
+        return self._moment_xx,self._moment_xxp,self._moment_xpxp
+
+    def get_moments_vertical(self):
+        return self._moment_yy,self._moment_yyp,self._moment_ypyp
+
+    def get_moments_all(self):
+        return self._moment_xx,self._moment_xxp,self._moment_xpxp,self._moment_yy,self._moment_yyp,self._moment_ypyp
+
+    def get_twiss_no_dispersion_horizontal(self):
+        emittance_x = numpy.sqrt(self._moment_xx * self._moment_xpxp - self._moment_xxp**2)
+        alpha_x = -self._moment_xxp / emittance_x
+        beta_x = self._moment_xx / emittance_x
+        return emittance_x,alpha_x,beta_x
+
+    def get_twiss_no_dispersion_vertical(self):
+        emittance_y = numpy.sqrt(self._moment_yy * self._moment_ypyp - self._moment_yyp**2)
+        alpha_y = -self._moment_yyp / emittance_y
+        beta_y = self._moment_yy / emittance_y
+        return emittance_y,alpha_y,beta_y
+
+    def get_twiss_no_dispersion_all(self):
+        ex, ax, bx =  self.get_twiss_no_dispersion_horizontal()
+        ey, ay, by = self.get_twiss_no_dispersion_vertical()
+        return ex, ax, bx, ey, ay, by
+
     def energy(self):
         return self._energy_in_GeV
 
@@ -121,6 +147,37 @@ class ElectronBeam(SynedObject):
     def set_energy_from_gamma(self, gamma):
         self._energy_in_GeV = (gamma / 1e9) * (codata.m_e *  codata.c**2 / codata.e)
 
+    def set_moments_horizontal(self,moment_xx,moment_xxp,moment_xpxp):
+        self._moment_xx   = moment_xx
+        self._moment_xxp  = moment_xxp
+        self._moment_xpxp = moment_xpxp
+
+    def set_moments_vertical(self,moment_yy,moment_yyp,moment_ypyp):
+        self._moment_yy   = moment_yy
+        self._moment_yyp  = moment_yyp
+        self._moment_ypyp = moment_ypyp
+
+    def set_moments_all(self,moment_xx,moment_xxp,moment_xpxp,moment_yy,moment_yyp,moment_ypyp):
+        self.set_moments_horizontal(moment_xx,moment_xxp,moment_xpxp)
+        self.set_moments_vertical(moment_yy,moment_yyp,moment_ypyp)
+
+    def set_twiss_horizontal(self,emittance_x,alpha_x,beta_x,eta_x=0,etap_x=0):
+        gamma_x = (1 + alpha_x**2) / beta_x
+        self._moment_xx   = beta_x   * emittance_x + eta_x**2 * self._energy_spread**2
+        self._moment_xxp  = -alpha_x * emittance_x + eta_x * etap_x * self._energy_spread ** 2
+        self._moment_xpxp = gamma_x  * emittance_x + etap_x**2 * self._energy_spread ** 2
+
+    def set_twiss_vertical(self,emittance_y,alpha_y,beta_y,eta_y=0,etap_y=0):
+        gamma_y = (1 + alpha_y**2) / beta_y
+        self._moment_yy   = beta_y   * emittance_y + eta_y**2 * self._energy_spread**2
+        self._moment_yyp  = -alpha_y * emittance_y + eta_y * etap_y * self._energy_spread ** 2
+        self._moment_ypyp = gamma_y  * emittance_y + etap_y**2 * self._energy_spread ** 2
+
+    def set_twiss_all(self,emittance_x,alpha_x,beta_x,eta_x,etap_x,
+                           emittance_y,alpha_y,beta_y,eta_y,etap_y):
+        self.set_twiss_horizontal(emittance_x,alpha_x,beta_x,eta_x,etap_x)
+        self.set_twiss_vertical(emittance_y,alpha_y,beta_y,eta_y,etap_y)
+
     #
     # some easy calculations
     #
@@ -141,7 +198,23 @@ class ElectronBeam(SynedObject):
 
 if __name__ == "__main__":
 
-    a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=6.0,current=0.2)
+    a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=2.0,current=0.5, energy_spread=0.00095)
+
+    a.set_twiss_horizontal(70e-12, 0.827, 0.34, 0, 0 ) #0.0031, -0.06)
+    a.set_twiss_vertical(  70e-12, -10.7, 24.26, 0, 0.0)
+
+    print("twiss data: 70e-12, 0.827, 0.34, 70e-12, -10.7, 24.26,")
+    print("sigmas: ",a.get_sigmas_all())
+    print("moments: ",a.get_moments_all())
+    print("twiss: ",a.get_twiss_no_dispersion_all())
+
+
+    s = a.get_sigmas_all()
+    a.set_sigmas_all(s[0],s[1],s[2],s[3])
+
+    print("\n\nsigmas: ",a.get_sigmas_all())
+    print("moments: ",a.get_moments_all())
+    print("twiss: ",a.get_twiss_no_dispersion_all())
 
 
 #    a.to_dictionary()
