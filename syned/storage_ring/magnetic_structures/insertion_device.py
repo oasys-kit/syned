@@ -14,7 +14,7 @@ class InsertionDevice(MagneticStructure):
                  K_vertical        = 0.0,
                  K_horizontal      = 0.0,
                  period_length     = 0.0,
-                 number_of_periods = 1):
+                 number_of_periods = 1.0):
         MagneticStructure.__init__(self)
 
         self._K_vertical = K_vertical
