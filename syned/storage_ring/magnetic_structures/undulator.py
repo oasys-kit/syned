@@ -62,6 +62,12 @@ class Undulator(InsertionDevice):
 
 
     def undulator_full_emitted_power(self, gamma, ring_current):
+        """
+        Reference: Eq. 18 in https://xdb.lbl.gov/Section2/Sec_2-1.html
+        :param gamma:
+        :param ring_current:
+        :return:
+        """
         ptot = (self.number_of_periods()/6) * codata.value('characteristic impedance of vacuum') * \
                ring_current * codata.e * 2 * numpy.pi * codata.c * gamma**2 * \
                (self.K_vertical()**2+self.K_horizontal()**2) / self.period_length()
