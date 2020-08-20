@@ -115,10 +115,10 @@ class Ellipsoid(SurfaceShape):
 
     @classmethod
     def get_p_q_from_axis(cls, min_axis=2.0, maj_axis=1.0, grazing_angle=0.003):
-        a = maj_axis/2
-        b = min_axis/2
+        a = 0.5*maj_axis
+        b = 0.5*min_axis
         p = a + numpy.sqrt(a**2 - (b/numpy.sin(grazing_angle))**2)
-        q = maj_axis - p
+        q = 2*a - p
 
         return p, q
 
