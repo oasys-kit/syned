@@ -45,6 +45,9 @@ class Cylinder:
     def __init__(self, cylinder_direction=Direction.TANGENTIAL):
         self._cylinder_direction = cylinder_direction
 
+    def get_cylinder_direction(self):
+        return self._cylinder_direction
+
 class Conic(SurfaceShape):
     def __init__(self, 
                  conic_coefficients=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 
@@ -52,6 +55,9 @@ class Conic(SurfaceShape):
         SurfaceShape.__init__(self, convexity)
 
         self._conic_coefficients = conic_coefficients
+
+    def get_conic_coefficients(self):
+        return self._conic_coefficients
 
 class Plane(SurfaceShape):
     def __init__(self):
@@ -99,6 +105,9 @@ class Ellipsoid(SurfaceShape):
         self._min_axis = min_axis
         self._maj_axis = maj_axis
 
+    def get_axes(self):
+        return self._min_axis, self._maj_axis
+
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
         self._min_axis, self._maj_axis = Ellipsoid.get_axis_from_p_q(p, q, grazing_angle)
 
@@ -135,7 +144,7 @@ class EllipticalCylinder(Ellipsoid, Cylinder):
         if self._cylinder_direction == Direction.SAGITTAL:
             raise NotImplementedError("Operation not possible for SAGITTAL direction")
 
-        return super().initialize_from_p_q(p, q, grazing_angle)
+        super().initialize_from_p_q(p, q, grazing_angle)
 
     def get_p_q(self, grazing_angle=0.003):
         if self._cylinder_direction == Direction.SAGITTAL:
@@ -150,6 +159,9 @@ class Paraboloid(SurfaceShape):
         SurfaceShape.__init__(self, convexity)
 
         self._parabola_parameter = parabola_parameter
+
+    def get_parabola_parameter(self):
+        return self._parabola_parameter
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003, at_infinity=Side.SOURCE):
         self._parabola_parameter = Paraboloid.get_parabola_parameter_from_p_q(p, q, grazing_angle, at_infinity)
@@ -183,6 +195,9 @@ class Hyperboloid(SurfaceShape):
         self._min_axis = min_axis
         self._maj_axis = maj_axis
 
+    def get_axis(self):
+        return self._min_axis, self._maj_axis
+
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
         raise NotImplementedError("TBD")
 
@@ -204,6 +219,9 @@ class Toroidal(SurfaceShape):
         
         self._min_radius = min_radius
         self._maj_radius = maj_radius
+
+    def get_radii(self):
+        return self._min_radius, self._maj_radius
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
         self._maj_radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
