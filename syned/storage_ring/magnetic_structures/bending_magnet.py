@@ -31,7 +31,7 @@ class BendingMagnet(MagneticStructure):
     #methods for practical calculations
     #
     @classmethod
-    def initialize_from_magnetic_field_divergence_and_electron_energy(cls,magnetic_field=1.0,divergence=1e-3,electron_energy_in_GeV=1.0):
+    def initialize_from_magnetic_field_divergence_and_electron_energy(cls, magnetic_field=1.0, divergence=1e-3, electron_energy_in_GeV=1.0, **params):
         """
         Constructor from  magnetic field divergence and electron energy
         :param magnetic_field: in T
@@ -40,10 +40,11 @@ class BendingMagnet(MagneticStructure):
         :return:
         """
         magnetic_radius = cls.calculate_magnetic_radius(magnetic_field, electron_energy_in_GeV)
-        return BendingMagnet(magnetic_radius,magnetic_field,numpy.abs(divergence * magnetic_radius))
+
+        return cls(magnetic_radius, magnetic_field, numpy.abs(divergence * magnetic_radius), **params)
 
     @classmethod
-    def initialize_from_magnetic_radius_divergence_and_electron_energy(cls,magnetic_radius=10.0,divergence=1e-3,electron_energy_in_GeV=1.0):
+    def initialize_from_magnetic_radius_divergence_and_electron_energy(cls, magnetic_radius=10.0, divergence=1e-3, electron_energy_in_GeV=1.0, **params):
         """
         Constructor from  magnetic radius, divergence and electron energy
         :param magnetic_radius: in m
@@ -52,7 +53,8 @@ class BendingMagnet(MagneticStructure):
         :return:
         """
         magnetic_field = cls.calculate_magnetic_field(magnetic_radius, electron_energy_in_GeV)
-        return BendingMagnet(magnetic_radius,magnetic_field,numpy.abs(divergence * magnetic_radius))
+
+        return cls(magnetic_radius,magnetic_field,numpy.abs(divergence * magnetic_radius), **params)
 
 
     def length(self):

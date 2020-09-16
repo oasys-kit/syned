@@ -55,11 +55,12 @@ class ElectronBeam(SynedObject):
     # initializares
     #
     @classmethod
-    def initialize_as_pencil_beam(cls, energy_in_GeV = 1.0, energy_spread = 0.0, current = 0.1):
-        return ElectronBeam(energy_in_GeV=energy_in_GeV,
-                            energy_spread=energy_spread,
-                            current=current,
-                            number_of_bunches=1)
+    def initialize_as_pencil_beam(cls, energy_in_GeV = 1.0, energy_spread = 0.0, current = 0.1, **params):
+        return cls(energy_in_GeV=energy_in_GeV,
+                   energy_spread=energy_spread,
+                   current=current,
+                   number_of_bunches=1,
+                   **params)
 
 
     #

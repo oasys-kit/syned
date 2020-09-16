@@ -38,11 +38,11 @@ class Undulator(InsertionDevice):
         return (1/gamma)*numpy.sqrt((1.0/(2.0*n*self.number_of_periods())) * (1.0 + self.K_horizontal()**2/2.0 + self.K_vertical()**2/2.0))
 
     @classmethod
-    def initialize_as_vertical_undulator(cls, K = 0.0, period_length = 0.0, periods_number = 1.0):
-        return Undulator(K_vertical=K,
-                         K_horizontal=0.0,
-                         period_length=period_length,
-                         number_of_periods=periods_number)
+    def initialize_as_vertical_undulator(cls, K = 0.0, period_length = 0.0, periods_number = 1.0, **params):
+        return cls(K_vertical=K,
+                   K_horizontal=0.0,
+                   period_length=period_length,
+                   number_of_periods=periods_number, **params)
     #
     #
     #
