@@ -72,7 +72,7 @@ class Sphere(SurfaceShape):
         return self._radius
 
     def initialize_from_p_q(self, p=2.0, q=1.0, grazing_angle=0.003):
-        self.self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
+        self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
 
     @classmethod
     def get_radius_from_p_q(cls, p=2.0, q=1.0, grazing_angle=0.003):
