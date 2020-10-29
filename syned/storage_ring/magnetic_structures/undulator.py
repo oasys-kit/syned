@@ -75,7 +75,7 @@ class Undulator(InsertionDevice):
 
     def get_photon_sizes_and_divergences(self,syned_electron_beam,harmonic=1):
         sr,srp = self.get_sigmas_radiation(syned_electron_beam.gamma(),harmonic=harmonic)
-        sx,sz,sxp,szp = syned_electron_beam.get_sigmas_all()
+        sx,sxp,sz,szp = syned_electron_beam.get_sigmas_all()
 
         Sx = numpy.sqrt( sx**2 + sr**2)
         Sz = numpy.sqrt( sz**2 + sr**2)
