@@ -1,7 +1,15 @@
-
 from syned.beamline.optical_element import OpticalElement
-from syned.beamline.shape import BoundaryShape
+from syned.beamline.shape import Rectangle, Ellipse, Circle
 
 class Absorber(OpticalElement):
-    def __init__(self, name="Undefined", boundary_shape=BoundaryShape()):
+    def __init__(self, name="Undefined", boundary_shape=None):
         OpticalElement.__init__(self, name=name, boundary_shape=boundary_shape)
+
+    def set_rectangle(self,width=3e-3,height=4e-3,center_x=0.0,center_y=0.0):
+        self._boundary_shape=Rectangle(-0.5*width+center_x,0.5*width+center_x,-0.5*height+center_y,0.5*height+center_y)
+
+    def set_circle(self,radius=3e-3,center_x=0.0,center_y=0.0):
+        self._boundary_shape=Circle(radius,center_x,center_y)
+
+    def set_ellipse(self,width=3e-3,height=4e-3,center_x=0.0,center_y=0.0):
+        self._boundary_shape=Ellipse(-0.5*width+center_x,0.5*width+center_x,-0.5*height+center_y,0.5*height+center_y)

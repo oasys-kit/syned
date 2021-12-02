@@ -11,7 +11,7 @@ except AttributeError:
 
 NAME = 'syned'
 
-VERSION = '1.0.23'
+VERSION = '1.0.24'
 ISRELEASED = False
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'
@@ -19,10 +19,10 @@ README_FILE = os.path.join(os.path.dirname(__file__), 'README.md')
 LONG_DESCRIPTION = open(README_FILE).read()
 AUTHOR = 'Manuel Sanchez del Rio, Luca Rebuffi'
 AUTHOR_EMAIL = 'srio@esrf.eu'
-URL = 'https://github.com/lucarebuffi/syned'
-DOWNLOAD_URL = 'https://github.com/lucarebuffi/syned'
+URL = 'https://github.com/oasys-kit/syned'
+DOWNLOAD_URL = 'https://github.com/oasys-kit/syned'
 MAINTAINER = 'Luca Rebuffi'
-MAINTAINER_EMAIL = 'luca.rebuffi@elettra.eu'
+MAINTAINER_EMAIL = 'lrebuffi at anl.gov'
 LICENSE = 'GPLv3'
 
 KEYWORDS = (
