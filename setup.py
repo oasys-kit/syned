@@ -21,8 +21,8 @@ AUTHOR = 'Manuel Sanchez del Rio, Luca Rebuffi'
 AUTHOR_EMAIL = 'srio@esrf.eu'
 URL = 'https://github.com/oasys-kit/syned'
 DOWNLOAD_URL = 'https://github.com/oasys-kit/syned'
-MAINTAINER = 'Luca Rebuffi'
-MAINTAINER_EMAIL = 'lrebuffi at anl.gov'
+MAINTAINER = 'L Rebuffi and M Sanchez del Rio'
+MAINTAINER_EMAIL = 'srio@esrf.eu'
 LICENSE = 'GPLv3'
 
 KEYWORDS = (
