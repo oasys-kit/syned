@@ -23,3 +23,15 @@ class BeamlineElement(SynedObject):
 
     def get_coordinates(self):
         return self._coordinates
+
+    def set_optical_element(self, value):
+        if isinstance(value, OpticalElement):
+            self._optical_element = value
+        else:
+            raise Exception("entry is not an instance of OpticalElement")
+
+    def set_coordinates(self, value):
+        if isinstance(value, ElementCoordinates):
+            self._coordinates = value
+        else:
+            raise Exception("entry is not an instance of ElementCoordinates")

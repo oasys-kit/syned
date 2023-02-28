@@ -9,7 +9,7 @@ from syned.storage_ring.magnetic_structures.wiggler import Wiggler
 from syned.storage_ring.magnetic_structures.bending_magnet import BendingMagnet
 from syned.storage_ring.magnetic_structure import MagneticStructure
 from syned.beamline.optical_elements.ideal_elements.screen import Screen
-from syned.beamline.optical_elements.ideal_elements.lens import IdealLens
+from syned.beamline.optical_elements.ideal_elements.ideal_lens import IdealLens
 from syned.beamline.optical_elements.absorbers.filter import Filter
 from syned.beamline.optical_elements.absorbers.slit import Slit
 from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
@@ -29,9 +29,7 @@ from syned.beamline.shape import Conic, Plane, Sphere, SphericalCylinder
 from syned.beamline.shape import Ellipsoid, EllipticalCylinder
 from syned.beamline.shape import Paraboloid, ParabolicCylinder
 from syned.beamline.shape import Hyperboloid, HyperbolicCylinder
-from syned.beamline.shape import Toroidal, NumbericalMesh
-
-
+from syned.beamline.shape import Toroid
 
 from syned.storage_ring.light_source import LightSource
 from syned.storage_ring.empty_light_source import EmptyLightSource

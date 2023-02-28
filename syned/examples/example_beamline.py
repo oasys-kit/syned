@@ -5,7 +5,7 @@ from syned.storage_ring.light_source import LightSource
 from syned.beamline.shape import *
 
 from syned.beamline.optical_elements.ideal_elements.screen import Screen
-from syned.beamline.optical_elements.ideal_elements.lens import IdealLens
+from syned.beamline.optical_elements.ideal_elements.ideal_lens import IdealLens
 from syned.beamline.optical_elements.absorbers.filter import Filter
 from syned.beamline.optical_elements.absorbers.slit import Slit
 from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper

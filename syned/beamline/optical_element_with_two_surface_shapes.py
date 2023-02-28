@@ -1,8 +1,6 @@
 from syned.beamline.optical_element import OpticalElement
 from syned.beamline.shape import SurfaceShape
 
-
-
 class OpticalElementsWithTwoSurfaceShapes(OpticalElement):
 
     def __init__(self, name="",
