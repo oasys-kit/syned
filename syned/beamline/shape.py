@@ -216,8 +216,6 @@ class Ellipsoid(SurfaceShape):
 
         return p, q
 
-
-
 class EllipticalCylinder(Ellipsoid, Cylinder):
     def __init__(self, 
                  min_axis=0.0, 
