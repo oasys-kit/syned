@@ -497,7 +497,7 @@ class Toroid(SurfaceShape):
 
 # This is exactly the same as OasysSurfaceData
 # class OasysSurfaceData(object):
-class SurfaceData(SurfaceShape):
+class NumericalMesh(SurfaceShape):
     def __init__(self,
                  xx=None,
                  yy=None,
