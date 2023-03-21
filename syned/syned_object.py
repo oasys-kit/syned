@@ -1,3 +1,4 @@
+import copy
 from collections import OrderedDict
 import json
 
@@ -74,7 +75,6 @@ class SynedObject(object):
             print("File written to disk: %s"%(file_name))
         return jsn1
 
-
     def info_recurrent(self,fd,prefix="    "):
         text = ""
         for key in fd.keys():
@@ -99,7 +99,6 @@ class SynedObject(object):
     def info(self):
         return self.info_recurrent( self.to_full_dictionary() )
 
-
     def set_value_from_key_name(self,key,value):
         if key in self.keys():
             try:
@@ -110,7 +109,6 @@ class SynedObject(object):
         else:
             raise ValueError("Key %s not accepted by class %s"%(key,self.__class__.__name__))
 
-
     def get_value_from_key_name(self,key):
         try:
             value = eval("self._%s" % (key))
@@ -118,5 +116,4 @@ class SynedObject(object):
         except:
             raise ValueError("Cannot get variable %s: "%key)
 
-
-
+    def duplicate(self): return copy.deepcopy(self)
