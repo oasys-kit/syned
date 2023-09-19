@@ -4,8 +4,23 @@ import json
 
 # TODO: although basic functionality is implemented, the use of exec should be replace by introspection tools
 class SynedObject(object):
+    """
+    This is the base object for SYNED.
 
-    def _set_support_text(self,text):
+    It includes the methods of the common interface to allow json file input/output and info mechanism
+
+    These standard methods are:
+        * keys()
+        * to_dictionary()
+        * to_full_dictionary()
+        * to_json()
+        * info()
+        * set_value_from_key_name()
+        * get_value_from_key_name()
+
+    """
+
+    def _set_support_text(self, text):
         ordered_support_dict = OrderedDict()
         for e in text:
             ordered_support_dict[e[0]] = (e[1], e[2])
@@ -25,12 +40,29 @@ class SynedObject(object):
     #   get_value_from_key_name
     #
     def keys(self):
+        """
+        Returns the keys of the supporting doctionary.
+        Returns
+        -------
+        list
+            A list of keys.
+
+        """
         try:
             return self._support_dictionary.keys()
         except:
             return None
 
     def to_dictionary(self):
+        """
+        Returns a dictionary with the object fields.
+
+        Returns
+        -------
+        dict
+            A dictionary with the data.
+
+        """
         dict_to_save = OrderedDict()
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
         try:
@@ -46,6 +78,14 @@ class SynedObject(object):
         return dict_to_save
 
     def to_full_dictionary(self):
+        """
+        Returns a dictionary with the object fields, including other syned objects embedded or list of elements.
+
+        Returns
+        -------
+        dict
+
+        """
         dict_to_save = OrderedDict()
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
         try:
@@ -63,7 +103,21 @@ class SynedObject(object):
 
         return dict_to_save
 
-    def to_json(self,file_name=None):
+    def to_json(self, file_name=None):
+        """
+        Writes a json file with the SYNED object data.
+
+        Parameters
+        ----------
+        file_name : str
+            The file name
+
+        Returns
+        -------
+        str
+            JSON formatted str. The result of json.dumps()
+
+        """
         dict1 = OrderedDict()
         dict1.update(self.to_dictionary())
 
@@ -75,7 +129,22 @@ class SynedObject(object):
             print("File written to disk: %s"%(file_name))
         return jsn1
 
-    def info_recurrent(self,fd,prefix="    "):
+    def info_recurrent(self, fd, prefix="    "):
+        """
+        Get text info of recurrent SYNED objects.
+
+        Parameters
+        ----------
+        fd : dict
+            The dictionary with SYNED data.
+        prefix : str, optional
+            Prefix to indent recursive items.
+
+        Returns
+        -------
+        str
+
+        """
         text = ""
         for key in fd.keys():
             if isinstance(fd[key],OrderedDict):
@@ -97,9 +166,28 @@ class SynedObject(object):
 
     # TODO: not working correctly for beamline
     def info(self):
+        """
+        Get text info of recurrent SYNED objects.
+
+        Returns
+        -------
+        str
+
+        """
         return self.info_recurrent( self.to_full_dictionary() )
 
     def set_value_from_key_name(self,key,value):
+        """
+        Sets a value using its key value.
+
+        Parameters
+        ----------
+        key : str
+            The key for the value to modify.
+        value
+            The new value
+
+        """
         if key in self.keys():
             try:
                 exec("self._%s = value" % (key))
@@ -109,11 +197,30 @@ class SynedObject(object):
         else:
             raise ValueError("Key %s not accepted by class %s"%(key,self.__class__.__name__))
 
-    def get_value_from_key_name(self,key):
+    def get_value_from_key_name(self, key):
+        """
+        Gets a value using its key value.
+
+        Parameters
+        ----------
+        key : str
+            The key for the value to retrieve.
+
+        """
         try:
             value = eval("self._%s" % (key))
             return value
         except:
             raise ValueError("Cannot get variable %s: "%key)
 
-    def duplicate(self): return copy.deepcopy(self)
+    def duplicate(self):
+        """
+        Returns a copy of the SYNED object instance.
+
+        Returns
+        -------
+        SynedObject instance
+            A copy of the object instance.
+
+        """
+        return copy.deepcopy(self)
