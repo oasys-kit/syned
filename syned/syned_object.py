@@ -65,13 +65,15 @@ class SynedObject(object):
         """
         dict_to_save = OrderedDict()
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
+
         try:
-            for key in self.keys():
-                tmp1 = eval("self._%s" % (key) )
-                if isinstance(tmp1,SynedObject):
-                    dict_to_save[key] = tmp1.to_dictionary()
-                else:
-                    dict_to_save[key] = tmp1
+            if self.keys() is not None:
+                for key in self.keys():
+                    tmp1 = eval("self._%s" % (key) )
+                    if isinstance(tmp1,SynedObject):
+                        dict_to_save[key] = tmp1.to_dictionary()
+                    else:
+                        dict_to_save[key] = tmp1
         except:
             pass
 

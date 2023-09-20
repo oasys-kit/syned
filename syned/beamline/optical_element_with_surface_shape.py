@@ -82,6 +82,10 @@ class OpticalElementsWithSurfaceShape(OpticalElementsWithMultipleShapes):
                                                               boundary_shape=boundary_shape,
                                                               surface_shapes=[surface_shape])
 
+    @property
+    def _surface_shape(self):
+        return self.get_surface_shape()
+
     def get_surface_shape(self):
         """
         Gets the surface shape.
