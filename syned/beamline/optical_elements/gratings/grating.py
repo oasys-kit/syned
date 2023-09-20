@@ -2,6 +2,21 @@ from syned.beamline.shape import SurfaceShape, BoundaryShape
 from syned.beamline.optical_element_with_surface_shape import OpticalElementsWithSurfaceShape
 
 class Grating(OpticalElementsWithSurfaceShape):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the optical element.
+    surface_shape : instance of SurfaceShape, optional
+        The geometry of the crystal surface. if None, it is initialized to SurfaceShape().
+    boundary_shape : instance of BoundaryShape, optional
+        The geometry of the slit aperture. if None, it is initialized to BoundaryShape().
+    ruling : float, optional
+        The grating ruling in lines/m.
+
+    """
     def __init__(self,
                  name="Undefined",
                  surface_shape=SurfaceShape(),
@@ -21,6 +36,33 @@ class Grating(OpticalElementsWithSurfaceShape):
 
 
 class GratingVLS(Grating):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the optical element.
+    surface_shape : instance of SurfaceShape, optional
+        The geometry of the optical element surface. if None, it is initialized to SurfaceShape().
+    boundary_shape : instance of BoundaryShape, optional
+        The geometry of the slit aperture. if None, it is initialized to BoundaryShape().
+    ruling : float, optional
+        The grating ruling polinomial coefficient of 0th order [lines/m].
+    ruling_coeff_linear : float, optional
+        The grating ruling polinomial coefficient of 1th order [lines/m^2].
+    ruling_coeff_quadratic : float, optional
+        The grating ruling polinomial coefficient of 2th order [lines/m^3].
+    ruling_coeff_cubic : float, optional
+        The grating ruling polinomial coefficient of 3th order [lines/m^4].
+    ruling_coeff_quartic : float, optional
+        The grating ruling polinomial coefficient of 4th order [lines/m^5].
+    coating : str, optional
+        The grating coating material.
+    coating_thickness : float, optional
+        The grating coating thickness in m.
+
+    """
     def __init__(self,
                  name="Undefined",
                  surface_shape=SurfaceShape(),
@@ -59,6 +101,37 @@ class GratingVLS(Grating):
 
 
 class GratingBlaze(GratingVLS):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the optical element.
+    surface_shape : instance of SurfaceShape, optional
+        The geometry of the crystal surface. if None, it is initialized to SurfaceShape().
+    boundary_shape : instance of BoundaryShape, optional
+        The geometry of the slit aperture. if None, it is initialized to BoundaryShape().
+    ruling : float, optional
+        The grating ruling polinomial coefficient of 0th order [lines/m].
+    ruling_coeff_linear : float, optional
+        The grating ruling polinomial coefficient of 1th order [lines/m^2].
+    ruling_coeff_quadratic : float, optional
+        The grating ruling polinomial coefficient of 2th order [lines/m^3].
+    ruling_coeff_cubic : float, optional
+        The grating ruling polinomial coefficient of 3th order [lines/m^4].
+    ruling_coeff_quartic : float, optional
+        The grating ruling polinomial coefficient of 4th order [lines/m^5].
+    coating : str, optional
+        The grating coating material.
+    coating_thickness : float, optional
+        The grating coating thickness in m.
+    blaze_angle : float, optional
+        The blaze angle in rad.
+    antiblaze_angle : float, optional
+        The anti-blaze angle in rad.
+
+    """
     def __init__(self,
                  name="Undefined",
                  surface_shape=SurfaceShape(),
@@ -107,6 +180,38 @@ class GratingBlaze(GratingVLS):
 
 
 class GratingLamellar(GratingVLS):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the optical element.
+    surface_shape : instance of SurfaceShape, optional
+        The geometry of the crystal surface. if None, it is initialized to SurfaceShape().
+    boundary_shape : instance of BoundaryShape, optional
+        The geometry of the slit aperture. if None, it is initialized to BoundaryShape().
+    ruling : float, optional
+        The grating ruling polinomial coefficient of 0th order [lines/m].
+    ruling_coeff_linear : float, optional
+        The grating ruling polinomial coefficient of 1th order [lines/m^2].
+    ruling_coeff_quadratic : float, optional
+        The grating ruling polinomial coefficient of 2th order [lines/m^3].
+    ruling_coeff_cubic : float, optional
+        The grating ruling polinomial coefficient of 3th order [lines/m^4].
+    ruling_coeff_quartic : float, optional
+        The grating ruling polinomial coefficient of 4th order [lines/m^5].
+    coating : str, optional
+        The grating coating material.
+    coating_thickness : float, optional
+        The grating coating thickness in m.
+    height : str, optional
+        The height of the grating lamella in m.
+    ratio_valley_to_period : float, optional
+        The grating ration valley to period.
+
+    """
+
     def __init__(self,
                  name="Undefined",
                  surface_shape=SurfaceShape(),
@@ -118,7 +223,7 @@ class GratingLamellar(GratingVLS):
                  coating=None,
                  coating_thickness=None,
                  height=1e-6,
-                 ratio_valley_to_period=0.5,
+                 ratio_valley_to_period=0.5, # TODO: is better to define ratio valley to height?
                  ):
         super().__init__(name, surface_shape, boundary_shape,
                          ruling=ruling,

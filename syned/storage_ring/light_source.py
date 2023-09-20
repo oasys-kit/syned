@@ -1,8 +1,5 @@
 """
-Base class for LighSource, which contains:
-    - a name
-    - an electron beam
-    - a magnetic structure
+
 
 """
 from syned.syned_object import SynedObject
@@ -10,6 +7,22 @@ from syned.storage_ring.magnetic_structure import MagneticStructure
 from syned.storage_ring.electron_beam import ElectronBeam
 
 class LightSource(SynedObject):
+    """
+    Base class for LighSource. A light source contains:
+    * a name
+    * an electron beam
+    * a magnetic structure
+
+    Parameters
+    ----------
+    name : str, optional
+        The light source name.
+    electron_beam : instance of ElectronBeam, optional
+        The electron beam. If None, it is initialized with ElectronBeam().
+    magnetic_structure : instance of MagneticStructure, optional
+        The electron beam. If None, it is initialized with MagneticStructure().
+
+    """
     def __init__(self, name="Undefined", electron_beam=None, magnetic_structure=None):
         self._name = name
         if electron_beam is None:
@@ -29,12 +42,36 @@ class LightSource(SynedObject):
 
 
     def get_name(self):
+        """
+        Returns the name of the light source.
+
+        Returns
+        -------
+        str
+
+        """
         return self._name
 
     def get_electron_beam(self):
+        """
+        Returns the electron beam.
+
+        Returns
+        -------
+        instance of ElectronBeam
+
+        """
         return self._electron_beam
 
     def get_magnetic_structure(self):
+        """
+        Returns the magnetic structure.
+
+        Returns
+        -------
+        instance of MagneticStructure
+
+        """
         return self._magnetic_structure
 
 

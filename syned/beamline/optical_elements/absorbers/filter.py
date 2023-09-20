@@ -2,6 +2,27 @@
 from syned.beamline.optical_elements.absorbers.absorber import Absorber
 
 class Filter(Absorber):
+    """
+    Filter or absorber or attenuator.
+
+    Note that:
+                                   Slit     BeamStopper    Filter      HoledFilter
+        beam pass at center         Yes     No             Yes         No
+        apply attenuation           No      No             Yes         Yes
+
+    Constructor.
+
+    Parameters
+    ----------
+    name : str
+        The name of the optical element.
+    material : str
+        A string defining the material.
+    thickness : float
+        The filter thickness in m.
+    boundary_shape : instance of BoundaryShape, optional
+        if None, it is initialized to BoundaryShape().
+    """
     def __init__(self,
                  name="Undefined",
                  material="Be",
@@ -18,7 +39,23 @@ class Filter(Absorber):
             ])
 
     def get_material(self):
+        """
+        Returns the material name.
+
+        Returns
+        -------
+        str
+
+        """
         return self._material
 
     def get_thickness(self):
+        """
+        Retuirns the filter thickness in m.
+
+        Returns
+        -------
+        float
+
+        """
         return self._thickness

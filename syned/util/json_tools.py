@@ -1,8 +1,13 @@
+"""
+Functions to read/write syned objects in json files.
 
-#
-# note that the elements that are not explicitely imported in the code that follows, they MUST be imported
-# order to define the objects at run time. For that, use the exec_command keyword
-#
+Notes
+-----
+The elements that are not explicitely imported in the code that follows, but they MUST be imported
+to define the objects at run time.
+To import more elements, yoy can use the exec_command keyword.
+
+"""
 from syned.storage_ring.electron_beam import ElectronBeam
 from syned.storage_ring.magnetic_structures.undulator import Undulator
 from syned.storage_ring.magnetic_structures.wiggler import Wiggler
@@ -13,9 +18,11 @@ from syned.beamline.optical_elements.ideal_elements.ideal_lens import IdealLens
 from syned.beamline.optical_elements.absorbers.filter import Filter
 from syned.beamline.optical_elements.absorbers.slit import Slit
 from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
+from syned.beamline.optical_elements.absorbers.holed_filter import HoledFilter
 from syned.beamline.optical_elements.mirrors.mirror import Mirror
 from syned.beamline.optical_elements.crystals.crystal import Crystal
 from syned.beamline.optical_elements.gratings.grating import Grating
+from syned.beamline.optical_elements.gratings.grating import GratingVLS
 from syned.beamline.optical_elements.gratings.grating import GratingBlaze
 from syned.beamline.optical_elements.gratings.grating import GratingLamellar
 
@@ -44,21 +51,83 @@ import json
 from urllib.request import urlopen
 
 def load_from_json_file(file_name, exec_commands=None):
+    """
+    Function to load a syned object from a json file.
+
+    Parameters
+    ----------
+    file_name : str
+        The file name.
+    exec_commands : str
+        The commands (typically import...) to be executed before accesing the file.
+
+    Returns
+    -------
+    instance of SynedObject
+
+    """
     f = open(file_name)
     text = f.read()
     f.close()
     return load_from_json_text(text, exec_commands=exec_commands)
 
 def load_from_json_url(file_url, exec_commands=None):
+    """
+    Function to load a syned object from a remote json file.
+
+    Parameters
+    ----------
+    file_url : str
+        The URL with the file name.
+    exec_commands : str
+        The commands (typically import...) to be executed before accesing the file.
+
+    Returns
+    -------
+    instance of SynedObject
+
+    """
     u = urlopen(file_url)
     ur = u.read()
     url = ur.decode(encoding='UTF-8')
     return load_from_json_text(url, exec_commands=exec_commands)
 
 def load_from_json_text(text, exec_commands=None):
+    """
+    Function to load a syned object from a json txt.
+
+    Parameters
+    ----------
+    text : str
+        The text with the corresponding info.
+    exec_commands : str
+        The commands (typically import...) to be executed before accesing the file.
+
+    Returns
+    -------
+    instance of SynedObject
+
+    """
     return load_from_json_dictionary_recurrent(json.loads(text), exec_commands=exec_commands)
 
 def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
+    """
+    Function to convert a dictionary (got from json file) into a syned object.
+
+    Parameters
+    ----------
+    jsn : dict
+        The dictionary with json file information.
+    verbose : boolean, optional
+        Define or not verbose output.
+    exec_commands : str
+        The commands (typically import...) to be executed before accesing the file.
+
+    Returns
+    -------
+    instance of SynedObject
+
+    """
     if isinstance(exec_commands, list):
         for command in exec_commands:
             if verbose: print(">>>>",command)

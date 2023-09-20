@@ -6,9 +6,36 @@ class DiffractionGeometry:
     LAUE = 1
 
 class Crystal(OpticalElementsWithSurfaceShape):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the optical element.
+    surface_shape : instance of SurfaceShape, optional
+        The geometry of the crystal surface. if None, it is initialized to SurfaceShape().
+    boundary_shape : instance of BoundaryShape, optional
+        The geometry of the slit aperture. if None, it is initialized to BoundaryShape().
+    material : str, optional
+        The material name.
+    diffraction_geometry : int (as defined in DiffractionGeometry, optional
+        BRAGG = 0, LAUE = 1.
+    miller_index_h : int, optional
+        The Miller index H.
+    miller_index_k : int, optional
+        The Miller index K.
+    miller_index_l : int, optional
+        The Miller index L.
+    asymmetry_angle : float, optional
+        The asymmetry angle in rad.
+    thickness : float, optional
+        The crystal thickness in m.
+
+    """
     def __init__(self,
                  name="Undefined",
-                 surface_shape=SurfaceShape(),
+                 surface_shape=SurfaceShape(), # TODO: this should be None
                  boundary_shape=None,
                  material="Si",
                  diffraction_geometry=DiffractionGeometry.BRAGG,
@@ -18,7 +45,6 @@ class Crystal(OpticalElementsWithSurfaceShape):
                  asymmetry_angle=0.0,
                  thickness=0.0,
                  ):
-
         super().__init__(name, surface_shape, boundary_shape)
         self._material = material
         self._diffraction_geometry = diffraction_geometry

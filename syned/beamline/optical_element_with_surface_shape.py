@@ -1,8 +1,8 @@
 """
-Base classes for optical elements with shape.
+Base classes for optical elements with shape(s).
 
    * OpticalElementsWithSurfaceShape (e.g. an elliptical mirror).
-   * OpticalElementsWithMultipleShapes.
+   * OpticalElementsWithMultipleShapes (e.g. a lens that has two surfaces).
 """
 from syned.beamline.optical_element import OpticalElement
 from syned.beamline.shape import SurfaceShape

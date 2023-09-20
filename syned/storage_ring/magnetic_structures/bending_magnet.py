@@ -8,13 +8,20 @@ import numpy
 import scipy.constants as codata
 
 class BendingMagnet(MagneticStructure):
+    """
+    Constructor.
+
+    Parameters
+    ----------
+    radius : float, optional
+        Physical Radius/curvature of the magnet in m.
+    magnetic_field : float, optional
+         Magnetic field strength in T.
+    length : float, optional
+        physical length of the bending magnet (along the arc) in m.
+
+    """
     def __init__(self, radius=1.0, magnetic_field=1.0, length=1.0):
-        """
-        Constructor.
-        :param radius: Physical Radius/curvature of the magnet in m
-        :param magnetic_field: Magnetic field strength in T
-        :param length: physical length of the bending magnet (along the arc) in m.
-        """
         MagneticStructure.__init__(self)
         self._radius         = radius
         self._magnetic_field = magnetic_field
@@ -31,26 +38,60 @@ class BendingMagnet(MagneticStructure):
     #methods for practical calculations
     #
     @classmethod
-    def initialize_from_magnetic_field_divergence_and_electron_energy(cls, magnetic_field=1.0, divergence=1e-3, electron_energy_in_GeV=1.0, **params):
+    def initialize_from_magnetic_field_divergence_and_electron_energy(cls,
+                                                                      magnetic_field=1.0,
+                                                                      divergence=1e-3,
+                                                                      electron_energy_in_GeV=1.0,
+                                                                      **params):
         """
-        Constructor from  magnetic field divergence and electron energy
-        :param magnetic_field: in T
-        :param divergence: in rad
-        :param electron_energy_in_GeV: in GeV
-        :return:
+        Returns an bending magnet from the magnetic field and electron energy.
+
+        Parameters
+        ----------
+        magnetic_field : float, optional
+             Magnetic field strength in T.
+        divergence : float, optional
+            The beam divergence also corresponding to the BM angle in rad.
+        electron_energy_in_GeV : float, optional
+            The electron beam energy in GeV.
+
+        params :
+            Other parameters accepted by BendingMagnet.
+
+        Returns
+        -------
+        instance of BendingMagnet
+
         """
         magnetic_radius = cls.calculate_magnetic_radius(magnetic_field, electron_energy_in_GeV)
 
         return cls(magnetic_radius, magnetic_field, numpy.abs(divergence * magnetic_radius), **params)
 
     @classmethod
-    def initialize_from_magnetic_radius_divergence_and_electron_energy(cls, magnetic_radius=10.0, divergence=1e-3, electron_energy_in_GeV=1.0, **params):
+    def initialize_from_magnetic_radius_divergence_and_electron_energy(cls,
+                                                                       magnetic_radius=10.0,
+                                                                       divergence=1e-3,
+                                                                       electron_energy_in_GeV=1.0,
+                                                                       **params):
         """
-        Constructor from  magnetic radius, divergence and electron energy
-        :param magnetic_radius: in m
-        :param divergence: in rad
-        :param electron_energy_in_GeV: in GeV
-        :return:
+        Returns an bending magnet from the magnetic radius and electron energy.
+
+        Parameters
+        ----------
+        magnetic_radius : float, optional
+             Magnetic radius in m.
+        divergence : float, optional
+            The beam divergence also corresponding to the BM angle in rad.
+        electron_energy_in_GeV : float, optional
+            The electron beam energy in GeV.
+
+        params :
+            Other parameters accepted by BendingMagnet.
+
+        Returns
+        -------
+        instance of BendingMagnet
+
         """
         magnetic_field = cls.calculate_magnetic_field(magnetic_radius, electron_energy_in_GeV)
 
@@ -59,57 +100,97 @@ class BendingMagnet(MagneticStructure):
 
     def length(self):
         """
-        return length in m
-        :return:
+        returns the BM length in m.
+
+        Returns
+        -------
+        float
+
         """
         return self._length
 
     def magnetic_field(self):
         """
-        return magnetic field in T
-        :return:
+        Returns the bagnetic field in T.
+
+        Returns
+        -------
+        float
+
         """
         return self._magnetic_field
 
     def radius(self):
         """
-        return radius in m
-        :return:
+        Returns the BM radius in m.
+
+        Returns
+        -------
+        float
+
         """
         return self._radius
 
     def horizontal_divergence(self):
         """
-        return horizontal divergence in rad
-        :return:
+        returns the horizontal divergence in rad.
+
+        Returns
+        -------
+        float
+
         """
         return numpy.abs(self.length()/self.radius())
 
     def get_magnetic_field(self, electron_energy_in_GeV):
         """
-        calculates magnetic field from magnetic radius and electron energy
-        :param electron_energy_in_GeV:
-        :return:
+        returns magnetic field in T (from the magnetic radius and electron energy).
+
+        Parameters
+        ----------
+        electron_energy_in_GeV : float, optional
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+
         """
         return BendingMagnet.calculate_magnetic_field(self._radius, electron_energy_in_GeV)
 
     def get_magnetic_radius(self, electron_energy_in_GeV):
         """
-        calculates magnetic radius from magnetic field and electron energy
-        :param electron_energy_in_GeV:
-        :return:
+        Calculates magnetic radius (from the magnetic field and electron energy).
+
+        Parameters
+        ----------
+        electron_energy_in_GeV : float, optional
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+
         """
         return BendingMagnet.calculate_magnetic_radius(self._magnetic_field, electron_energy_in_GeV)
 
 
     def get_critical_energy(self, electron_energy_in_GeV, method=1):
         """
-        Calculates critical energy
-        :param electron_energy_in_GeV:
-        :param method: 0= uses magnetic radius, 1=uses magnetic field
-        :return: Photon Critical energy in eV
-        """
+        Returns the photon critical energy in eV.
 
+        Parameters
+        ----------
+        electron_energy_in_GeV : float, optional
+            The electron beam energy in GeV.
+        method : int, optional
+            0= uses magnetic radius, 1=uses magnetic field
+
+        Returns
+        -------
+        float
+
+        """
         if method == 0:
             return BendingMagnet.calculate_critical_energy(self._radius, electron_energy_in_GeV)
         else:
@@ -121,10 +202,24 @@ class BendingMagnet(MagneticStructure):
     @classmethod
     def calculate_magnetic_field(cls, magnetic_radius, electron_energy_in_GeV):
         """
-        Calculates magnetic field
-        :param magnetic_radius:
-        :param electron_energy_in_GeV:
-        :return: magnetic field in T
+        Calculates magnetic field from magnetic radius and electron energy.
+
+        Parameters
+        ----------
+        magnetic_radius : float
+             Magnetic radius in m.
+        electron_energy_in_GeV : float
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+            The magnetic field in T.
+
+        References
+        ----------
+        See, for example, https://people.eecs.berkeley.edu/~attwood/srms/2007/Lec09.pdf
+
         """
         # return 3.334728*electron_energy_in_GeV/magnetic_radius
         return 1e9 / codata.c * electron_energy_in_GeV / magnetic_radius
@@ -132,10 +227,24 @@ class BendingMagnet(MagneticStructure):
     @classmethod
     def calculate_magnetic_radius(cls, magnetic_field, electron_energy_in_GeV):
         """
-        Calculates magnetic radius
-        :param magnetic_field:
-        :param electron_energy_in_GeV:
-        :return:
+        Calculates magnetic radius from magnetic field and electron energy.
+
+        Parameters
+        ----------
+        magnetic_field : float
+             Magnetic field in T.
+        electron_energy_in_GeV : float
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+            The magnetic radius in m.
+
+        References
+        ----------
+        See, for example, https://people.eecs.berkeley.edu/~attwood/srms/2007/Lec09.pdf
+
         """
         # return 3.334728*electron_energy_in_GeV/magnetic_field
         return 1e9 / codata.c * electron_energy_in_GeV / magnetic_field
@@ -143,10 +252,24 @@ class BendingMagnet(MagneticStructure):
     @classmethod
     def calculate_critical_energy(cls, magnetic_radius, electron_energy_in_GeV):
         """
-        Calculates critical energy
-        :param magnetic_radius:
-        :param electron_energy_in_GeV:
-        :return:
+        Calculates the photon critical energy from magnetic radius and electron energy.
+
+        Parameters
+        ----------
+        magnetic_radius : float
+             Magnetic radius in m.
+        electron_energy_in_GeV : float
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+            The photon critical energy in eV.
+
+        References
+        ----------
+        See, for example, https://people.eecs.berkeley.edu/~attwood/srms/2007/Lec09.pdf
+
         """
         # omega = 3 g3 c / (2r)
         gamma = 1e9 * electron_energy_in_GeV / (codata.m_e *  codata.c**2 / codata.e)
@@ -157,10 +280,24 @@ class BendingMagnet(MagneticStructure):
     @classmethod
     def calculate_critical_energy_from_magnetic_field(cls, magnetic_field, electron_energy_in_GeV):
         """
-        Calculates critical energy
-        :param magnetic_field:
-        :param electron_energy_in_GeV:
-        :return:
+        Calculates the photon critical energy from magnetic field and electron energy.
+
+        Parameters
+        ----------
+        magnetic_field : float
+             Magnetic field in T.
+        electron_energy_in_GeV : float
+            The electron beam energy in GeV.
+
+        Returns
+        -------
+        float
+            The critical energy in eV.
+
+        References
+        ----------
+        See, for example, https://people.eecs.berkeley.edu/~attwood/srms/2007/Lec09.pdf
+
         """
         # omega = 3 g3 c / (2r)
         magnetic_radius = cls.calculate_magnetic_radius(magnetic_field, electron_energy_in_GeV)
