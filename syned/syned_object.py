@@ -26,6 +26,12 @@ class SynedObject(object):
             ordered_support_dict[e[0]] = (e[1], e[2])
         self._support_dictionary = ordered_support_dict
 
+    def _add_support_text(self, text):
+        try:
+            for e in text:
+                self._support_dictionary[e[0]] = (e[1], e[2])
+        except:
+            self._set_support_text(text)
 
     #
     # this is the common interface to allow json file input/output and info mechanism
@@ -159,7 +165,10 @@ class SynedObject(object):
                         text += self.info_recurrent(element,prefix="    ")
                 elif isinstance(fd[key][0],list):
                     for i,element in enumerate(fd[key][0]):
-                        text += element.info()
+                        try:
+                            text += element.info()
+                        except:
+                            text += ("%s%s[%d]: %s\n" %(prefix, key, i, repr(element))) # used for conic coefficients
                 else:
                     text += prefix + '    %s: %s %s # %s\n' %(key,  repr(fd[key][0]), fd[key][1][1], fd[key][1][0])
             else:

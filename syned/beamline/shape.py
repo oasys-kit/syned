@@ -85,10 +85,13 @@ class BoundaryShape(Shape):
 # Subclasses for SurfaceShape
 #############################
 
-class Cylinder: # TODO: must heritate from SurfaceShape.
+class Cylinder(SynedObject):
     def __init__(self, cylinder_direction=Direction.TANGENTIAL):
         """
-        Defines a cylindrical surface shape.
+        Defines that a surface shape is cylindrical in one direction.
+
+        Usage: must be used with double inheritance in other classes (e.g. ParabolicCylinder).
+        It should not be used standalone.
 
         Parameters
         ----------
@@ -97,6 +100,10 @@ class Cylinder: # TODO: must heritate from SurfaceShape.
 
         """
         self._cylinder_direction = cylinder_direction
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._add_support_text([
+                    ("cylinder_direction"        , "(0=tangential, 1=sagittal)", " " ),
+            ] )
 
     def get_cylinder_direction(self):
         """
@@ -125,6 +132,10 @@ class Conic(SurfaceShape):
         SurfaceShape.__init__(self, convexity=Convexity.NONE)
 
         self._conic_coefficients = conic_coefficients
+
+        self._set_support_text([
+                    ("conic_coefficients"         , "Conic coeffs.   ", " " ),
+            ] )
 
     def get_conic_coefficients(self):
         """
@@ -160,6 +171,13 @@ class Sphere(SurfaceShape):
     def __init__(self, radius=1.0, convexity=Convexity.UPWARD):
         SurfaceShape.__init__(self, convexity=convexity)
         self._radius = radius
+
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("radius"         , "Sphere radius   ", "m" ),
+                    ("convexity"                  , "(0=upwards, 1=downwards)", " "),
+            ] )
+
 
     @classmethod
     def create_sphere_from_radius(cls, radius=0.0, convexity=Convexity.UPWARD):
@@ -399,6 +417,13 @@ class Ellipsoid(SurfaceShape):
         self._min_axis = min_axis
         self._maj_axis = maj_axis
         self._p_focus  = p_focus
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("min_axis"         , "Ellipse major axis   ", "m" ),
+                    ("maj_axis"         , "Ellipse minor axis   ", "m"),
+                    ("min_axis"         , "Ellipse p (source-focus to pole)   ", "m"),
+                    ("convexity"        , "(0=upwards, 1=downwards)", " "),
+            ] )
 
 
     @classmethod
@@ -827,6 +852,13 @@ class Hyperboloid(SurfaceShape):
         self._min_axis = min_axis
         self._maj_axis = maj_axis
         self._p_focus  = p_focus
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("min_axis"         , "Hyperbola major axis   ", "m" ),
+                    ("maj_axis"         , "Hyperbola minor axis   ", "m"),
+                    ("min_axis"         , "Hyperbola p (source-focus to pole)   ", "m"),
+                    ("convexity"        , "(0=upwards, 1=downwards)", " "),
+            ] )
 
     @classmethod
     def create_hyperboloid_from_axes(cls, min_axis=0.0, maj_axis=0.0, p_focus=0.0, convexity=Convexity.UPWARD):
@@ -1239,6 +1271,13 @@ class Paraboloid(SurfaceShape):
         self._parabola_parameter = parabola_parameter
         self._at_infinity = at_infinity
         self._pole_to_focus = pole_to_focus
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("parabola_parameter"         , "Parabola parameter   ", "m" ),
+                    ("at_infinity"                , "(0=source, 1=image)", " " ),
+                    ("pole_to_focus"              , "pole to focus", "m"),
+                    ("convexity"                  , "(0=upwards, 1=downwards)", " "),
+            ] )
 
     @classmethod
     def create_paraboloid_from_parabola_parameter(cls, parabola_parameter=0.0, at_infinity=Side.SOURCE,
@@ -1534,7 +1573,7 @@ class Toroid(SurfaceShape):
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
                     ("min_radius"         , "Minor radius r   ", "m" ),
-                    ("maj_radius"         , "Major radius R (optical=R+r)", "m" ),
+                    ("maj_radius"         , "Major (optical) radius R (R=Ro+r)", "m" ),
             ] )
 
     @classmethod
@@ -1576,10 +1615,9 @@ class Toroid(SurfaceShape):
         instance of Toroid
 
         """
-        toroid = Toroid()
-        toroid.initialize_from_p_q(p, q, grazing_angle)
-
-        return toroid
+        R = 2 / numpy.sin(grazing_angle) * p * q / (p + q)
+        r = 2 * numpy.sin(grazing_angle) * p * q / (p + q)
+        return Toroid(min_radius=r, maj_radius=R)
 
     def get_radii(self):
         """
@@ -2236,6 +2274,7 @@ class MultiplePatch(BoundaryShape):
             self._patch_list = []
         else:
             self._patch_list = patch_list
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
                     ("multiple_patch_list",  "Multiple Patch", ""),
             ])
@@ -2444,6 +2483,18 @@ class DoubleRectangle(MultiplePatch):
         self.append_patch(Rectangle(x_left=x_left1, x_right=x_right1, y_bottom=y_bottom1, y_top=y_top1))
         self.append_patch(Rectangle(x_left=x_left2, x_right=x_right2, y_bottom=y_bottom2, y_top=y_top2))
 
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("x_left1"          , "x (width) minimum (signed)   ", "m" ),
+                    ("x_right1"         , "x (width) maximum (signed)   ", "m" ),
+                    ("y_bottom1"        , "y (length) minimum (signed)  ", "m" ),
+                    ("y_top1"           , "y (length) maximum (signed)  ", "m" ),
+                    ("x_left2"          , "x (width) minimum (signed)   ", "m" ),
+                    ("x_right2"         , "x (width) maximum (signed)   ", "m" ),
+                    ("y_bottom2"        , "y (length) minimum (signed)  ", "m" ),
+                    ("y_top2"           , "y (length) maximum (signed)  ", "m" ),
+            ] )
+
     def set_boundaries(self,x_left1=-0.010, x_right1=0.0, y_bottom1=-0.020, y_top1=0.0,
                         x_left2=-0.010, x_right2=0.010, y_bottom2=-0.001, y_top2=0.020):
         self._patch_list[0].set_boundaries(x_left1, x_right1, y_bottom1, y_top1)
@@ -2480,7 +2531,16 @@ class DoubleEllipse(MultiplePatch):
         self.reset()
         self.append_patch(Ellipse(a_axis_min1, a_axis_max1, b_axis_min1, b_axis_max1))
         self.append_patch(Ellipse(a_axis_min2, a_axis_max2, b_axis_min2, b_axis_max2))
-
+        self._set_support_text([
+                    ("a_axis_min1"         , "x (width) axis starts (signed)  ", "m" ),
+                    ("a_axis_max1"         , "x (width) axis ends (signed)    ", "m" ),
+                    ("b_axis_min1"         , "y (length) axis starts (signed) ", "m" ),
+                    ("b_axis_max1"         , "y (length) axis ends (signed)   ", "m" ),
+                    ("a_axis_min2"         , "x (width) axis starts (signed)  ", "m" ),
+                    ("a_axis_max2"         , "x (width) axis ends (signed)    ", "m" ),
+                    ("b_axis_min2"         , "y (length) axis starts (signed) ", "m" ),
+                    ("b_axis_max2"         , "y (length) axis ends (signed)   ", "m" ),
+            ] )
     def set_boundaries(self,a_axis_min1=-0.010, a_axis_max1=0.0,   b_axis_min1=-0.020, b_axis_max1=0.0,
                             a_axis_min2=-0.010, a_axis_max2=0.010, b_axis_min2=-0.001, b_axis_max2=0.020):
         """
@@ -2535,7 +2595,15 @@ class DoubleCircle(MultiplePatch):
         self.reset()
         self.append_patch(Circle(radius1,x_center1,y_center1))
         self.append_patch(Circle(radius2,x_center2,y_center2))
-
+        # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
+        self._set_support_text([
+                    ("radius1"              , "radius  ", "m" ),
+                    ("x_center1"            , "x center (signed)    ", "m" ),
+                    ("y_center1"            , "y center (signed)    ", "m" ),
+                    ("radius2"              , "radius  ", "m" ),
+                    ("x_center2"            , "x center (signed)    ", "m" ),
+                    ("y_center2"            , "y center (signed)    ", "m" ),
+            ] )
     def set_boundaries(self,radius1=50e-6,x_center1=0.0,y_center1=0.0,
                             radius2=50e-6,x_center2=100e-6,y_center2=100e-6):
         """
@@ -2592,18 +2660,73 @@ if __name__=="__main__":
     p = 20
     q = 10
     theta_graz = 0.003
+
+    #
+    # toroid
+    #
+    par = Toroid.create_toroid_from_p_q(p=p, q=q, grazing_angle=theta_graz)
+    print("inputs  p, q, theta_graz: ", p, q, theta_graz)
+    radii = par.get_radii()
+    print("toroid radii: ", radii )
+    R =  2 / numpy.sin(theta_graz) * p * q / (p + q)
+    r =  2 * numpy.sin(theta_graz) * p * q / (p + q)
+    assert ((radii[0] - R) < 1e-10 )
+    assert ((radii[0] - r) < 1e-10 )
+    print(par.info())
+
+    #
+    # paraboloid
+    #
     at_infinity = Side.SOURCE
+
     par = Paraboloid.create_paraboloid_from_p_q(p=p, q=q, grazing_angle=theta_graz, at_infinity=at_infinity, convexity=Convexity.UPWARD)
     print("inputs  p, q, theta_graz: ", p, q, theta_graz, at_infinity)
-    print ("ellipse p or q: ",par.get_pole_to_focus())
-    print("ellipse par: ", par.get_parabola_parameter())
-    print("ellipse grazing_angle: ", par.get_grazing_angle())
+    print ("parabola p or q: ",par.get_pole_to_focus())
+    print("parabola par: ", par.get_parabola_parameter())
+    print("parabola grazing_angle: ", par.get_grazing_angle())
     if par.get_at_infinity() == Side.SOURCE:
         assert (numpy.abs(q - par.get_pole_to_focus()) < 1e-10 )
     else:
         assert (numpy.abs(p - par.get_pole_to_focus()) < 1e-10)
     assert (numpy.abs(theta_graz - par.get_grazing_angle()) < 1e-10)
+    print(par.info())
 
+    #
+    # parabolic cylinder: TODO: check that the info is not good for double inheritage
+    #
+    a = Cylinder()
+    print(a.info())
+    print(a.to_dictionary())
+
+    parC = ParabolicCylinder(par, a)
+    print(parC.info())
+
+    #
+    # conic coeffs.
+    #
+    ccc = Conic()
+    print(ccc.get_conic_coefficients())
+    print(ccc.info())
+
+    # print(parC.keys())
+    # print(parC._support_dictionary)
+    # d = parC.to_dictionary()
+    # # print(d)
+    # for key in d:
+    #     print("----", key, d[key] )
+
+    #.create_paraboloid_from_p_q(p=p, q=q, grazing_angle=theta_graz, at_infinity=at_infinity,
+    #                                                    # convexity=Convexity.UPWARD)
+    # print("inputs  p, q, theta_graz: ", p, q, theta_graz, at_infinity)
+    # print ("parabola p or q: ",parC.get_pole_to_focus())
+    # print("parabola par: ", parC.get_parabola_parameter())
+    # print("parabola grazing_angle: ", par.get_grazing_angle())
+    # # if parC.get_at_infinity() == Side.SOURCE:
+    # #     assert (numpy.abs(q - par.get_pole_to_focus()) < 1e-10 )
+    # # else:
+    # #     assert (numpy.abs(p - par.get_pole_to_focus()) < 1e-10)
+    # # assert (numpy.abs(theta_graz - par.get_grazing_angle()) < 1e-10)
+    # print(parC.info())
 
     # circle = Circle(3.0)
     #

@@ -82,9 +82,15 @@ class OpticalElementsWithSurfaceShape(OpticalElementsWithMultipleShapes):
                                                               boundary_shape=boundary_shape,
                                                               surface_shapes=[surface_shape])
 
+    # these definitions are necessary to define self._surface_shape which is needed to
+    # build the object instance from json files.
     @property
     def _surface_shape(self):
         return self.get_surface_shape()
+
+    @_surface_shape.setter
+    def _surface_shape(self, value):
+        self.set_surface_shape(value)
 
     def get_surface_shape(self):
         """
