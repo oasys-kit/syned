@@ -26,9 +26,9 @@ if __name__ == "__main__":
     patches.append_rectangle(-0.02,-0.01,-0.001,0.001)
     patches.append_rectangle(0.01,0.02,-0.001,0.001)
 
-    slit1 = Slit(name="slit1",boundary_shape=patches)
+    slit1 = Slit(name="slit1", boundary_shape=patches)
 
-    mylist = [src1,src2,slit1]
+    mylist = [src1, src2, slit1]
 
     #
     # test individual elements
@@ -37,46 +37,47 @@ if __name__ == "__main__":
     for i,element in enumerate(mylist):
         element.to_json("tmp_%d.json"%i)
 
-    for i,element in enumerate(mylist):
-        print("loading element %d"%i)
+    for i, element in enumerate(mylist):
+        print("\nloading element %d"%i)
         tmp = load_from_json_file("tmp_%d.json"%i)
         print("returned class: ",type(tmp))
+        print(mylist[i].to_dictionary())
+        print(tmp.to_dictionary())
+        assert (mylist[i].to_dictionary() == tmp.to_dictionary())
 
 
 
     #
     # test Ligtsource
     #
-    lightsource1 = LightSource("test_source",src1,src2)
+    lightsource1 = LightSource("test_source",src1, src2)
     lightsource1.to_json("tmp_100.json")
 
-    tmp = load_from_json_file("tmp_100.json")
-    print("returned class: ",type(tmp))
-    print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+    for i in [100]:
+        print("\nloading element %d"%i)
+        tmp = load_from_json_file("tmp_%d.json"%i)
+        print("returned class: ",type(tmp))
+        print(lightsource1.to_dictionary())
+        print(tmp.to_dictionary())
+        assert (lightsource1.to_dictionary() == tmp.to_dictionary())
 
-    print( tmp.get_electron_beam().info() )
-    print( tmp.get_magnetic_structure().info() )
 
     #
-    # test full beamline
+    # test beamline element
     #
 
     SLIT1       = BeamlineElement(slit1,        coordinates=ElementCoordinates(p=15.0))
 
     MyList = [SLIT1]
 
-
-    #
-    # test BeamlineElement
-    #
-
-
     for i,element in enumerate(MyList):
 
         element.to_json("tmp_%d.json"%(100+i))
         tmp = load_from_json_file("tmp_%d.json"%(100+i))
         print("returned class: ",type(tmp))
-        print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+        print(element.to_dictionary())
+        print(tmp.to_dictionary())
+        assert (element.to_dictionary() == tmp.to_dictionary())
 
     #
     # test Beamline
@@ -85,17 +86,11 @@ if __name__ == "__main__":
     BL = Beamline(LightSource(name="test",electron_beam=src1,magnetic_structure=src2),
                   [SLIT1])
 
-    BL.to_json("tmp_200.json")
+    BL.to_json("tmp_300.json")
 
     #
-    tmp = load_from_json_file("tmp_200.json")
+    tmp = load_from_json_file("tmp_300.json")
     print("returned class: ",type(tmp))
-
-
-    print(tmp.get_light_source().info())
-    for element in tmp.get_beamline_elements():
-        print("list element class: ",type(element))
-        print(element.info())
-    #
-    #
-    print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+    print(BL.to_dictionary())
+    print(tmp.to_dictionary())
+    assert(BL.to_dictionary() == tmp.to_dictionary())

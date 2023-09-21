@@ -2276,7 +2276,7 @@ class MultiplePatch(BoundaryShape):
             self._patch_list = patch_list
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
-                    ("multiple_patch_list",  "Multiple Patch", ""),
+                    ("patch_list",  "Multiple Patch", ""),
             ])
 
 
@@ -2293,7 +2293,7 @@ class MultiplePatch(BoundaryShape):
         dict_to_save = OrderedDict()
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
 
-        dict_to_save["multiple_patch_list"] = [el.to_dictionary() for el in self._patch_list]
+        dict_to_save["patch_list"] = [el.to_dictionary() for el in self._patch_list]
 
         return dict_to_save
 
