@@ -32,7 +32,7 @@ if __name__ == "__main__":
     src2 = Undulator()
     src2.set_value_from_key_name("K_horizontal",33)
     # just to be sure...
-    assert (33,src2.get_value_from_key_name("K_horizontal"))
+    assert (33 == src2.get_value_from_key_name("K_horizontal"))
 
     src = LightSource("test",src1,src2)
 
