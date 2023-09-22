@@ -47,7 +47,10 @@ from syned.beamline.element_coordinates import ElementCoordinates
 
 from collections import OrderedDict
 
-import json
+try:
+    import json_tricks as json # to save numpy arrays
+except:
+    import json
 from urllib.request import urlopen
 
 def load_from_json_file(file_name, exec_commands=None):
@@ -155,15 +158,17 @@ def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
                     tmp2 = load_from_json_dictionary_recurrent(jsn[key],exec_commands=exec_commands)
                     if verbose: print(">>>>2",key,type(tmp2))
                     tmp1.set_value_from_key_name(key,tmp2)
-                elif isinstance(jsn[key],list):
+                elif isinstance(jsn[key], list):
                     if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(jsn[key]))
                     out_list_of_objects = []
                     for element in jsn[key]:
-                        if isinstance(element,dict):
+                        if isinstance(element, dict):
                             if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(element))
                             tmp3 = load_from_json_dictionary_recurrent(element, exec_commands=exec_commands)
                             if verbose: print(">>>>3",type(tmp3))
                             out_list_of_objects.append(tmp3)
+                        else:
+                            print("***** Failed to load", element)
                     if verbose: print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",out_list_of_objects)
                     tmp1.set_value_from_key_name(key,out_list_of_objects)
                         # tmp1.set_value_from_key_name(key,tmp2)

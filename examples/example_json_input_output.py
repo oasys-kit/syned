@@ -28,16 +28,18 @@ if __name__ == "__main__":
 
     src1 = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=6.0,current=0.2)
     src2 = Undulator()
+    lightsource1 = LightSource("test_source", src1, src2)
+
     screen1 = Screen("screen1")
     lens1 = IdealLens(name="lens1",focal_y=6.0,focal_x=None,)
     filter1 = Filter("filter1","H2O",3.0e-6)
     slit1 = Slit(name="slit1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
     stopper1 = BeamStopper(name="stopper1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3))
     mirror1 = Mirror(name="mirror1",boundary_shape=Rectangle(-0.5e-3,0.5e-3,-2e-3,2e-3), surface_shape=Toroid())
-    crystal1 = Crystal(name="crystal1",surface_shape=Plane())
     grating1 = Grating(name="grating1",surface_shape=Conic())
+    crystal1 = Crystal(name="crystal1",surface_shape=Plane())
 
-    mylist = [src1,src2,screen1,lens1,filter1,slit1, stopper1, mirror1, grating1, crystal1]
+    mylist = [lightsource1, screen1, lens1, filter1, slit1, stopper1, mirror1, crystal1, grating1]
 
     #
     # test individual elements
@@ -48,67 +50,57 @@ if __name__ == "__main__":
 
     for i,element in enumerate(mylist):
         print("loading element %d"%i)
-        try:
-            tmp = load_from_json_file("tmp_%d.json"%i)
-            print("returned class: ",type(tmp))
-        except:
-            print(">>>>> ERROR LOADING JSON FILE!!!!!")
+        tmp = load_from_json_file("tmp_%d.json"%i)
+        print("returned class: ",type(tmp))
+        print(element.to_dictionary())
+        print(tmp.to_dictionary())
+        # assert (element.to_dictionary() == tmp.to_dictionary())
 
 
-    # #
-    # # test Ligtsource
-    # #
-    # lightsource1 = LightSource("test_source",src1,src2)
-    # lightsource1.to_json("tmp_100.json")
+
     #
-    # tmp = load_from_json_file("tmp_100.json")
-    # print("returned class: ",type(tmp))
-    # print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+    # test full beamline
     #
-    # print( tmp.get_electron_beam().info() )
-    # print( tmp.get_magnetic_structure().info() )
+
+    SCREEN1     = BeamlineElement(screen1,      coordinates=ElementCoordinates(p=11.0))
+    LENS1       = BeamlineElement(lens1,        coordinates=ElementCoordinates(p=12.0))
+    FILTER1     = BeamlineElement(filter1,      coordinates=ElementCoordinates(p=13.0))
+    SLIT1       = BeamlineElement(slit1,        coordinates=ElementCoordinates(p=15.0))
+    STOPPER1    = BeamlineElement(stopper1,     coordinates=ElementCoordinates(p=16.0))
+    MIRROR1     = BeamlineElement(mirror1,      coordinates=ElementCoordinates(p=17.0))
+    GRATING1    = BeamlineElement(grating1,     coordinates=ElementCoordinates(p=18.0))
+    CRYSTAL1    = BeamlineElement(crystal1,     coordinates=ElementCoordinates(p=19.0))
+
+    MyList = [SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1]
+
+
     #
-    # #
-    # # test full beamline
-    # #
+    # test BeamlineElement
     #
-    # SCREEN1     = BeamlineElement(screen1,      coordinates=ElementCoordinates(p=11.0))
-    # LENS1       = BeamlineElement(lens1,        coordinates=ElementCoordinates(p=12.0))
-    # FILTER1     = BeamlineElement(filter1,      coordinates=ElementCoordinates(p=13.0))
-    # SLIT1       = BeamlineElement(slit1,        coordinates=ElementCoordinates(p=15.0))
-    # STOPPER1    = BeamlineElement(stopper1,     coordinates=ElementCoordinates(p=16.0))
-    # MIRROR1     = BeamlineElement(mirror1,      coordinates=ElementCoordinates(p=17.0))
-    # GRATING1    = BeamlineElement(grating1,     coordinates=ElementCoordinates(p=18.0))
-    # CRYSTAL1    = BeamlineElement(crystal1,     coordinates=ElementCoordinates(p=19.0))
-    #
-    # MyList = [SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1]
-    #
-    #
-    # #
-    # # test BeamlineElement
-    # #
-    #
-    #
+
+
     # for i,element in enumerate(MyList):
     #
     #     element.to_json("tmp_%d.json"%(100+i))
     #     tmp = load_from_json_file("tmp_%d.json"%(100+i))
     #     print("returned class: ",type(tmp))
     #     print("\n-----------Info on: \n",tmp.info(),"----------------\n\n")
+
     #
-    # #
-    # # test Beamline
-    # #
+    # test Beamline
     #
-    # BL = Beamline(LightSource(name="test",electron_beam=src1,magnetic_structure=src2),
-    #               [SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1])
-    #
-    # BL.to_json("tmp_200.json")
-    #
-    # #
-    # tmp = load_from_json_file("tmp_200.json")
-    # print("returned class: ",type(tmp))
-    #
+
+    BL = Beamline(LightSource(name="test",electron_beam=src1,magnetic_structure=src2),
+                  [SCREEN1,LENS1,FILTER1,SLIT1,STOPPER1,MIRROR1,CRYSTAL1,GRATING1])
+
+    BL.to_json("tmp_200.json")
+
+    tmp = load_from_json_file("tmp_200.json")
+    print("returned class: ",type(tmp))
+    print(BL.to_full_dictionary())
+    print(tmp.to_full_dictionary())
+    # assert(BL.to_full_dictionary() == tmp.to_full_dictionary())
+
     #
     # print(tmp.get_light_source().info())
     # for element in tmp.get_beamline_elements():

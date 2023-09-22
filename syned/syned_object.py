@@ -1,6 +1,9 @@
 import copy
 from collections import OrderedDict
-import json
+try:
+    import json_tricks as json # to save numpy arrays
+except:
+    import json
 
 # TODO: although basic functionality is implemented, the use of exec should be replace by introspection tools
 class SynedObject(object):
@@ -63,6 +66,9 @@ class SynedObject(object):
         """
         Returns a dictionary with the object fields.
 
+        Some dictionary keys may contain SYNED instances. Use to_full_dictionary to recurrently expand these objects
+        in their basic ingredients.
+
         Returns
         -------
         dict
@@ -89,6 +95,8 @@ class SynedObject(object):
         """
         Returns a dictionary with the object fields, including other syned objects embedded or list of elements.
 
+        The "full" means that the SYNED instances found are recurrently expanded in their basic ingredients.
+
         Returns
         -------
         dict
@@ -97,17 +105,18 @@ class SynedObject(object):
         dict_to_save = OrderedDict()
         dict_to_save.update({"CLASS_NAME":self.__class__.__name__})
         try:
-            for key in self.keys():
-                tmp1 = eval("self._%s" % (key) )
-                if isinstance(tmp1,SynedObject):
-                    dict_to_save[key] = tmp1.to_full_dictionary()
-                else:
-                    mylist = []
-                    mylist.append(tmp1)
-                    mylist.append(self._support_dictionary[key])
-                    dict_to_save[key] = mylist # [tmp1,self._support_dictionary[key]]
+            if self.keys() is not None:
+                for key in self.keys():
+                    tmp1 = eval("self._%s" % (key) )
+                    if isinstance(tmp1, SynedObject):
+                        dict_to_save[key] = tmp1.to_full_dictionary()
+                    else:
+                        mylist = []
+                        mylist.append(tmp1)
+                        mylist.append(self._support_dictionary[key])
+                        dict_to_save[key] = mylist # [tmp1,self._support_dictionary[key]]
         except:
-            pass
+            print("** Warning: failed to load/write one or multiple items in ", self.keys())
 
         return dict_to_save
 
@@ -154,28 +163,29 @@ class SynedObject(object):
 
         """
         text = ""
+        prefix1 = prefix
         for key in fd.keys():
             if isinstance(fd[key],OrderedDict):
-                text += prefix + self.info_recurrent(fd[key])
+                text += prefix1 + self.info_recurrent(fd[key], prefix=prefix1)
             elif isinstance(fd[key],str):
-                text += prefix + "-------%s---------\n"%fd[key]
+                text += prefix1 + "-------%s---------\n"%fd[key]
             elif isinstance(fd[key],list):
                 if isinstance(fd[key][0],OrderedDict):
                     for element in fd[key]:
-                        text += self.info_recurrent(element,prefix="    ")
+                        text += self.info_recurrent(element, prefix=prefix1)
                 elif isinstance(fd[key][0],list):
                     for i,element in enumerate(fd[key][0]):
                         try:
-                            text += element.info()
+                            # text += "****\n"
+                            text += prefix1 + element.info()
                         except:
-                            text += ("%s%s[%d]: %s\n" %(prefix, key, i, repr(element))) # used for conic coefficients
+                            text += ("%s%s[%d]: %s\n" %(prefix1, key, i, repr(element))) # used for conic coefficients
                 else:
-                    text += prefix + '    %s: %s %s # %s\n' %(key,  repr(fd[key][0]), fd[key][1][1], fd[key][1][0])
+                    text += prefix1 + prefix1 + '%s: %s %s # %s\n' %(key,  repr(fd[key][0]), fd[key][1][1], fd[key][1][0])
             else:
                 pass
         return text
 
-    # TODO: not working correctly for beamline
     def info(self):
         """
         Get text info of recurrent SYNED objects.

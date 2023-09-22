@@ -131,7 +131,9 @@ class Conic(SurfaceShape):
                  conic_coefficients=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]):
         SurfaceShape.__init__(self, convexity=Convexity.NONE)
 
-        self._conic_coefficients = conic_coefficients
+        # stored as numpy array, not as list, to avoid in i/o to interpret the items as syned objects.
+        self._conic_coefficients = numpy.array(conic_coefficients)
+
 
         self._set_support_text([
                     ("conic_coefficients"         , "Conic coeffs.   ", " " ),
@@ -147,7 +149,7 @@ class Conic(SurfaceShape):
             A list with the 10 coefficients.
 
         """
-        return self._conic_coefficients
+        return list(self._conic_coefficients)
 
 class Plane(SurfaceShape):
     """
@@ -2254,7 +2256,14 @@ class Polygon(BoundaryShape):
 
         """
         inside = self.check_inside(x0, y0)
-        return ~inside
+        if isinstance(inside, list):
+            out = []
+            for item in inside:
+                out.append(not(item))
+        else:
+            out = not(inside)
+
+        return out
 
 
 class MultiplePatch(BoundaryShape):
@@ -2632,34 +2641,18 @@ class DoubleCircle(MultiplePatch):
 
 if __name__=="__main__":
 
-    pass
-
-
-    # ell = Ellipsoid()
-    # ell.initialize_from_p_q(20, 10, 0.2618)
-    # print ("ellipse axes: ",ell._min_axis/2, ell._maj_axis/2)
-    #
-    #
-    # ell = Ellipsoid(min_axis=ell._min_axis, maj_axis=ell._maj_axis)
-    # print("for grazing angle 0.2618, ellipse p,q = ",ell.get_p_q(0.2618))
-
-
-    # ell = Ellipsoid()
-    # p = 20
-    # q = 10
-    # theta_graz = 0.2618
-    # ell.initialize_from_p_q(p, q, theta_graz)
-    # print ("ellipse p, q: ",ell.get_p(), ell.get_q())
-    # print("ellipse grazing_angle: ", ell.get_grazing_angle())
-    # assert (numpy.abs(p - ell.get_p()) < 1e-10 )
-    # assert (numpy.abs(q - ell.get_q()) < 1e-10)
-    # assert (numpy.abs(theta_graz - ell.get_grazing_angle()) < 1e-10)
-
 
 
     p = 20
     q = 10
     theta_graz = 0.003
+
+    #
+    # Ellipsoid
+    #
+    ell = Ellipsoid()
+    ell.initialize_from_p_q(p, q, theta_graz)
+
 
     #
     # toroid
@@ -2701,89 +2694,84 @@ if __name__=="__main__":
     parC = ParabolicCylinder(par, a)
     print(parC.info())
 
+
+
     #
+    # some other checks...
+    #
+
     # conic coeffs.
-    #
     ccc = Conic()
     print(ccc.get_conic_coefficients())
     print(ccc.info())
-
-    # print(parC.keys())
-    # print(parC._support_dictionary)
-    # d = parC.to_dictionary()
-    # # print(d)
-    # for key in d:
-    #     print("----", key, d[key] )
-
-    #.create_paraboloid_from_p_q(p=p, q=q, grazing_angle=theta_graz, at_infinity=at_infinity,
-    #                                                    # convexity=Convexity.UPWARD)
-    # print("inputs  p, q, theta_graz: ", p, q, theta_graz, at_infinity)
-    # print ("parabola p or q: ",parC.get_pole_to_focus())
-    # print("parabola par: ", parC.get_parabola_parameter())
-    # print("parabola grazing_angle: ", par.get_grazing_angle())
-    # # if parC.get_at_infinity() == Side.SOURCE:
-    # #     assert (numpy.abs(q - par.get_pole_to_focus()) < 1e-10 )
-    # # else:
-    # #     assert (numpy.abs(p - par.get_pole_to_focus()) < 1e-10)
-    # # assert (numpy.abs(theta_graz - par.get_grazing_angle()) < 1e-10)
-    # print(parC.info())
-
-    # circle = Circle(3.0)
-    #
-    # print(circle.get_radius(),circle.get_center())
-    # print(circle.get_boundaries())
+    ccc.to_json("tmp.json")
+    from syned.util.json_tools import load_from_json_file
+    tmp = load_from_json_file("tmp.json")
+    print("returned class: ",type(tmp))
+    print(ccc.to_dictionary())
+    print(tmp.to_dictionary())
+    from deepdiff import DeepDiff # use this because  == gives an error
+    assert (len(DeepDiff(ccc.to_dictionary(), tmp.to_dictionary())) == 0)
 
 
 
 
-    # patches = MultiplePatch()
-    #
-    # patches.append_rectangle(-0.02,-0.01,-0.001,0.001)
-    # patches.append_rectangle(0.01,0.02,-0.001,0.001)
-    # patches.append_polygon([-0.02,-0.02,0.02,0.02], [-0.02,0.02,0.02,-0.02])
-    #
-    # print(patches.get_number_of_patches(),patches.get_boundaries())
-    # for patch in patches.get_patches():
-    #     print(patch.info())
-    # print("Patch 0 is: ",patches.get_name_of_patch(0))
-    # print("Patch 1 is: ",patches.get_name_of_patch(1))
-    # print(patches.get_boundaries())
+    # circle
+    circle = Circle(3.0)
+    print(circle.get_radius(),circle.get_center())
+    print(circle.get_boundaries())
 
 
 
+    # patches
+    patches = MultiplePatch()
 
-    # double_rectangle = DoubleRectangle()
-    # double_rectangle.set_boundaries(-0.02,-0.01,-0.001,0.001,0.01,0.02,-0.001,0.001)
-    # print("Rectangle 0 is: ",double_rectangle.get_name_of_patch(0))
-    # print("Rectangle 1 is: ",double_rectangle.get_name_of_patch(1))
-    # print(double_rectangle.get_boundaries())
+    patches.append_rectangle(-0.02,-0.01,-0.001,0.001)
+    patches.append_rectangle(0.01,0.02,-0.001,0.001)
+    patches.append_polygon([-0.02,-0.02,0.02,0.02], [-0.02,0.02,0.02,-0.02])
 
-
-    # angle = numpy.linspace(0, 2 * numpy.pi, 5)
-    # x = numpy.sin(angle) + 0.5
-    # y = numpy.cos(angle) + 0.5
-    # poly = Polygon(x=x, y=y)
-    # print(poly.info())
-    # print("vertices: ", poly.get_number_of_vertices())
-    # from srxraylib.plot.gol import plot,set_qt
-    # set_qt()
-    # plot(x,y)
-    # print(poly.get_polygon())
-    # print(poly.check_inside([0.5,0],[0.5,5]))
-    # print(poly.check_outside([0.5, 0], [0.5, 5]))
+    print(patches.get_number_of_patches(),patches.get_boundaries())
+    for patch in patches.get_patches():
+        print(patch.info())
+    print("Patch 0 is: ",patches.get_name_of_patch(0))
+    print("Patch 1 is: ",patches.get_name_of_patch(1))
+    print(patches.get_boundaries())
 
 
+    # double rectangle
+    double_rectangle = DoubleRectangle()
+    double_rectangle.set_boundaries(-0.02,-0.01,-0.001,0.001,0.01,0.02,-0.001,0.001)
+    print("Rectangle 0 is: ",double_rectangle.get_name_of_patch(0))
+    print("Rectangle 1 is: ",double_rectangle.get_name_of_patch(1))
+    print(double_rectangle.get_boundaries())
 
-    # patches = MultiplePatch()
-    # patches.append_polygon(numpy.array([-1,-1,1,1]),numpy.array([-1,1,1,-1]))
-    # x = [-0.00166557,  0.12180897, -0.11252591, -0.12274196,  0.00586896, -0.12999401, -0.12552975, -0.0377907,  -0.01094828, -0.13689862]
-    # y = [ 0.16279557, -0.00085991,  0.01349174, -0.01371226,  0.01480265, -0.04810334, 0.07198068, -0.03725407,  0.13301309, -0.00296213]
-    # x = numpy.array(x)
-    # y = numpy.array(y)
-    # patch = patches.get_patch(0)
-    # # # print(patch.check_inside(x,y))
-    # for i in range(x.size):
-    #     tmp = patch.check_inside_one_point(x[i], y[i])
-    #     print(x[i], y[i], tmp )
-    # print(patch.check_inside(x, y))
-    # print(patch.check_inside_vector(x, y))
+    # polygon
+    angle = numpy.linspace(0, 2 * numpy.pi, 5)
+    x = numpy.sin(angle) + 0.5
+    y = numpy.cos(angle) + 0.5
+    poly = Polygon(x=x, y=y)
+    print(poly.info())
+    print("vertices: ", poly.get_number_of_vertices())
+    if False:
+        from srxraylib.plot.gol import plot,set_qt
+        set_qt()
+        plot(x,y)
+    print(poly.get_polygon())
+    print("inside? : ", poly.check_inside([0.5,0],[0.5,5]))
+    print("outside? : ", poly.check_outside([0.5, 0], [0.5, 5]))
+
+
+    # multiple patches
+    patches = MultiplePatch()
+    patches.append_polygon(numpy.array([-1,-1,1,1]),numpy.array([-1,1,1,-1]))
+    x = [-0.00166557,  0.12180897, -0.11252591, -0.12274196,  0.00586896, -0.12999401, -0.12552975, -0.0377907,  -0.01094828, -0.13689862]
+    y = [ 0.16279557, -0.00085991,  0.01349174, -0.01371226,  0.01480265, -0.04810334, 0.07198068, -0.03725407,  0.13301309, -0.00296213]
+    x = numpy.array(x)
+    y = numpy.array(y)
+    patch = patches.get_patch(0)
+    # print(patch.check_inside(x,y))
+    for i in range(x.size):
+        tmp = patch.check_inside_one_point(x[i], y[i])
+        print(x[i], y[i], tmp )
+    print("inside? : ", patch.check_inside(x, y), type(patch.check_inside(x, y)))
+    print("inside? : ", patch.check_inside_vector(x, y), type(patch.check_inside_vector(x, y)))
