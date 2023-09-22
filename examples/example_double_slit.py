@@ -14,7 +14,6 @@ from syned.beamline.element_coordinates import ElementCoordinates
 
 from syned.beamline.shape import MultiplePatch
 
-#
 # this is an example of a double slit (a slit with two rectangular apertures).
 if __name__ == "__main__":
 
