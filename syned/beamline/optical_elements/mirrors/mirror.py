@@ -3,7 +3,7 @@ from syned.beamline.optical_element_with_surface_shape import OpticalElementsWit
 
 class Mirror(OpticalElementsWithSurfaceShape):
     """
-    Defines a mirror.
+    Constructor.
 
     Parameters
     ----------
