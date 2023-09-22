@@ -137,12 +137,13 @@ optical elements
 
 * ``syned.beamline.optical_elements.mirrors`` mirrors
 
-   syned.beamline.optical_elements.mirrors.mirror
-
 .. autosummary::
    :toctree: generated/
 
+   syned.beamline.optical_elements.mirrors.mirror
+
 * ``syned.beamline.optical_elements.refractors`` interface, lens, crl
+
 .. autosummary::
    :toctree: generated/
 
