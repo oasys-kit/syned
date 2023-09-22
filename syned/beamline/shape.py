@@ -7,7 +7,7 @@ Classes with geometrical shapes.
 
 Additional classes help to define flags:
     * Convexity:  NONE = -1, UPWARD = 0, DOWNWARD = 1
-    * Diraction:  TANGENTIAL = 0, SAGITTAL = 1
+    * Direction:  TANGENTIAL = 0, SAGITTAL = 1
     * Side:       SOURCE = 0, IMAGE = 1
 """
 import numpy
@@ -86,19 +86,19 @@ class BoundaryShape(Shape):
 #############################
 
 class Cylinder(SynedObject):
+    """
+    Defines that a surface shape is cylindrical in one direction.
+
+    Usage: must be used with double inheritance in other classes (e.g. ParabolicCylinder).
+    It should not be used standalone.
+
+    Parameters
+    ----------
+    cylinder_direction : int, optional
+        TANGENTIAL = 0, SAGITTAL = 1.
+
+    """
     def __init__(self, cylinder_direction=Direction.TANGENTIAL):
-        """
-        Defines that a surface shape is cylindrical in one direction.
-
-        Usage: must be used with double inheritance in other classes (e.g. ParabolicCylinder).
-        It should not be used standalone.
-
-        Parameters
-        ----------
-        cylinder_direction : int, optional
-            TANGENTIAL = 0, SAGITTAL = 1.
-
-        """
         self._cylinder_direction = cylinder_direction
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
         self._add_support_text([
