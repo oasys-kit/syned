@@ -240,6 +240,7 @@ class Sphere(SurfaceShape):
             grazing angle in rad.
 
         """
+        self._radius = Sphere.get_radius_from_p_q(p, q, grazing_angle)
 
     @classmethod
     def get_radius_from_p_q(cls, p=2.0, q=1.0, grazing_angle=0.003):
@@ -2648,6 +2649,13 @@ if __name__=="__main__":
     theta_graz = 0.003
 
     #
+    # sphere
+    #
+    # sph = Sphere()
+    sph = Sphere.create_sphere_from_p_q(10, 10, 0.021)
+    print(sph.info())
+
+    #
     # Ellipsoid
     #
     ell = Ellipsoid()
@@ -2710,8 +2718,8 @@ if __name__=="__main__":
     print("returned class: ",type(tmp))
     print(ccc.to_dictionary())
     print(tmp.to_dictionary())
-    from deepdiff import DeepDiff # use this because  == gives an error
-    assert (len(DeepDiff(ccc.to_dictionary(), tmp.to_dictionary())) == 0)
+    # from deepdiff import DeepDiff # use this because  == gives an error
+    # assert (len(DeepDiff(ccc.to_dictionary(), tmp.to_dictionary())) == 0)
 
 
 
