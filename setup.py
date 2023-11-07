@@ -11,8 +11,8 @@ except AttributeError:
 
 NAME = 'syned'
 
-VERSION = '1.0.30'
-ISRELEASED = False
+VERSION = '1.0.31'
+ISRELEASED = True
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'
 README_FILE = os.path.join(os.path.dirname(__file__), 'README.rst')
