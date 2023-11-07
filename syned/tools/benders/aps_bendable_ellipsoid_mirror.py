@@ -268,8 +268,8 @@ def calculate_bender_correction(bender_parameters : ApsBenderParameters):
         z_figure_error = None
         z_bender_correction = z_bender_correction_no_figure_error
 
-    return parameters, BenderDataToPlot(x=bender_parameters.x,
-                                        y=bender_parameters.y,
+    return parameters, BenderDataToPlot(x=x,
+                                        y=y,
                                         ideal_profile=ideal_profile,
                                         bender_profile=bender_profile,
                                         correction_profile=correction_profile,
