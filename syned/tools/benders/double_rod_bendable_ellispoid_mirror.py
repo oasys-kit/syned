@@ -50,7 +50,7 @@ from scipy.interpolate import interp2d
 from scipy.optimize import curve_fit
 from scipy import integrate
 
-from oasys.widgets.abstract.benders.bender_data_to_plot import BenderDataToPlot
+from syned.tools.benders.bender_data_to_plot import BenderDataToPlot
 
 # -----------------------------------------------------------------
 
@@ -91,24 +91,24 @@ class DoubleRodBenderParameters:
     y = None
     figure_error = None
 
-def calculate_bender_correction(bender_parameter : DoubleRodBenderParameters):
-    workspace_units_to_m  = bender_parameter.workspace_units_to_m
-    workspace_units_to_mm = bender_parameter.workspace_units_to_mm
+def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters):
+    workspace_units_to_m  = bender_parameters.workspace_units_to_m
+    workspace_units_to_mm = bender_parameters.workspace_units_to_mm
 
-    x             = bender_parameter.x
-    y             = bender_parameter.y
-    W1            = bender_parameter.W1
-    L             = bender_parameter.L
-    p             = bender_parameter.p
-    q             = bender_parameter.q
-    grazing_angle = bender_parameter.grazing_angle
+    x             = bender_parameters.x
+    y             = bender_parameters.y
+    W1            = bender_parameters.W1
+    L             = bender_parameters.L
+    p             = bender_parameters.p
+    q             = bender_parameters.q
+    grazing_angle = bender_parameters.grazing_angle
 
-    optimized_length = bender_parameter.optimized_length
+    optimized_length = bender_parameters.optimized_length
 
-    E = bender_parameter.E
-    l = bender_parameter.l
-    h = bender_parameter.h
-    r = bender_parameter.r
+    E = bender_parameters.E
+    l = bender_parameters.l
+    h = bender_parameters.h
+    r = bender_parameters.r
 
     if optimized_length is None:
         y_fit = y
@@ -121,19 +121,19 @@ def calculate_bender_correction(bender_parameter : DoubleRodBenderParameters):
     epsilon_minus = 1 - 1e-8
     epsilon_plus  = 1 + 1e-8
 
-    initial_guess    = [ bender_parameter.R0, bender_parameter.eta, bender_parameter.W2]
-    constraints     =  [[bender_parameter.R0_min if bender_parameter.R0_fixed == False else (bender_parameter.R0 * epsilon_minus),
-                         bender_parameter.eta_min if bender_parameter.eta_fixed == False else (bender_parameter.eta * epsilon_minus),
-                         bender_parameter.W2_min if bender_parameter.W2_fixed == False else (bender_parameter.W2 * epsilon_minus)],
-                        [bender_parameter.R0_max if bender_parameter.R0_fixed == False else (bender_parameter.R0 * epsilon_plus),
-                         bender_parameter.eta_max if bender_parameter.eta_fixed == False else (bender_parameter.eta * epsilon_plus),
-                         bender_parameter.W2_max if bender_parameter.W2_fixed == False else (bender_parameter.W2 * epsilon_plus)]
+    initial_guess    = [bender_parameters.R0, bender_parameters.eta, bender_parameters.W2]
+    constraints     =  [[bender_parameters.R0_min if bender_parameters.R0_fixed == False else (bender_parameters.R0 * epsilon_minus),
+                         bender_parameters.eta_min if bender_parameters.eta_fixed == False else (bender_parameters.eta * epsilon_minus),
+                         bender_parameters.W2_min if bender_parameters.W2_fixed == False else (bender_parameters.W2 * epsilon_minus)],
+                        [bender_parameters.R0_max if bender_parameters.R0_fixed == False else (bender_parameters.R0 * epsilon_plus),
+                         bender_parameters.eta_max if bender_parameters.eta_fixed == False else (bender_parameters.eta * epsilon_plus),
+                         bender_parameters.W2_max if bender_parameters.W2_fixed == False else (bender_parameters.W2 * epsilon_plus)]
                        ]
 
     def bender_function(x, R0, eta, W2):
         return __bender_slope_profile(x, p, q, grazing_angle, W1, L, R0 / workspace_units_to_m, eta, W2 / workspace_units_to_mm)
 
-    for i in range(bender_parameter.n_fit_steps):
+    for i in range(bender_parameters.n_fit_steps):
         parameters, _ = curve_fit(f=bender_function,
                                   xdata=y_fit,
                                   ydata=ideal_slope_profile_fit,
@@ -171,7 +171,7 @@ def calculate_bender_correction(bender_parameter : DoubleRodBenderParameters):
     # r-squared = 1 - residual sum of squares / total sum of squares
     r_squared = 1 - (numpy.sum(correction_profile ** 2) / numpy.sum((ideal_profile - numpy.mean(ideal_profile)) ** 2))
     rms       = round(correction_profile.std() * 1e9 * workspace_units_to_m, 6)
-    if not bender_parameter.optimized_length is None: rms_opt = round(correction_profile_fit.std() * 1e9 * workspace_units_to_m, 6)
+    if not bender_parameters.optimized_length is None: rms_opt = round(correction_profile_fit.std() * 1e9 * workspace_units_to_m, 6)
 
     z_bender_correction = numpy.zeros((len(x), len(y)))
 
@@ -186,8 +186,8 @@ def calculate_bender_correction(bender_parameter : DoubleRodBenderParameters):
                                                    "Correction Profile 1D, r.m.s. = " + str(rms) + " nm" + ("" if optimized_length is None else (", " + str(rms_opt) + " nm (optimized)"))],
                                            z_bender_correction_no_figure_error=z_bender_correction)
 
-    if not bender_parameter.figure_error is None:
-        x_e, y_e, z_e = bender_parameter.figure_error
+    if not bender_parameters.figure_error is None:
+        x_e, y_e, z_e = bender_parameters.figure_error
 
         if len(x) == len(x_e) and len(y) == len(y_e) and \
                 x[0] == x_e[0] and x[-1] == x_e[-1] and \
