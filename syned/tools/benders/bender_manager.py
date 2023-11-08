@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------- #
-# Copyright (c) 2021, UChicago Argonne, LLC. All rights reserved.         #
+# Copyright (c) 2023, UChicago Argonne, LLC. All rights reserved.         #
 #                                                                         #
-# Copyright 2021. UChicago Argonne, LLC. This software was produced       #
+# Copyright 2023. UChicago Argonne, LLC. This software was produced       #
 # under U.S. Government contract DE-AC02-06CH11357 for Argonne National   #
 # Laboratory (ANL), which is operated by UChicago Argonne, LLC for the    #
 # U.S. Department of Energy. The U.S. Government has rights to use,       #
@@ -44,23 +44,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
-class BenderDataToPlot:
-    def __init__(self,
-                 x=None,
-                 y=None,
-                 ideal_profile=None,
-                 bender_profile=None,
-                 correction_profile=None,
-                 titles=None,
-                 z_bender_correction=None,
-                 z_figure_error=None,
-                 z_bender_correction_no_figure_error=None):
-        self.x = x
-        self.y = y
-        self.ideal_profile = ideal_profile
-        self.bender_profile = bender_profile
-        self.correction_profile = correction_profile
-        self.titles = titles
-        self.z_bender_correction=z_bender_correction
-        self.z_figure_error=z_figure_error
-        self.z_bender_correction_no_figure_error=z_bender_correction_no_figure_error
+
+import numpy
+from scipy.interpolate import interp2d
+from scipy.optimize import curve_fit
+
+from syned.tools.benders.bender_data import BenderData, BenderParameters
+
+class AbstractBenderManager:
+
+    def fit_bender_data(self, bender_parameters: BenderParameters) -> BenderData: raise NotImplementedError
+    def get_bender_shape(self, bender_parameters: BenderParameters) -> BenderData: raise NotImplementedError

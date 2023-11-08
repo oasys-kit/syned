@@ -50,55 +50,115 @@ from scipy.interpolate import interp2d
 from scipy.optimize import curve_fit
 from scipy import integrate
 
-from syned.tools.benders.bender_data_to_plot import BenderDataToPlot
+from syned.tools.benders.bender_data import BenderData, BenderParameters
 
-# -----------------------------------------------------------------
+class DoubleRodBenderParameters(BenderParameters):
+    def __init__(self,
+                 dim_x_minus=None,
+                 dim_x_plus=None,
+                 bender_bin_x=None,
+                 dim_y_minus=None,
+                 dim_y_plus=None,
+                 bender_bin_y=None,
+                 optimized_length=None,
+                 p=None,
+                 q=None,
+                 grazing_angle=None,
+                 E=None,
+                 h=None,
+                 figure_error_mesh=None,
+                 n_fit_steps=None,
+                 workspace_units_to_m=None,
+                 workspace_units_to_mm=None,
+                 r=None,
+                 l=None,
+                 R0=None,
+                 R0_max=False,
+                 R0_min=None,
+                 R0_fixed=None,
+                 eta=None,
+                 eta_max=False,
+                 eta_min=None,
+                 eta_fixed=None,
+                 W2=None,
+                 W2_max=False,
+                 W2_min=None,
+                 W2_fixed=None):
+        super(DoubleRodBenderParameters, self).__init__(dim_x_minus=dim_x_minus,
+                                                        dim_x_plus=dim_x_plus,
+                                                        bender_bin_x=bender_bin_x,
+                                                        dim_y_minus=dim_y_minus,
+                                                        dim_y_plus=dim_y_plus,
+                                                        bender_bin_y=bender_bin_y,
+                                                        optimized_length=optimized_length,
+                                                        p=p,
+                                                        q=q,
+                                                        grazing_angle=grazing_angle,
+                                                        E=E,
+                                                        h=h,
+                                                        figure_error_mesh=figure_error_mesh,
+                                                        n_fit_steps=n_fit_steps,
+                                                        workspace_units_to_m=workspace_units_to_m,
+                                                        workspace_units_to_mm=workspace_units_to_mm)
+        self.r = r
+        self.l = l
+        self.R0 = R0
+        self.R0_max = R0_max
+        self.R0_min = R0_min
+        self.R0_fixed = R0_fixed
+        self.eta = eta
+        self.eta_max = eta_max
+        self.eta_min = eta_min
+        self.eta_fixed = eta_fixed
+        self.W2 = W2
+        self.W2_max = W2_max
+        self.W2_min = W2_min
+        self.W2_fixed = W2_fixed
 
-class DoubleRodBenderParameters:
-    W1 = None
-    L = None
-    p = None
-    q = None
-    grazing_angle = None
-    optimized_length = None
 
-    E = None
-    h = None
-    r = None
-    l = None
+class DoubleRodBenderData(BenderData):
+    def __init__(self,
+                 x=None,
+                 y=None,
+                 ideal_profile=None,
+                 bender_profile=None,
+                 correction_profile=None,
+                 titles=None,
+                 z_bender_correction=None,
+                 z_figure_error=None,
+                 z_bender_correction_no_figure_error=None,
+                 R0_out=None,
+                 eta_out=None,
+                 W2_out=None,
+                 alpha= None,
+                 W0=None,
+                 F_upstream=None,
+                 F_downstream=None):
+        super(DoubleRodBenderData, self).__init__(x,
+                                            y,
+                                            ideal_profile,
+                                            bender_profile,
+                                            correction_profile,
+                                            titles,
+                                            z_bender_correction,
+                                            z_figure_error,
+                                            z_bender_correction_no_figure_error)
+        self.R0_out       = R0_out
+        self.eta_out      = eta_out
+        self.W2_out       = W2_out
+        self.alpha        = alpha
+        self.W0           = W0
+        self.F_upstream   = F_upstream
+        self.F_downstream = F_downstream
 
-    R0 = None
-    R0_max = False
-    R0_min = None
-    R0_fixed = None
-
-    eta = None
-    eta_max = False
-    eta_min = None
-    eta_fixed = None
-
-    W2 = None
-    W2_max = False
-    W2_min = None
-    W2_fixed = None
-
-    n_fit_steps = None
-
-    workspace_units_to_m = None
-    workspace_units_to_mm = None
-
-    x = None
-    y = None
-    figure_error = None
-
-def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters):
+def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters) -> DoubleRodBenderData:
     workspace_units_to_m  = bender_parameters.workspace_units_to_m
     workspace_units_to_mm = bender_parameters.workspace_units_to_mm
 
-    x             = bender_parameters.x
-    y             = bender_parameters.y
-    W1            = bender_parameters.W1
-    L             = bender_parameters.L
+    x             = numpy.linspace(-bender_parameters.dim_x_minus, bender_parameters.dim_x_plus, bender_parameters.bender_bin_x + 1)
+    y             = numpy.linspace(-bender_parameters.dim_y_minus, bender_parameters.dim_y_plus, bender_parameters.bender_bin_y + 1)
+    W1            = bender_parameters.dim_x_plus + bender_parameters.dim_x_minus
+    L             = bender_parameters.dim_y_plus + bender_parameters.dim_y_minus
     p             = bender_parameters.p
     q             = bender_parameters.q
     grazing_angle = bender_parameters.grazing_angle
@@ -177,17 +237,18 @@ def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters):
 
     for i in range(z_bender_correction.shape[0]): z_bender_correction[i, :] = numpy.copy(correction_profile)
 
-    bender_data_to_plot = BenderDataToPlot(x=x,
-                                           y=y,
-                                           ideal_profile=ideal_profile,
-                                           bender_profile=bender_profile,
-                                           correction_profile=correction_profile,
-                                           titles=["Bender vs. Ideal Profiles" + "\n" + r'$R^2$ = ' + str(r_squared),
-                                                   "Correction Profile 1D, r.m.s. = " + str(rms) + " nm" + ("" if optimized_length is None else (", " + str(rms_opt) + " nm (optimized)"))],
-                                           z_bender_correction_no_figure_error=z_bender_correction)
+    bender_data = DoubleRodBenderData(x=x,
+                                      y=y,
+                                      ideal_profile=ideal_profile,
+                                      bender_profile=bender_profile,
+                                      correction_profile=correction_profile,
+                                      titles=["Bender vs. Ideal Profiles" + "\n" + r'$R^2$ = ' + str(r_squared),
+                                              "Correction Profile 1D, r.m.s. = " + str(rms) + " nm" +
+                                              ("" if optimized_length is None else (", " + str(rms_opt) + " nm (optimized)"))],
+                                      z_bender_correction_no_figure_error=z_bender_correction)
 
-    if not bender_parameters.figure_error is None:
-        x_e, y_e, z_e = bender_parameters.figure_error
+    if not bender_parameters.figure_error_mesh is None:
+        x_e, y_e, z_e = bender_parameters.figure_error_mesh
 
         if len(x) == len(x_e) and len(y) == len(y_e) and \
                 x[0] == x_e[0] and x[-1] == x_e[-1] and \
@@ -196,12 +257,21 @@ def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters):
         else:
             z_figure_error = interp2d(y_e, x_e, z_e, kind='cubic')(y, x)
 
-        bender_data_to_plot.z_figure_error      = z_figure_error
-        bender_data_to_plot.z_bender_correction = bender_data_to_plot.z_bender_correction_no_figure_error + z_figure_error
+        bender_data.z_figure_error      = z_figure_error
+        bender_data.z_bender_correction = bender_data.z_bender_correction_no_figure_error + z_figure_error
     else:
-        bender_data_to_plot.z_bender_correction = bender_data_to_plot.z_bender_correction_no_figure_error
+        bender_data.z_bender_correction = bender_data.z_bender_correction_no_figure_error
 
-    return parameters, bender_data_to_plot
+
+    bender_data.R0_out       = round(parameters[0], 5)
+    bender_data.eta_out      = parameters[1]
+    bender_data.W2_out       = round(parameters[2], 3)
+    bender_data.alpha        = parameters[3]
+    bender_data.W0           = parameters[4]
+    bender_data.F_upstream   = parameters[5]
+    bender_data.F_downstream = parameters[6]
+
+    return bender_data
 
 def __focal_distance(p, q):
     return p*q/(p+q)
@@ -244,8 +314,7 @@ def ideal_height_profile(y, p, q, grazing_angle):
     K0id   = numpy.tan(grazing_angle)/(2*fprime)
 
     profile = numpy.zeros(len(y))
-    for i in range(len(y)):
-        profile[i] = integrate.quad(func=(lambda x: __calculate_ideal_slope_variation(x, fprime, K0id, mu, nu)), a=y[0], b=y[i])[0]
+    for i in range(len(y)): profile[i] = integrate.quad(func=(lambda x: __calculate_ideal_slope_variation(x, fprime, K0id, mu, nu)), a=y[0], b=y[i])[0]
 
     return profile
 
