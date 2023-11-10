@@ -46,8 +46,6 @@
 # ----------------------------------------------------------------------- #
 
 import numpy
-from scipy.interpolate import interp2d
-from scipy.optimize import curve_fit
 
 from syned.tools.benders.bender_io import BenderOuputData, BenderFitParameters, BenderStructuralParameters, BenderMovement
 

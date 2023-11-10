@@ -51,7 +51,7 @@ from scipy.optimize import curve_fit
 from syned.tools.benders.bender_io import BenderMovement, BenderFitParameters, BenderStructuralParameters, BenderOuputData
 from syned.tools.benders.bender_manager import StandardBenderManager, CalibratedBenderManager, CalibrationParameters
 
-class APSBenderFitParameters(BenderFitParameters):
+class FlexuralHingeBenderFitParameters(BenderFitParameters):
     def __init__(self,
                  optimized_length=None,
                  n_fit_steps=None,
@@ -67,8 +67,8 @@ class APSBenderFitParameters(BenderFitParameters):
                  ratio_max=False,
                  ratio_min=None,
                  ratio_fixed=None):
-        super(APSBenderFitParameters, self).__init__(optimized_length=optimized_length,
-                                                     n_fit_steps=n_fit_steps)
+        super(FlexuralHingeBenderFitParameters, self).__init__(optimized_length=optimized_length,
+                                                               n_fit_steps=n_fit_steps)
         self.M1 = M1
         self.M1_max = M1_max
         self.M1_min = M1_min
@@ -82,7 +82,7 @@ class APSBenderFitParameters(BenderFitParameters):
         self.ratio_min = ratio_min
         self.ratio_fixed = ratio_fixed
 
-class APSBenderOuputData(BenderOuputData):
+class FlexuralHingeBenderOuputData(BenderOuputData):
     def __init__(self,
                  x=None,
                  y=None,
@@ -96,7 +96,7 @@ class APSBenderOuputData(BenderOuputData):
                  M1_out=None,
                  e_out=None,
                  ratio_out=None):
-        super(APSBenderOuputData, self).__init__(x,
+        super(FlexuralHingeBenderOuputData, self).__init__(x,
                                                  y,
                                                  ideal_profile,
                                                  bender_profile,
@@ -110,7 +110,7 @@ class APSBenderOuputData(BenderOuputData):
         self.ratio_out = ratio_out
 
 
-class APSBenderStructuralParameters(BenderStructuralParameters):
+class FlexuralHingeBenderStructuralParameters(BenderStructuralParameters):
     def __init__(self,
                  dim_x_minus=None,
                  dim_x_plus=None,
@@ -131,20 +131,20 @@ class APSBenderStructuralParameters(BenderStructuralParameters):
                  ratio=None,
                  workspace_units_to_m=None,
                  workspace_units_to_mm=None):
-        super(APSBenderStructuralParameters, self).__init__(dim_x_minus=dim_x_minus,
-                                                            dim_x_plus=dim_x_plus ,
-                                                            bender_bin_x=bender_bin_x ,
-                                                            dim_y_minus=dim_y_minus,
-                                                            dim_y_plus=dim_y_plus,
-                                                            bender_bin_y=bender_bin_y,
-                                                            p=p,
-                                                            q=q,
-                                                            grazing_angle=grazing_angle,
-                                                            E=E,
-                                                            h=h,
-                                                            figure_error_mesh=figure_error_mesh,
-                                                            workspace_units_to_m=workspace_units_to_m,
-                                                            workspace_units_to_mm=workspace_units_to_mm)
+        super(FlexuralHingeBenderStructuralParameters, self).__init__(dim_x_minus=dim_x_minus,
+                                                                      dim_x_plus=dim_x_plus ,
+                                                                      bender_bin_x=bender_bin_x ,
+                                                                      dim_y_minus=dim_y_minus,
+                                                                      dim_y_plus=dim_y_plus,
+                                                                      bender_bin_y=bender_bin_y,
+                                                                      p=p,
+                                                                      q=q,
+                                                                      grazing_angle=grazing_angle,
+                                                                      E=E,
+                                                                      h=h,
+                                                                      figure_error_mesh=figure_error_mesh,
+                                                                      workspace_units_to_m=workspace_units_to_m,
+                                                                      workspace_units_to_mm=workspace_units_to_mm)
         self.shape       = shape
         self.bender_type = bender_type
         self.M1          = M1
@@ -163,11 +163,11 @@ epsilon_minus = 1 - 1e-8
 epsilon_plus = 1 + 1e-8
 
 # Decorator
-class _APSBenderCalculator():
+class _FlexuralHingeBenderCalculator():
     def __init__(self, bender_manager):
         self.__bender_manager = bender_manager
 
-    def fit_bender_at_focus_position(self, bender_fit_parameters: APSBenderFitParameters) -> APSBenderOuputData:
+    def fit_bender_at_focus_position(self, bender_fit_parameters: FlexuralHingeBenderFitParameters) -> FlexuralHingeBenderOuputData:
         workspace_units_to_m  = self.__bender_manager.bender_structural_parameters.workspace_units_to_m
         workspace_units_to_mm = self.__bender_manager.bender_structural_parameters.workspace_units_to_mm
         shape                 = self.__bender_manager.bender_structural_parameters.shape
@@ -215,7 +215,7 @@ class _APSBenderCalculator():
 
         return bender_data
 
-    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) ->  APSBenderOuputData:
+    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) ->  FlexuralHingeBenderOuputData:
         E                     = self.__bender_manager.bender_structural_parameters.E
         h                     = self.__bender_manager.bender_structural_parameters.h
         shape                 = self.__bender_manager.bender_structural_parameters.shape
@@ -229,7 +229,7 @@ class _APSBenderCalculator():
         
         bender_fit_parameters = self.__get_fit_parameters()
         
-        if self.__bender_manager.bender_structural_parameters.bender_type == BenderType.SINGLE_MOMENTUM:
+        if bender_type == BenderType.SINGLE_MOMENTUM:
             if not q_downstream is None: raise ValueError("Specify q_upstream only on a Single Momentum Bender")
 
             ideal_surface_coords = self.__bender_manager.calculate_ideal_surface(q=q_upstream)
@@ -237,9 +237,9 @@ class _APSBenderCalculator():
 
             _, parameters, ideal_profile, _ = self.__fit_bender_parameters(bender_fit_parameters, ideal_surface_coords)
 
-            M1 = parameters_downstream[0]
-            if shape == MirrorShape.TRAPEZIUM:   bender_profile = cls.__general_bender_function(y, M1, bender_fit_parameters.e, 1.0, E, h, b0, L)
-            elif shape == MirrorShape.RECTANGLE: bender_profile = cls.__general_bender_function(y, M1, 0.0, 1.0, E, h, b0, L)
+            M1 = parameters[0]
+            if shape == MirrorShape.TRAPEZIUM:   bender_profile = self.__general_bender_function(y, M1, bender_fit_parameters.e, 1.0, E, h, b0, L)
+            elif shape == MirrorShape.RECTANGLE: bender_profile = self.__general_bender_function(y, M1, 0.0, 1.0, E, h, b0, L)
         else:
             ideal_surface_coords            = self.__bender_manager.calculate_ideal_surface(q=0.5 * (q_upstream + q_downstream))
             ideal_surface_coords_upstream   = self.__bender_manager.calculate_ideal_surface(q=q_upstream)
@@ -254,10 +254,10 @@ class _APSBenderCalculator():
             M1 = parameters_downstream[0]
             if shape == MirrorShape.TRAPEZIUM:
                 M2 = parameters_upstream[0] * parameters_upstream[2]
-                bender_profile = cls.__general_bender_function(y, M1, bender_fit_parameters.e, M1/M2, E, h, b0, L)
+                bender_profile = self.__general_bender_function(y, M1, bender_fit_parameters.e, M1/M2, E, h, b0, L)
             elif shape == MirrorShape.RECTANGLE:
                 M2 = parameters_upstream[0] * parameters_upstream[1]
-                bender_profile = cls.__general_bender_function(y, M1, 0.0, M1 / M2, E, h, b0, L)
+                bender_profile = self.__general_bender_function(y, M1, 0.0, M1 / M2, E, h, b0, L)
 
         return self.__generate_bender_output_data(ideal_profile, bender_profile, ideal_surface_coords)
 
@@ -289,7 +289,7 @@ class _APSBenderCalculator():
             z_figure_error = None
             z_bender_correction = z_bender_correction_no_figure_error
 
-        return APSBenderOuputData(x=x,
+        return FlexuralHingeBenderOuputData(x=x,
                                   y=y,
                                   ideal_profile=ideal_profile,  # 1D
                                   bender_profile=bender_profile,
@@ -299,20 +299,22 @@ class _APSBenderCalculator():
                                   z_bender_correction_no_figure_error=z_bender_correction_no_figure_error)
 
     def __get_fit_parameters(self):
-        bender_fit_parameters = ApsBenderFitParameters(optimized_length=None,
-                                                       n_fit_steps=5,
-                                                       M1=self.__bender_manager.bender_structural_parameters.M1,
-                                                       M1_min=0,
-                                                       M1_max=self.__bender_manager.bender_structural_parameters.M1*5,
-                                                       M1_fixed=False,
-                                                       e=self.__bender_manager.bender_structural_parameters.e,
-                                                       e_min=None,
-                                                       e_max=None,
-                                                       e_fixed=True,
-                                                       ratio=self.__bender_manager.bender_structural_parameters.ratio,
-                                                       ratio_min=0.0,
-                                                       ratio_max=1.0,
-                                                       ratio_fixed=False)
+        bender_fit_parameters = FlexuralHingeBenderFitParameters(optimized_length=None,
+                                                                 n_fit_steps=5,
+                                                                 M1=self.__bender_manager.bender_structural_parameters.M1,
+                                                                 M1_min=0,
+                                                                 M1_max=self.__bender_manager.bender_structural_parameters.M1*5,
+                                                                 M1_fixed=False,
+                                                                 e=self.__bender_manager.bender_structural_parameters.e,
+                                                                 e_min=None,
+                                                                 e_max=None,
+                                                                 e_fixed=True,
+                                                                 ratio=self.__bender_manager.bender_structural_parameters.ratio,
+                                                                 ratio_min=0.0,
+                                                                 ratio_max=1.0,
+                                                                 ratio_fixed=False)
+
+        return bender_fit_parameters
 
     @classmethod
     def __fit_bender_parameters(cls, bender_structural_parameters, bender_fit_parameters, ideal_surface_coords):
@@ -426,31 +428,31 @@ class _APSBenderCalculator():
         return H * ((CDY / D) * numpy.log(CDY) - Y) - (B * Y ** 2) / (2 * D) + F * Y + G
 
 
-class APSStandardBenderManager(StandardBenderManager):
+class FlexuralHingeStandardBenderManager(StandardBenderManager):
     def __init__(self,
-                 bender_structural_parameters : APSBenderStructuralParameters):
-        super(APSStandardBenderManager, self).__init__(bender_structural_parameters=bender_structural_parameters)
-        self.__calculator = _APSBenderCalculator(bender_manager=self)
+                 bender_structural_parameters : FlexuralHingeBenderStructuralParameters):
+        super(FlexuralHingeStandardBenderManager, self).__init__(bender_structural_parameters=bender_structural_parameters)
+        self.__calculator = _FlexuralHingeBenderCalculator(bender_manager=self)
 
-    def fit_bender_at_focus_position(self, bender_fit_parameters: APSBenderFitParameters) -> APSBenderOuputData:
+    def fit_bender_at_focus_position(self, bender_fit_parameters: FlexuralHingeBenderFitParameters) -> FlexuralHingeBenderOuputData:
         return self.__calculator.fit_bender_at_focus_position(bender_fit_parameters)
 
-    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) ->  APSBenderOuputData:
+    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) ->  FlexuralHingeBenderOuputData:
         return self.__calculator.get_bender_shape_from_movement(bender_movement)
 
 
-class APSCalibratedBenderManager(CalibratedBenderManager):
+class FlexuralHingeCalibratedBenderManager(CalibratedBenderManager):
     def __init__(self,
-                 bender_structural_parameters: APSBenderStructuralParameters,
+                 bender_structural_parameters: FlexuralHingeBenderStructuralParameters,
                  calibration_parameters : CalibrationParameters):
-        super(APSCalibratedBenderManager, self).__init__(bender_structural_parameters=bender_structural_parameters,
+        super(FlexuralHingeCalibratedBenderManager, self).__init__(bender_structural_parameters=bender_structural_parameters,
                                                          calibration_parameters=calibration_parameters)
-        self.__calculator = _APSBenderCalculator(bender_manager=self)
+        self.__calculator = _FlexuralHingeBenderCalculator(bender_manager=self)
 
-    def fit_bender_at_focus_position(self, bender_fit_parameters: APSBenderFitParameters) -> APSBenderOuputData:
+    def fit_bender_at_focus_position(self, bender_fit_parameters: FlexuralHingeBenderFitParameters) -> FlexuralHingeBenderOuputData:
         return self.__calculator.fit_bender_at_focus_position(bender_fit_parameters)
 
-    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) -> APSBenderOuputData:
+    def get_bender_shape_from_movement(self, bender_movement: BenderMovement) -> FlexuralHingeBenderOuputData:
         return self.__calculator.get_bender_shape_from_movement(bender_movement)
 
 
