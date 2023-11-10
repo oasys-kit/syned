@@ -50,9 +50,9 @@ from scipy.interpolate import interp2d
 from scipy.optimize import curve_fit
 from scipy import integrate
 
-from syned.tools.benders.bender_data import BenderData, BenderParameters
+from syned.tools.benders.bender_io import BenderOuputData, BenderFitParameters
 
-class DoubleRodBenderParameters(BenderParameters):
+class DoubleRodBenderFitParameters(BenderFitParameters):
     def __init__(self,
                  dim_x_minus=None,
                  dim_x_plus=None,
@@ -84,22 +84,22 @@ class DoubleRodBenderParameters(BenderParameters):
                  W2_max=False,
                  W2_min=None,
                  W2_fixed=None):
-        super(DoubleRodBenderParameters, self).__init__(dim_x_minus=dim_x_minus,
-                                                        dim_x_plus=dim_x_plus,
-                                                        bender_bin_x=bender_bin_x,
-                                                        dim_y_minus=dim_y_minus,
-                                                        dim_y_plus=dim_y_plus,
-                                                        bender_bin_y=bender_bin_y,
-                                                        optimized_length=optimized_length,
-                                                        p=p,
-                                                        q=q,
-                                                        grazing_angle=grazing_angle,
-                                                        E=E,
-                                                        h=h,
-                                                        figure_error_mesh=figure_error_mesh,
-                                                        n_fit_steps=n_fit_steps,
-                                                        workspace_units_to_m=workspace_units_to_m,
-                                                        workspace_units_to_mm=workspace_units_to_mm)
+        super(DoubleRodBenderFitParameters, self).__init__(dim_x_minus=dim_x_minus,
+                                                           dim_x_plus=dim_x_plus,
+                                                           bender_bin_x=bender_bin_x,
+                                                           dim_y_minus=dim_y_minus,
+                                                           dim_y_plus=dim_y_plus,
+                                                           bender_bin_y=bender_bin_y,
+                                                           optimized_length=optimized_length,
+                                                           p=p,
+                                                           q=q,
+                                                           grazing_angle=grazing_angle,
+                                                           E=E,
+                                                           h=h,
+                                                           figure_error_mesh=figure_error_mesh,
+                                                           n_fit_steps=n_fit_steps,
+                                                           workspace_units_to_m=workspace_units_to_m,
+                                                           workspace_units_to_mm=workspace_units_to_mm)
         self.r = r
         self.l = l
         self.R0 = R0
@@ -116,7 +116,7 @@ class DoubleRodBenderParameters(BenderParameters):
         self.W2_fixed = W2_fixed
 
 
-class DoubleRodBenderData(BenderData):
+class DoubleRodBenderOuputData(BenderOuputData):
     def __init__(self,
                  x=None,
                  y=None,
@@ -134,15 +134,15 @@ class DoubleRodBenderData(BenderData):
                  W0=None,
                  F_upstream=None,
                  F_downstream=None):
-        super(DoubleRodBenderData, self).__init__(x,
-                                            y,
-                                            ideal_profile,
-                                            bender_profile,
-                                            correction_profile,
-                                            titles,
-                                            z_bender_correction,
-                                            z_figure_error,
-                                            z_bender_correction_no_figure_error)
+        super(DoubleRodBenderOuputData, self).__init__(x,
+                                                       y,
+                                                       ideal_profile,
+                                                       bender_profile,
+                                                       correction_profile,
+                                                       titles,
+                                                       z_bender_correction,
+                                                       z_figure_error,
+                                                       z_bender_correction_no_figure_error)
         self.R0_out       = R0_out
         self.eta_out      = eta_out
         self.W2_out       = W2_out
@@ -151,7 +151,7 @@ class DoubleRodBenderData(BenderData):
         self.F_upstream   = F_upstream
         self.F_downstream = F_downstream
 
-def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters) -> DoubleRodBenderData:
+def calculate_bender_correction(bender_parameters : DoubleRodBenderFitParameters) -> DoubleRodBenderOuputData:
     workspace_units_to_m  = bender_parameters.workspace_units_to_m
     workspace_units_to_mm = bender_parameters.workspace_units_to_mm
 
@@ -237,15 +237,15 @@ def calculate_bender_correction(bender_parameters : DoubleRodBenderParameters) -
 
     for i in range(z_bender_correction.shape[0]): z_bender_correction[i, :] = numpy.copy(correction_profile)
 
-    bender_data = DoubleRodBenderData(x=x,
-                                      y=y,
-                                      ideal_profile=ideal_profile,
-                                      bender_profile=bender_profile,
-                                      correction_profile=correction_profile,
-                                      titles=["Bender vs. Ideal Profiles" + "\n" + r'$R^2$ = ' + str(r_squared),
+    bender_data = DoubleRodBenderOuputData(x=x,
+                                           y=y,
+                                           ideal_profile=ideal_profile,
+                                           bender_profile=bender_profile,
+                                           correction_profile=correction_profile,
+                                           titles=["Bender vs. Ideal Profiles" + "\n" + r'$R^2$ = ' + str(r_squared),
                                               "Correction Profile 1D, r.m.s. = " + str(rms) + " nm" +
                                               ("" if optimized_length is None else (", " + str(rms_opt) + " nm (optimized)"))],
-                                      z_bender_correction_no_figure_error=z_bender_correction)
+                                           z_bender_correction_no_figure_error=z_bender_correction)
 
     if not bender_parameters.figure_error_mesh is None:
         x_e, y_e, z_e = bender_parameters.figure_error_mesh

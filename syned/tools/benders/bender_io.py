@@ -45,7 +45,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
 
-class BenderParameters:
+class BenderStructuralParameters:
     def __init__(self,
                  dim_x_minus=None,
                  dim_x_plus=None,
@@ -53,14 +53,12 @@ class BenderParameters:
                  dim_y_minus=None,
                  dim_y_plus=None,
                  bender_bin_y=None,
-                 optimized_length=None,
                  p=None,
                  q=None,
                  grazing_angle=None,
                  E=None,
                  h=None,
                  figure_error_mesh=None,
-                 n_fit_steps=None,
                  workspace_units_to_m=None,
                  workspace_units_to_mm=None):
         self.dim_x_minus = dim_x_minus 
@@ -69,19 +67,27 @@ class BenderParameters:
         self.dim_y_minus = dim_y_minus 
         self.dim_y_plus = dim_y_plus 
         self.bender_bin_y = bender_bin_y
-        self.optimized_length = optimized_length
-        self.p = p
-        self.q = q
-        self.grazing_angle = grazing_angle
+        self.p                = p
+        self.q                = q
+        self.grazing_angle    = grazing_angle
         self.E = E
         self.h = h 
         self.figure_error_mesh = figure_error_mesh
-        self.n_fit_steps = n_fit_steps
         self.workspace_units_to_m = workspace_units_to_m
         self.workspace_units_to_mm = workspace_units_to_mm
 
+# ----------------------------------------------------------------------
+# Bender FIT
+# ----------------------------------------------------------------------
 
-class BenderData:
+class BenderFitParameters():
+    def __init__(self,
+                 optimized_length = None,
+                 n_fit_steps=None):
+        self.optimized_length = optimized_length
+        self.n_fit_steps      = n_fit_steps
+
+class BenderOuputData:
     def __init__(self,
                  x=None,
                  y=None,
@@ -101,3 +107,17 @@ class BenderData:
         self.z_bender_correction = z_bender_correction
         self.z_figure_error      = z_figure_error
         self.z_bender_correction_no_figure_error=z_bender_correction_no_figure_error
+
+# ----------------------------------------------------------------------
+# Bender Movements
+# ----------------------------------------------------------------------
+
+class BenderMovement():
+    def __init__(self, position_upstream=None, position_downstream=None):
+        self.__position_upstream   = position_upstream
+        self.__position_downstream = position_downstream
+
+    @property
+    def position_upstream(self): return self.__position_upstream
+    @property
+    def position_downstream(self): return self.__position_downstream
