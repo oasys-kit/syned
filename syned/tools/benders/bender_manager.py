@@ -46,8 +46,13 @@
 # ----------------------------------------------------------------------- #
 
 import numpy
+import decimal
 
 from syned.tools.benders.bender_io import BenderOuputData, BenderFitParameters, BenderStructuralParameters, BenderMovement
+
+def get_significant_digits(number):
+    return abs(decimal.Decimal(str(number)).as_tuple().exponent)
+
 
 class AbstractBenderManager:
     def __init__(self, bender_structural_parameters : BenderStructuralParameters):
