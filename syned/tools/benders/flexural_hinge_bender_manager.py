@@ -289,13 +289,13 @@ class _FlexuralHingeBenderCalculator():
             z_bender_correction = z_bender_correction_no_figure_error
 
         return FlexuralHingeBenderOuputData(x=x,
-                                  y=y,
-                                  ideal_profile=ideal_profile,  # 1D
-                                  bender_profile=bender_profile,
-                                  correction_profile=correction_profile,
-                                  z_bender_correction=z_bender_correction,
-                                  z_figure_error=z_figure_error,
-                                  z_bender_correction_no_figure_error=z_bender_correction_no_figure_error)
+                                            y=y,
+                                            ideal_profile=ideal_profile,  # 1D
+                                            bender_profile=bender_profile,
+                                            correction_profile=correction_profile,
+                                            z_bender_correction=z_bender_correction,
+                                            z_figure_error=z_figure_error,
+                                            z_bender_correction_no_figure_error=z_bender_correction_no_figure_error)
 
     def __get_fit_parameters_for_movement(self):
         bender_fit_parameters = FlexuralHingeBenderFitParameters(optimized_length=None,
@@ -347,10 +347,10 @@ class _FlexuralHingeBenderCalculator():
         
         if shape == MirrorShape.TRAPEZIUM:
             def bender_function_2m(Y, M1, e, ratio):
-                return cls.__general_bender_function(Y, M1, e, ratio, E, h, b0, L)
+                return self.__general_bender_function(Y, M1, e, ratio, E, h, b0, L)
 
             def bender_function_1m(Y, M1, e):
-                return cls.__general_bender_function(Y, M1, e, 1.0, E, h, b0, L)
+                return self.__general_bender_function(Y, M1, e, 1.0, E, h, b0, L)
 
             if bender_type == BenderType.SINGLE_MOMENTUM:
                 bender_function = bender_function_1m
@@ -370,10 +370,10 @@ class _FlexuralHingeBenderCalculator():
                                 bender_fit_parameters.ratio_max if bender_fit_parameters.ratio_fixed == False else (bender_fit_parameters.ratio * epsilon_plus)]]
         elif shape == MirrorShape.RECTANGLE:
             def bender_function_2m(Y, M1, ratio):
-                return cls.__general_bender_function(Y, M1, 0.0, ratio, E, h, b0, L)
+                return self.__general_bender_function(Y, M1, 0.0, ratio, E, h, b0, L)
 
             def bender_function_1m(Y, M1):
-                return cls.__general_bender_function(Y, M1, 0.0, 1.0, E, h, b0, L)
+                return self.__general_bender_function(Y, M1, 0.0, 1.0, E, h, b0, L)
 
             if bender_type == BenderType.SINGLE_MOMENTUM:
                 bender_function = bender_function_1m

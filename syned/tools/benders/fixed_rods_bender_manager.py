@@ -119,7 +119,6 @@ class FixedRodsBenderOuputData(BenderOuputData):
         self.F_upstream   = F_upstream
         self.F_downstream = F_downstream
 
-
 class FixedRodsBenderStructuralParameters(BenderStructuralParameters):
     def __init__(self,
                  dim_x_minus=None,
@@ -185,6 +184,10 @@ class _FixedRodsBenderCalculator():
         p             = self.__bender_manager.bender_structural_parameters.p
         q             = self.__bender_manager.bender_structural_parameters.q
         grazing_angle = self.__bender_manager.bender_structural_parameters.grazing_angle
+        E             = self.__bender_manager.bender_structural_parameters.E
+        l             = self.__bender_manager.bender_structural_parameters.l
+        h             = self.__bender_manager.bender_structural_parameters.h
+        r             = self.__bender_manager.bender_structural_parameters.r
 
         ideal_surface_coords = x, y
 
@@ -215,7 +218,7 @@ class _FixedRodsBenderCalculator():
                               ("" if optimized_length is None else (", " + str(rms_opt) + " nm (optimized)"))]
 
         bender_data.R0_out       = round(R0 * workspace_units_to_m, 5)
-        bender_data.eta_out      = round(eta, 5),
+        bender_data.eta_out      = round(eta, 5)
         bender_data.W2_out       = round(W2,  int(3 + get_significant_digits(workspace_units_to_mm)))
         bender_data.alpha        = round(alpha, 3)
         bender_data.W0           = round(W0, int(3 + get_significant_digits(workspace_units_to_mm)))
@@ -295,6 +298,10 @@ class _FixedRodsBenderCalculator():
     def __fit_bender_parameters(self, bender_fit_parameters, ideal_surface_coords, q_fit=None):
         x, y = ideal_surface_coords
 
+        workspace_units_to_m  = self.__bender_manager.bender_structural_parameters.workspace_units_to_m
+
+        optimized_length  = bender_fit_parameters.optimized_length
+
         W1            = self.__bender_manager.bender_structural_parameters.dim_x_plus + self.__bender_manager.bender_structural_parameters.dim_x_minus
         L             = self.__bender_manager.bender_structural_parameters.dim_y_plus + self.__bender_manager.bender_structural_parameters.dim_y_minus
         p             = self.__bender_manager.bender_structural_parameters.p
@@ -302,10 +309,11 @@ class _FixedRodsBenderCalculator():
         grazing_angle = self.__bender_manager.bender_structural_parameters.grazing_angle
 
         if optimized_length is None:
-            y_fit = y
+            cursor = None
+            y_fit  = y
         else:
             cursor = numpy.where(numpy.logical_and(y >= -optimized_length / 2, y <= optimized_length / 2))
-            y_fit = y[cursor]
+            y_fit  = y[cursor]
 
         ideal_slope_profile_fit = ideal_slope_profile(y_fit, p, q, grazing_angle)
 
@@ -342,8 +350,8 @@ class _FixedRodsBenderCalculator():
         # from here it's Shadow Axis system
         correction_profile = ideal_profile - bender_profile
 
-        z_bender_correction = numpy.zeros((len(x), len(y)))
-        for i in range(z_bender_correction.shape[0]): z_bender_correction[i, :] = numpy.copy(correction_profile)
+        z_bender_correction_no_figure_error = numpy.zeros((len(x), len(y)))
+        for i in range(z_bender_correction_no_figure_error.shape[0]): z_bender_correction_no_figure_error[i, :] = numpy.copy(correction_profile)
 
         if not self.__bender_manager.bender_structural_parameters.figure_error_mesh is None:
             x_e, y_e, z_e = self.__bender_manager.bender_structural_parameters.figure_error_mesh
@@ -355,18 +363,18 @@ class _FixedRodsBenderCalculator():
             else:
                 z_figure_error = interp2d(y_e, x_e, z_e, kind='cubic')(y, x)
 
-            z_bender_correction = bender_data.z_bender_correction_no_figure_error + z_figure_error
+            z_bender_correction = z_bender_correction_no_figure_error + z_figure_error
         else:
-            z_bender_correction = bender_data.z_bender_correction_no_figure_error
+            z_bender_correction = z_bender_correction_no_figure_error
 
-        bender_data = FixedRodsBenderOuputData(x=x,
-                                               y=y,
-                                               ideal_profile=ideal_profile,
-                                               bender_profile=bender_profile,
-                                               correction_profile=correction_profile,
-                                               z_bender_correction=z_bender_correction,
-                                               z_figure_error=z_figure_error,
-                                               z_bender_correction_no_figure_error=z_bender_correction_no_figure_error)
+        return FixedRodsBenderOuputData(x=x,
+                                        y=y,
+                                        ideal_profile=ideal_profile,
+                                        bender_profile=bender_profile,
+                                        correction_profile=correction_profile,
+                                        z_bender_correction=z_bender_correction,
+                                        z_figure_error=z_figure_error,
+                                        z_bender_correction_no_figure_error=z_bender_correction_no_figure_error)
 
     @classmethod
     def __general_bender_function(cls, y, p, q, grazing_angle, W1, L, R0, eta, W2):
