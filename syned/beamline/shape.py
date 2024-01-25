@@ -1241,17 +1241,31 @@ class Paraboloid(SurfaceShape):
     It is defined with three parameters: the parabola_parameter and two more parameters
     defining the position of the origin of the mirror.
 
-    The parabola_parameter = 2 * focal_distance = - 0.5 * ccc_9 / ccc_2
+    The parabola_parameter = 2 * focal_length = - 0.5 * ccc_9 / ccc_2
 
     The additional parameter can be the focal distances
     ("p" or "q", one is infinity), "x0", "y0" or the grazing angle.
     Here, we selected the at_infinity and the finite focal distance p or q or distance from
     the mirror pole to focus (pole to focus).
 
+    The parabola equation is:
+
+    ccc_2 y^2 + ccc_9 z = 0 or
+
+    y^2 = -ccc_9/ccc_2 z = 2 parabola_parameter z = 4 focal_length z
+
+    The focus is at (0, 0, focal_length).
+
+    The directrix is at (0, 0, -focal_length).
+
+    The distance from the directrix to focus is 2 * focal_length.
+
+    The radius of curvature at the vertex is 2 * focal_length.
+
     Parameters
     ----------
     parabola_parameter : float, optional
-        parabola_parameter = 2 * focal_distance = - 0.5 * ccc_9 / ccc_2.
+        parabola_parameter = 2 * focal_length = - 0.5 * ccc_9 / ccc_2. Equation: y^2 = 2 parabola_parameter z.
     at_infinity : int (as defined by Side), optional
         SOURCE = 0, IMAGE = 1.
     pole_to_focus : float, optional
@@ -1261,6 +1275,10 @@ class Paraboloid(SurfaceShape):
 
     References
     ----------
+    https://en.wikipedia.org/wiki/Parabola
+
+    https://doi.org/10.1107/S1600577522004593
+
     Some equations can be found here: https://github.com/srio/shadow3-docs/blob/master/doc/conics.pdf
 
     """
