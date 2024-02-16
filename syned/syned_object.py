@@ -7,6 +7,33 @@ except:
 
 # TODO: although basic functionality is implemented, the use of exec should be replace by introspection tools
 class SynedObject(object):
+
+    # ---------------------------------------------------------------------------------------------------------
+    # This override is necessary to avoid TypeError: cannot pickle '_thread.lock' object while duplicating
+    # that occurs on large workspace while enabling/disabling connectors
+    #
+    # from Python documentation, the method should return:
+    # - For a class that has no instance __dict__ and no __slots__, the default state is None.
+    # - For a class that has an instance __dict__ and no __slots__, the default state is self.__dict__.
+    # - For a class that has an instance __dict__ and __slots__, the default state is a tuple consisting of two dictionaries:
+    #   self.__dict__, and a dictionary mapping slot names to slot values. Only slots that have a value are included in the latter.
+    # - For a class that has __slots__ and no instance __dict__, the default state is a tuple whose first item is None
+    #   and whose second item is a dictionary mapping slot names to slot values described in the previous bullet.
+    # ---------------------------------------------------------------------------------------------------------
+    def __getstate__(self):
+        has_dict  = hasattr(self, "__dict__")
+        has_slots = hasattr(self, "__slots__")
+
+        if has_dict:  state = {key: value for key, value in self.__dict__.items() if key not in ['lock']}
+        if has_slots: slots = {s : self.__getattribute__(s) for s in self.__slots__}
+
+        if has_dict and not has_slots: return state
+        elif has_dict and has_slots: return state, slots
+        elif has_slots and not has_dict: return None, slots
+        elif not has_dict and not has_slots: return None
+
+
+
     """
     This is the base object for SYNED.
 
