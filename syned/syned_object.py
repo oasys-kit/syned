@@ -10,29 +10,19 @@ class SynedObject(object):
 
     # ---------------------------------------------------------------------------------------------------------
     # This override is necessary to avoid TypeError: cannot pickle '_thread.lock' object while duplicating
-    # that occurs on large workspace while enabling/disabling connectors
+    # that occurs while enabling/disabling connectors
     #
-    # from Python documentation, the method should return:
-    # - For a class that has no instance __dict__ and no __slots__, the default state is None.
-    # - For a class that has an instance __dict__ and no __slots__, the default state is self.__dict__.
-    # - For a class that has an instance __dict__ and __slots__, the default state is a tuple consisting of two dictionaries:
-    #   self.__dict__, and a dictionary mapping slot names to slot values. Only slots that have a value are included in the latter.
-    # - For a class that has __slots__ and no instance __dict__, the default state is a tuple whose first item is None
-    #   and whose second item is a dictionary mapping slot names to slot values described in the previous bullet.
+    # When an attribute is an object that contains non pickable attributes, we make a shallow copy of it
     # ---------------------------------------------------------------------------------------------------------
-    def __getstate__(self):
-        has_dict  = hasattr(self, "__dict__")
-        has_slots = hasattr(self, "__slots__")
 
-        if has_dict:  state = {key: value for key, value in self.__dict__.items() if key not in ['lock']}
-        if has_slots: slots = {s : self.__getattribute__(s) for s in self.__slots__}
-
-        if has_dict and not has_slots: return state
-        elif has_dict and has_slots: return state, slots
-        elif has_slots and not has_dict: return None, slots
-        elif not has_dict and not has_slots: return None
-
-
+    def __deepcopy__(self, memodict={}):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memodict[id(self)] = result
+        for k, v in self.__dict__.items():
+                try:              setattr(result, k, copy.deepcopy(v, memodict))
+                except TypeError: setattr(result, k, copy.copy(v, memodict))
+        return result
 
     """
     This is the base object for SYNED.
