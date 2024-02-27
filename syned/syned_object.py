@@ -21,7 +21,7 @@ class SynedObject(object):
         memodict[id(self)] = result
         for k, v in self.__dict__.items():
                 try:              setattr(result, k, copy.deepcopy(v, memodict))
-                except TypeError: setattr(result, k, copy.copy(v, memodict))
+                except TypeError: setattr(result, k, copy.copy(v))
         return result
 
     """
