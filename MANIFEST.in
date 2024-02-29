@@ -1,5 +1,5 @@
 recursive-include syned *.pyx
 recursive-include syned *.py
 
-include README.txt
+include README.rst
 include LICENSE
