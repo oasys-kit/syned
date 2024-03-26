@@ -424,7 +424,7 @@ class Ellipsoid(SurfaceShape):
         self._set_support_text([
                     ("min_axis"         , "Ellipse major axis   ", "m" ),
                     ("maj_axis"         , "Ellipse minor axis   ", "m"),
-                    ("min_axis"         , "Ellipse p (source-focus to pole)   ", "m"),
+                    ("p_focus"          , "Ellipse p (source-focus to pole)   ", "m"),
                     ("convexity"        , "(0=upwards, 1=downwards)", " "),
             ] )
 
@@ -859,7 +859,7 @@ class Hyperboloid(SurfaceShape):
         self._set_support_text([
                     ("min_axis"         , "Hyperbola major axis   ", "m" ),
                     ("maj_axis"         , "Hyperbola minor axis   ", "m"),
-                    ("min_axis"         , "Hyperbola p (source-focus to pole)   ", "m"),
+                    ("p_focus"          , "Hyperbola p (source-focus to pole)   ", "m"),
                     ("convexity"        , "(0=upwards, 1=downwards)", " "),
             ] )
 
