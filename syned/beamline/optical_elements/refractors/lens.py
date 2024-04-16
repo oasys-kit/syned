@@ -42,8 +42,7 @@ class Lens(OpticalElementsWithMultipleShapes):
         # support text contaning name of variable, help text and unit. Will be stored in self._support_dictionary
         self._set_support_text([
                     ("name",                "Name" ,                                "" ),
-                    ("surface_shape1",      "Surface shape 1",                      "" ),
-                    ("surface_shape2",      "Surface shape 2",                      ""),
+                    ("surface_shapes",      "Surface shapes",                       ""),
                     ("boundary_shape",      "Boundary shape",                       "" ),
                     ("material",            "Material (element, compound or name)", "" ),
                     ("thickness",           "Thickness",                            "m"),
