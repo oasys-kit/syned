@@ -18,9 +18,9 @@ class WidgetDecorator(object):
             [("SynedData", Beamline, "receive_syned_data")]
 
         """
-        try:
+        try: # OASYS2
             import oasys2
-            from orangewidget.widget import Input # OASYS2
+            from orangewidget.widget import Input
 
             return Input(name="SynedData",
                          type=Beamline,
