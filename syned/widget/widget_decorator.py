@@ -18,7 +18,16 @@ class WidgetDecorator(object):
             [("SynedData", Beamline, "receive_syned_data")]
 
         """
-        return [("SynedData", Beamline, "receive_syned_data")]
+        try:
+            import oasys2
+            from orangewidget.widget import Input # OASYS2
+
+            return Input(name="SynedData",
+                         type=Beamline,
+                         id="SynedData",
+                         default=True, auto_summary=False)
+        except:
+            return [("SynedData", Beamline, "receive_syned_data")]
 
     @classmethod
     def append_syned_input_data(cls, inputs):
