@@ -8,7 +8,7 @@ class WidgetDecorator(object):
     """
 
     @classmethod
-    def syned_input_data(cls):
+    def syned_input_data(cls, multi_input=False):
         """
         A string to help defining SYNED data in OASYS.
 
@@ -20,12 +20,21 @@ class WidgetDecorator(object):
         """
         try: # OASYS2
             import oasys2
-            from orangewidget.widget import Input
 
-            return Input(name="SynedData",
-                         type=Beamline,
-                         id="SynedData",
-                         default=True, auto_summary=False)
+            if not multi_input:
+                from orangewidget.widget import Input
+
+                return Input(name="SynedData",
+                             type=Beamline,
+                             id="SynedData",
+                             default=True, auto_summary=False)
+            else:
+                from orangewidget.widget import MultiInput
+
+                return MultiInput(name="SynedData",
+                                  type=Beamline,
+                                  id="SynedData",
+                                  default=True, auto_summary=False)
         except:
             return [("SynedData", Beamline, "receive_syned_data")]
 
