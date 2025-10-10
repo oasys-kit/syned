@@ -150,31 +150,33 @@ def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
 
 
         if tmp1.keys() is not None:
-
+            NOT_FOUND = "--------NOT-FOUND--------"
             for key in tmp1.keys():
-                if verbose: print(">>>>processing",key ,type(jsn[key]))
-                if isinstance(jsn[key],dict):
-                    if verbose: print(">>>>>>>>dictionary found, starting recurrency",key ,type(jsn[key]))
-                    tmp2 = load_from_json_dictionary_recurrent(jsn[key],exec_commands=exec_commands)
-                    if verbose: print(">>>>2",key,type(tmp2))
-                    tmp1.set_value_from_key_name(key,tmp2)
-                elif isinstance(jsn[key], list):
-                    if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(jsn[key]))
-                    out_list_of_objects = []
-                    for element in jsn[key]:
-                        if isinstance(element, dict):
-                            if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(element))
-                            tmp3 = load_from_json_dictionary_recurrent(element, exec_commands=exec_commands)
-                            if verbose: print(">>>>3",type(tmp3))
-                            out_list_of_objects.append(tmp3)
-                        else:
-                            print("***** Failed to load", element)
-                    if verbose: print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",out_list_of_objects)
-                    tmp1.set_value_from_key_name(key,out_list_of_objects)
-                        # tmp1.set_value_from_key_name(key,tmp2)
-                else:
-                    if verbose: print(">>>>>>> setting value for key: ",key," to: ",repr(jsn[key]))
-                    tmp1.set_value_from_key_name(key,jsn[key])
+                stored_value = jsn.get(key, NOT_FOUND)
+                if str(stored_value) != NOT_FOUND:
+                    if verbose: print(">>>>processing",key ,type(jsn[key]))
+                    if isinstance(jsn[key],dict):
+                        if verbose: print(">>>>>>>>dictionary found, starting recurrency",key ,type(jsn[key]))
+                        tmp2 = load_from_json_dictionary_recurrent(jsn[key],exec_commands=exec_commands)
+                        if verbose: print(">>>>2",key,type(tmp2))
+                        tmp1.set_value_from_key_name(key,tmp2)
+                    elif isinstance(jsn[key], list):
+                        if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(jsn[key]))
+                        out_list_of_objects = []
+                        for element in jsn[key]:
+                            if isinstance(element, dict):
+                                if verbose: print(">>>>>>>>LIST found, starting recurrency",key ,type(element))
+                                tmp3 = load_from_json_dictionary_recurrent(element, exec_commands=exec_commands)
+                                if verbose: print(">>>>3",type(tmp3))
+                                out_list_of_objects.append(tmp3)
+                            else:
+                                print("***** Failed to load", element)
+                        if verbose: print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",out_list_of_objects)
+                        tmp1.set_value_from_key_name(key,out_list_of_objects)
+                            # tmp1.set_value_from_key_name(key,tmp2)
+                    else:
+                        if verbose: print(">>>>>>> setting value for key: ",key," to: ",repr(jsn[key]))
+                        tmp1.set_value_from_key_name(key,jsn[key])
 
         return tmp1
 
