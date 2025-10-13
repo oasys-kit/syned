@@ -94,9 +94,10 @@ class ElectronBeam(SynedObject):
                     ("dispersionp_y"      , "Dispersion (angular, vertical)", ""),
         ] )
 
-    #
-    # initializares
-    #
+    # ------------------------------------------------------------------------
+    # initializares and class methods
+    # ------------------------------------------------------------------------
+
     @classmethod
     def initialize_as_pencil_beam(cls, energy_in_GeV = 1.0, energy_spread = 0.0, current = 0.1, **params):
         """
@@ -124,37 +125,42 @@ class ElectronBeam(SynedObject):
                    number_of_bunches=1,
                    **params)
 
+    @classmethod
+    def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
+        emittance = numpy.sqrt(moment_ss * moment_aa - moment_sa**2)
+        alpha     = -moment_sa / emittance
+        beta      = moment_ss / emittance
+        gamma     = (1 + alpha**2) / beta
 
-    #
-    # useful getters
-    #
-    def get_sigmas_real_space(self):
-        """
-        Returns the sigmas in real space.
+        alpha = 0.0 if alpha == 0 else alpha # to avoid -0.0
 
-        Returns
-        -------
-        tuple
-            (sigma_x, sigma_y)
+        return emittance, alpha, beta, gamma
 
-        """
-        return numpy.sqrt(self._moment_xx),\
-               numpy.sqrt(self._moment_yy)
+    @classmethod
+    def _get_moments_from_twiss_without_dispersion(cls, emittance, alpha, beta):
+        gamma = (1 + alpha ** 2) / beta
 
-    def get_sigmas_divergence_space(self):
-        """
-        Returns the sigmas in divergence (angle) space.
+        moment_ss = beta * emittance
+        moment_sa = -alpha * emittance
+        moment_aa = gamma * emittance
 
-        Returns
-        -------
-        tuple
-            (sigma_x', sigma_y')
+        moment_sa = 0.0 if moment_sa == 0 else moment_sa  # to avoid -0.0
 
-        """
-        return numpy.sqrt(self._moment_xpxp),\
-               numpy.sqrt(self._moment_ypyp)
+        return moment_ss, moment_sa, moment_aa
 
-    def get_sigmas_horizontal(self):
+    @classmethod
+    def _get_moments_with_dispersion(cls, moment_ss, moment_aa, moment_sa, energy_spread, dispersion_s, dispersion_a):
+        moment_ss_disp = moment_ss + (dispersion_s * energy_spread) ** 2
+        moment_sa_disp = moment_sa + dispersion_s * dispersion_a * (energy_spread ** 2)
+        moment_aa_disp = moment_aa + (dispersion_a * energy_spread) ** 2
+
+        return moment_ss_disp, moment_sa_disp, moment_aa_disp
+
+    # ------------------------------------------------------------------------
+    # GETTERS
+    # ------------------------------------------------------------------------
+
+    def get_sigmas_horizontal(self, no_dispersion=True):
         """
         Returns the sigmas in horizontal direction.
 
@@ -164,10 +170,12 @@ class ElectronBeam(SynedObject):
             (sigma_x, sigma_x')
 
         """
-        return numpy.sqrt(self._moment_xx),\
-               numpy.sqrt(self._moment_xpxp)
 
-    def get_sigmas_vertical(self):
+        moment_xx, _, moment_xpxp = self.get_moments_horizontal(no_dispersion)
+
+        return numpy.sqrt(moment_xx), numpy.sqrt(moment_xpxp)
+
+    def get_sigmas_vertical(self, no_dispersion=True):
         """
         Returns the sigmas in vertical direction.
 
@@ -177,10 +185,11 @@ class ElectronBeam(SynedObject):
             (sigma_y, sigma_y')
 
         """
-        return numpy.sqrt(self._moment_yy),\
-               numpy.sqrt(self._moment_ypyp)
+        moment_yy, _, moment_ypyp = self.get_moments_vertical(no_dispersion)
 
-    def get_sigmas_all(self):
+        return numpy.sqrt(moment_yy), numpy.sqrt(moment_ypyp)
+
+    def get_sigmas_all(self, no_dispersion=True):
         """
         Returns all sigmas.
 
@@ -190,12 +199,13 @@ class ElectronBeam(SynedObject):
             (sigma_x, sigma_x', sigma_y, sigma_y')
 
         """
-        return numpy.sqrt(self._moment_xx),\
-               numpy.sqrt(self._moment_xpxp),\
-               numpy.sqrt(self._moment_yy),\
-               numpy.sqrt(self._moment_ypyp)
 
-    def get_moments_horizontal(self):
+        sigma_x, sigmap_x = self.get_sigmas_horizontal(no_dispersion)
+        sigma_y, sigmap_y = self.get_sigmas_vertical(no_dispersion)
+
+        return sigma_x, sigmap_x, sigma_y, sigmap_y
+
+    def get_moments_horizontal(self, no_dispersion=True):
         """
         Returns the moments in the horizontal direction.
 
@@ -205,9 +215,15 @@ class ElectronBeam(SynedObject):
             ( <x^2>, <x x'>, <x'^2>)
 
         """
-        return self._moment_xx, self._moment_xxp, self._moment_xpxp
+        if no_dispersion: return self._moment_xx, self._moment_xxp, self._moment_xpxp
+        else:             return self._get_moments_with_dispersion(self._moment_xx,
+                                                                   self._moment_xxp,
+                                                                   self._moment_xpxp,
+                                                                   self._energy_spread,
+                                                                   self._dispersion_x,
+                                                                   self._dispersionp_x)
 
-    def get_moments_vertical(self):
+    def get_moments_vertical(self, no_dispersion=True):
         """
         Returns the moments in the vertical direction.
 
@@ -217,9 +233,16 @@ class ElectronBeam(SynedObject):
             ( <y^2>, <y y'>, <y'^2>)
 
         """
-        return self._moment_yy, self._moment_yyp, self._moment_ypyp
 
-    def get_moments_all(self):
+        if no_dispersion: return self._moment_yy, self._moment_yyp, self._moment_ypyp
+        else:             return self._get_moments_with_dispersion(self._moment_yy,
+                                                                   self._moment_yyp,
+                                                                   self._moment_ypyp,
+                                                                   self._energy_spread,
+                                                                   self._dispersion_y,
+                                                                   self._dispersionp_y)
+
+    def get_moments_all(self, no_dispersion=True):
         """
         Returns all moments.
 
@@ -229,71 +252,23 @@ class ElectronBeam(SynedObject):
             ( <x^2>, <x x'>, <x'^2>, <y^2>, <y y'>, <y'^2>)
 
         """
-        return self._moment_xx, self._moment_xxp, self._moment_xpxp, self._moment_yy, self._moment_yyp, self._moment_ypyp
-    
-    @classmethod
-    def _get_twiss_no_dispersion(cls, moment_ss, moment_sa, moment_aa):
-        emittance_x = numpy.sqrt(moment_ss * moment_aa - moment_sa**2)
-        alpha_x     = -moment_sa / emittance_x
-        beta_x      = moment_ss / emittance_x
 
-        return emittance_x, alpha_x, beta_x
+        moment_xx, moment_xxp, moment_xpxp = self.get_moments_horizontal(no_dispersion)
+        moment_yy, moment_yyp, moment_ypyp = self.get_moments_vertical(no_dispersion)
 
-    
-    def get_twiss_no_dispersion_horizontal(self):
-        """
-        Returns the Twiss parameters in horizontal direction.
-        (The energy disperion is not considered.)
+        return moment_xx, moment_xxp, moment_xpxp, moment_yy, moment_yyp, moment_ypyp
 
-        Returns
-        -------
-        tuple
-            (emittance_x, alpha_x, beta_x).
+    def get_dispersion_horizontal(self):
+        return self._dispersion_x, self._dispersionp_x
 
-        """
-        return self._get_twiss_no_dispersion(self._moment_xx, self._moment_xxp, self._moment_xpxp)
+    def get_dispersion_vertical(self):
+        return self._dispersion_y, self._dispersionp_y
 
-    def get_twiss_no_dispersion_vertical(self):
-        """
-        Returns the Twiss parameters in vertical direction.
-        (The energy disperion is not considered.)
+    def get_dispersion_all(self):
+        dispersion_x, dispersionp_x = self.get_dispersion_horizontal()
+        dispersion_y, dispersionp_y = self.get_dispersion_vertical()
 
-        Returns
-        -------
-        tuple
-            (emittance_y, alpha_y, beta_y).
-
-        """
-        return self._get_twiss_no_dispersion(self._moment_yy, self._moment_yyp, self._moment_ypyp)
-
-    def get_twiss_no_dispersion_all(self):
-        """
-        Returns all Twiss parameters.
-        (The energy disperion is not considered.)
-
-        Returns
-        -------
-        tuple
-            (emittance_x, alpha_x, beta_x, emittance_y, alpha_y, beta_y).
-
-        """
-        ex, ax, bx =  self.get_twiss_no_dispersion_horizontal()
-        ey, ay, by = self.get_twiss_no_dispersion_vertical()
-
-        return ex, ax, bx, ey, ay, by
-
-    @classmethod
-    def _get_twiss(cls, moment_ss, moment_aa, moment_sa, energy_spread, dispersion_s, dispersion_a):
-        dispersion = numpy.array([[dispersion_s], [dispersion_a]])
-        sigma      = numpy.array([[moment_ss, moment_sa], [moment_sa, moment_aa]])
-        sigma_b    = sigma - (energy_spread ** 2) * (dispersion @ dispersion.T)
-        emittance  = numpy.sqrt(numpy.linalg.det(sigma_b))
-
-        beta  =  sigma_b[0, 0] / emittance
-        alpha = -sigma_b[0, 1] / emittance
-        gamma =  sigma_b[1, 1] / emittance
-
-        return emittance, alpha, beta, gamma
+        return dispersion_x, dispersionp_x, dispersion_y, dispersionp_y
 
     def get_twiss_horizontal(self):
         """
@@ -306,12 +281,11 @@ class ElectronBeam(SynedObject):
             (emittance_x, alpha_x, beta_x).
 
         """
-        ex, ax, bx, _ = self._get_twiss(moment_ss=self._moment_xx,
-                                        moment_aa=self._moment_xpxp,
-                                        moment_sa=self._moment_xxp,
-                                        energy_spread=self._energy_spread,
-                                        dispersion_s=self._dispersion_x,
-                                        dispersion_a=self._dispersionp_x)
+
+        ex, ax, bx, _ = self._get_twiss_from_moments(moment_ss=self._moment_xx,
+                                                     moment_aa=self._moment_xpxp,
+                                                     moment_sa=self._moment_xxp)
+
         return ex, ax, bx
 
     def get_twiss_vertical(self):
@@ -325,12 +299,10 @@ class ElectronBeam(SynedObject):
             (emittance_y, alpha_y, beta_y).
 
         """
-        ey, ay, by, _  = self._get_twiss(moment_ss=self._moment_yy,
-                                         moment_aa=self._moment_ypyp,
-                                         moment_sa=self._moment_yyp,
-                                         energy_spread=self._energy_spread,
-                                         dispersion_s=self._dispersion_y,
-                                         dispersion_a=self._dispersionp_y)
+        ey, ay, by, _ = self._get_twiss_from_moments(moment_ss=self._moment_yy,
+                                                     moment_aa=self._moment_ypyp,
+                                                     moment_sa=self._moment_yyp)
+
         return ey, ay, by
 
     def get_twiss_all(self):
@@ -370,53 +342,6 @@ class ElectronBeam(SynedObject):
 
         """
         return self._current
-
-    #
-    # setters
-    #
-    def set_sigmas_real_space(self, sigma_x=0.0, sigma_y=0.0):
-        """
-        Sets the electron beam parameters in real space from the sigma values.
-
-        Parameters
-        ----------
-        sigma_x : float, optional
-            The sigma in horizontal direction.
-        sigma_y : float, optional
-            The sigma in vertical direction.
-
-        """
-        self._moment_xx    = sigma_x**2
-        self._moment_yy    = sigma_y**2
-        
-    def set_sigmas_divergence_space(self, sigma_xp=0.0, sigma_yp=0.0):
-        """
-        Sets the electron beam parameters in divergence space from the sigma values.
-
-        Parameters
-        ----------
-        sigma_xp : float, optional
-            The sigma in horizontal direction.
-        sigma_yp : float, optional
-            The sigma in vertical direction.
-
-        """
-        self._moment_xpxp = sigma_xp**2
-        self._moment_ypyp = sigma_yp**2
-
-    def _reset_twiss_horizontal(self):
-        self._dispersion_x  = 0.0
-        self._dispersionp_x = 0.0
-
-        ex, ax, bx = self.get_twiss_horizontal()
-        self.set_twiss_horizontal(ex, ax, bx)
-
-    def _reset_twiss_vertical(self):
-        self._dispersion_y  = 0.0
-        self._dispersionp_y = 0.0
-
-        ey, ay, by = self.get_twiss_vertical()
-        self.set_twiss_vertical(ey, ay, by)
 
     def set_sigmas_horizontal(self, sigma_x=0.0, sigma_xp=0.0):
         """
@@ -491,11 +416,9 @@ class ElectronBeam(SynedObject):
             The <x'^2> moment.
 
         """
-        self._moment_xx   = moment_xx
-        self._moment_xxp  = moment_xxp
-        self._moment_xpxp = moment_xpxp
-
-        self._reset_twiss_horizontal()
+        self._moment_xx     = moment_xx
+        self._moment_xxp    = moment_xxp
+        self._moment_xpxp   = moment_xpxp
 
     def set_moments_vertical(self, moment_yy, moment_yyp, moment_ypyp):
         """
@@ -511,11 +434,9 @@ class ElectronBeam(SynedObject):
             The <y'^2> moment.
 
         """
-        self._moment_yy   = moment_yy
-        self._moment_yyp  = moment_yyp
-        self._moment_ypyp = moment_ypyp
-
-        self._reset_twiss_vertical()
+        self._moment_yy     = moment_yy
+        self._moment_yyp    = moment_yyp
+        self._moment_ypyp   = moment_ypyp
 
     def set_moments_all(self, moment_xx, moment_xxp, moment_xpxp, moment_yy, moment_yyp, moment_ypyp):
         """
@@ -538,32 +459,57 @@ class ElectronBeam(SynedObject):
 
         """
         self.set_moments_horizontal(moment_xx, moment_xxp, moment_xpxp)
-        self.set_moments_vertical(  moment_yy, moment_yyp, moment_ypyp)
+        self.set_moments_vertical(moment_yy, moment_yyp, moment_ypyp)
 
+    def set_dispersion_horizontal(self, eta_x, etap_x):
+        """
+        Sets the horizontal dispersion values.
 
-    @classmethod
-    def _set_twiss(cls, energy_spread, emittance, alpha, beta, eta, etap, check_consistency=False, direction=""):
-        gamma       = (1 + alpha**2) / beta
+        Parameters
+        ----------
+        eta_x : float
+            The eta value in horizontal.
+        etap_x : float
+            The eta' value in horizontal.
+        """
+        self._dispersion_x  = eta_x
+        self._dispersionp_x = etap_x
 
-        moment_ss  = beta   * emittance + eta**2 * energy_spread**2
-        moment_sa  = -alpha * emittance + eta * etap * energy_spread ** 2
-        moment_aa  = gamma  * emittance + etap**2 * energy_spread ** 2
+    def set_dispersion_vertical(self, eta_y, etap_y):
+        """
+        Sets the vertical dispersion values.
 
-        if check_consistency:
-            _, alpha, beta, gamma = cls._get_twiss(moment_ss=moment_ss,
-                                                   moment_sa=moment_sa,
-                                                   moment_aa=moment_aa,
-                                                   energy_spread=energy_spread,
-                                                   dispersion_s=eta,
-                                                   dispersion_a=etap)
+        Parameters
+        ----------
+        eta_y : float
+            The eta value in vertical.
+        etap_y : float
+            The eta' value in vertical.
 
-            check_value = beta*gamma - alpha**2
+        """
+        self._dispersion_y  = eta_y
+        self._dispersionp_y = etap_y
 
-            if numpy.abs(check_value - 1) > 1e-10: raise ValueError(f"{direction} twiss parameters do not respect the constraint: \u03b1\u03b3 - \u03b1\u00b2 = 1")
-        
-        return moment_ss, moment_sa, moment_aa
+    def set_dispersion_all(self, eta_x, etap_x, eta_y, etap_y):
+        """
+        Sets the dispersion values.
 
-    def set_twiss_horizontal(self, emittance_x, alpha_x, beta_x, eta_x=0, etap_x=0, check_consistency=False):
+        Parameters
+        ----------
+        eta_x : float
+            The eta value in horizontal.
+        etap_x : float
+            The eta' value in horizontal.
+        eta_y : float
+            The eta value in vertical.
+        etap_y : float
+            The eta' value in vertical.
+
+        """
+        self.set_dispersion_horizontal(eta_x, etap_x)
+        self.set_dispersion_vertical(eta_y, etap_y)
+
+    def set_twiss_horizontal(self, emittance_x, alpha_x, beta_x):
         """
         Sets the electron beam parameters from the Twiss values in the horizontal direction.
 
@@ -581,22 +527,13 @@ class ElectronBeam(SynedObject):
             The eta' value in horizontal.
 
         """
-        moment_xx, moment_xxp, moment_xpxp = self._set_twiss(self._energy_spread,
-                                                             emittance_x, 
-                                                             alpha_x,
-                                                             beta_x,
-                                                             eta_x,
-                                                             etap_x,
-                                                             check_consistency,
-                                                             "Horizontal")
+        moment_xx, moment_xxp, moment_xpxp = self._get_moments_from_twiss_without_dispersion(emittance_x,  alpha_x, beta_x)
 
         self._moment_xx     = moment_xx
         self._moment_xxp    = moment_xxp
         self._moment_xpxp   = moment_xpxp
-        self._dispersion_x  = eta_x
-        self._dispersionp_x = etap_x
 
-    def set_twiss_vertical(self, emittance_y, alpha_y, beta_y, eta_y=0, etap_y=0, check_consistency=False):
+    def set_twiss_vertical(self, emittance_y, alpha_y, beta_y):
         """
         Sets the electron beam parameters from the Twiss values in the vertical direction.
 
@@ -608,29 +545,14 @@ class ElectronBeam(SynedObject):
             The alpha value in vertical.
         beta_x : float
             The beta value in vertical.
-        eta_x : float, optional
-            The eta value.
-        etap_x : float, optional
-            The eta' value in vertical.
-
         """
-        moment_yy, moment_yyp, moment_ypyp = self._set_twiss(self._energy_spread,
-                                                             emittance_y, 
-                                                             alpha_y,
-                                                             beta_y,
-                                                             eta_y,
-                                                             etap_y,
-                                                             check_consistency,
-                                                             "Vertical")
+        moment_yy, moment_yyp, moment_ypyp = self._get_moments_from_twiss_without_dispersion(emittance_y,  alpha_y, beta_y)
 
         self._moment_yy     = moment_yy
         self._moment_yyp    = moment_yyp
         self._moment_ypyp   = moment_ypyp
-        self._dispersion_y  = eta_y
-        self._dispersionp_y = etap_y
 
-    def set_twiss_all(self, emittance_x, alpha_x, beta_x, eta_x, etap_x,
-                            emittance_y, alpha_y, beta_y, eta_y, etap_y, check_consistency=False):
+    def set_twiss_all(self, emittance_x, alpha_x, beta_x, emittance_y, alpha_y, beta_y):
         """
         Sets the electron beam parameters from the Twiss values.
 
@@ -642,24 +564,16 @@ class ElectronBeam(SynedObject):
             The alpha value in horizontal.
         beta_x : float
             The beta value in horizontal.
-        eta_x : float
-            The eta value in horizontal.
-        etap_x : float
-            The eta' value in horizontal.
         emittance_y : float
             The emittance value in vertical.
-        alpha_x : float
+        alpha_y : float
             The alpha value in vertical.
-        beta_x : float
+        beta_y : float
             The beta value in vertical.
-        eta_x : float
-            The eta value.
-        etap_x : float
-            The eta' value in vertical.
 
         """
-        self.set_twiss_horizontal(emittance_x, alpha_x, beta_x, eta_x, etap_x, check_consistency)
-        self.set_twiss_vertical(emittance_y, alpha_y, beta_y, eta_y, etap_y, check_consistency)
+        self.set_twiss_horizontal(emittance_x, alpha_x, beta_x)
+        self.set_twiss_vertical(emittance_y, alpha_y, beta_y)
 
     #
     # some easy calculations
@@ -723,6 +637,9 @@ if __name__ == "__main__":
     print("moments: ",a.get_moments_all())
     print("twiss: ",a.get_twiss_no_dispersion_all())
 
+    a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=2.0,current=0.5, energy_spread=0.00095)
+    a.set_moments_all(1e-6,9e-6,4e-6,16e-6,36e-6,25e-6)
+    print(a.get_moments_all())
 
 #    a.to_dictionary()
 
