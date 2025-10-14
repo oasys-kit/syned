@@ -4,6 +4,7 @@ Base class for electron beams.
 This class is intentionally shorten for simplicity.
 Usually we would need to consider also the electron distribution within the beam.
 """
+import warnings
 
 from syned.syned_object import SynedObject
 import scipy.constants as codata
@@ -126,8 +127,17 @@ class ElectronBeam(SynedObject):
                    **params)
 
     @classmethod
+    def _emittance_without_dispersion(cls, moment_ss, moment_sa, moment_aa):
+        return numpy.sqrt(moment_ss * moment_aa - moment_sa**2)
+
+    @classmethod
+    def _emittance_with_dispersion(cls, moment_ss, moment_sa, moment_aa,  energy_spread, dispersion_s, dispersion_a):
+        return numpy.sqrt((moment_ss  - (dispersion_s *  energy_spread) ** 2) *(moment_aa - (dispersion_a * energy_spread) ** 2) -
+                          (moment_sa - (dispersion_s *  dispersion_a * energy_spread ** 2) ** 2))
+
+    @classmethod
     def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
-        emittance = numpy.sqrt(moment_ss * moment_aa - moment_sa**2)
+        emittance = cls._emittance_without_dispersion(moment_ss, moment_sa, moment_aa)
         alpha     = -moment_sa / emittance
         beta      = moment_ss / emittance
         gamma     = (1 + alpha**2) / beta
@@ -156,11 +166,19 @@ class ElectronBeam(SynedObject):
 
         return moment_ss_disp, moment_sa_disp, moment_aa_disp
 
-    # ------------------------------------------------------------------------
-    # GETTERS
-    # ------------------------------------------------------------------------
+    @classmethod
+    def __send_deprectation_warning(cls, function_name_use, new_function_use):
+        warnings.warn(
+            f"{function_name_use} is deprecated and will be removed in a future version. "
+            f"Use {new_function_use} instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
 
-    def get_sigmas_horizontal(self, no_dispersion=True):
+    # --- GETTERS
+    #     # ---------------------------------------------------------------------------------------------------------------------------------------------
+    #
+    def get_sigmas_horizontal(self, dispersion=False):
         """
         Returns the sigmas in horizontal direction.
 
@@ -171,11 +189,11 @@ class ElectronBeam(SynedObject):
 
         """
 
-        moment_xx, _, moment_xpxp = self.get_moments_horizontal(no_dispersion)
+        moment_xx, _, moment_xpxp = self.get_moments_horizontal(dispersion)
 
         return numpy.sqrt(moment_xx), numpy.sqrt(moment_xpxp)
 
-    def get_sigmas_vertical(self, no_dispersion=True):
+    def get_sigmas_vertical(self, dispersion=False):
         """
         Returns the sigmas in vertical direction.
 
@@ -185,11 +203,11 @@ class ElectronBeam(SynedObject):
             (sigma_y, sigma_y')
 
         """
-        moment_yy, _, moment_ypyp = self.get_moments_vertical(no_dispersion)
+        moment_yy, _, moment_ypyp = self.get_moments_vertical(dispersion)
 
         return numpy.sqrt(moment_yy), numpy.sqrt(moment_ypyp)
 
-    def get_sigmas_all(self, no_dispersion=True):
+    def get_sigmas_all(self, dispersion=False):
         """
         Returns all sigmas.
 
@@ -200,12 +218,12 @@ class ElectronBeam(SynedObject):
 
         """
 
-        sigma_x, sigmap_x = self.get_sigmas_horizontal(no_dispersion)
-        sigma_y, sigmap_y = self.get_sigmas_vertical(no_dispersion)
+        sigma_x, sigmap_x = self.get_sigmas_horizontal(dispersion)
+        sigma_y, sigmap_y = self.get_sigmas_vertical(dispersion)
 
         return sigma_x, sigmap_x, sigma_y, sigmap_y
 
-    def get_moments_horizontal(self, no_dispersion=True):
+    def get_moments_horizontal(self, dispersion=False):
         """
         Returns the moments in the horizontal direction.
 
@@ -215,15 +233,15 @@ class ElectronBeam(SynedObject):
             ( <x^2>, <x x'>, <x'^2>)
 
         """
-        if no_dispersion: return self._moment_xx, self._moment_xxp, self._moment_xpxp
-        else:             return self._get_moments_with_dispersion(self._moment_xx,
-                                                                   self._moment_xxp,
-                                                                   self._moment_xpxp,
-                                                                   self._energy_spread,
-                                                                   self._dispersion_x,
-                                                                   self._dispersionp_x)
+        if not dispersion: return self._moment_xx, self._moment_xxp, self._moment_xpxp
+        else:              return self._get_moments_with_dispersion(self._moment_xx,
+                                                                    self._moment_xxp,
+                                                                    self._moment_xpxp,
+                                                                    self._energy_spread,
+                                                                    self._dispersion_x,
+                                                                    self._dispersionp_x)
 
-    def get_moments_vertical(self, no_dispersion=True):
+    def get_moments_vertical(self, dispersion=False):
         """
         Returns the moments in the vertical direction.
 
@@ -234,15 +252,15 @@ class ElectronBeam(SynedObject):
 
         """
 
-        if no_dispersion: return self._moment_yy, self._moment_yyp, self._moment_ypyp
-        else:             return self._get_moments_with_dispersion(self._moment_yy,
+        if not dispersion: return self._moment_yy, self._moment_yyp, self._moment_ypyp
+        else:              return self._get_moments_with_dispersion(self._moment_yy,
                                                                    self._moment_yyp,
                                                                    self._moment_ypyp,
                                                                    self._energy_spread,
                                                                    self._dispersion_y,
                                                                    self._dispersionp_y)
 
-    def get_moments_all(self, no_dispersion=True):
+    def get_moments_all(self, dispersion=False):
         """
         Returns all moments.
 
@@ -253,8 +271,8 @@ class ElectronBeam(SynedObject):
 
         """
 
-        moment_xx, moment_xxp, moment_xpxp = self.get_moments_horizontal(no_dispersion)
-        moment_yy, moment_yyp, moment_ypyp = self.get_moments_vertical(no_dispersion)
+        moment_xx, moment_xxp, moment_xpxp = self.get_moments_horizontal(dispersion)
+        moment_yy, moment_yyp, moment_ypyp = self.get_moments_vertical(dispersion)
 
         return moment_xx, moment_xxp, moment_xpxp, moment_yy, moment_yyp, moment_ypyp
 
@@ -509,7 +527,7 @@ class ElectronBeam(SynedObject):
         self.set_dispersion_horizontal(eta_x, etap_x)
         self.set_dispersion_vertical(eta_y, etap_y)
 
-    def set_twiss_horizontal(self, emittance_x, alpha_x, beta_x, eta_x=0, etap_x=0):
+    def set_twiss_horizontal(self, emittance_x, alpha_x, beta_x, **kwargs):
         """
         Sets the electron beam parameters from the Twiss values in the horizontal direction.
 
@@ -532,9 +550,20 @@ class ElectronBeam(SynedObject):
         self._moment_xx     = moment_xx
         self._moment_xxp    = moment_xxp
         self._moment_xpxp   = moment_xpxp
+
+        # RETROCOMPATIBILITY
+        eta_x = kwargs.get("eta_x", None)
+        etap_x = kwargs.get("etap_x", None)
+
+        if eta_x is not None or etap_x is not None:
+            self.__send_deprectation_warning("Setting dispersion parameters with set_twiss_horizontal(..., eta_x, etap_x)",
+                                             "set_dispersion_horizontal(eta_x, etap_x) separately")
+            self.set_dispersion_vertical(0.0 if eta_x is None else eta_x,
+                                         0.0 if etap_x is None else etap_x)
+
         self.set_dispersion_horizontal(eta_x, etap_x)
 
-    def set_twiss_vertical(self, emittance_y, alpha_y, beta_y, eta_y=0, etap_y=0):
+    def set_twiss_vertical(self, emittance_y, alpha_y, beta_y, **kwargs):
         """
         Sets the electron beam parameters from the Twiss values in the vertical direction.
 
@@ -557,9 +586,18 @@ class ElectronBeam(SynedObject):
         self._moment_yy     = moment_yy
         self._moment_yyp    = moment_yyp
         self._moment_ypyp   = moment_ypyp
-        self.set_dispersion_vertical(eta_y, etap_y)
 
-    def set_twiss_all(self, emittance_x, alpha_x, beta_x, emittance_y, alpha_y, beta_y):
+        # RETROCOMPATIBILITY
+        eta_y  = kwargs.get("eta_y", None)
+        etap_y = kwargs.get("etap_y", None)
+
+        if eta_y is not None or etap_y is not None:
+            self.__send_deprectation_warning("Setting dispersion parameters with set_twiss_vertical(..., eta_y, etap_y)",
+                                             "set_dispersion_vertical(eta_y, etap_y) separately")
+            self.set_dispersion_vertical(0.0 if eta_y is None else eta_y,
+                                         0.0 if etap_y is None else etap_y)
+
+    def set_twiss_all(self, emittance_x, alpha_x, beta_x, emittance_y, alpha_y, beta_y, **kwargs):
         """
         Sets the electron beam parameters from the Twiss values.
 
@@ -579,8 +617,8 @@ class ElectronBeam(SynedObject):
             The beta value in vertical.
 
         """
-        self.set_twiss_horizontal(emittance_x, alpha_x, beta_x)
-        self.set_twiss_vertical(emittance_y, alpha_y, beta_y)
+        self.set_twiss_horizontal(emittance_x, alpha_x, beta_x, **kwargs)
+        self.set_twiss_vertical(emittance_y, alpha_y, beta_y, **kwargs)
 
     #
     # some easy calculations
@@ -618,25 +656,38 @@ class ElectronBeam(SynedObject):
         """
         return numpy.sqrt(1.0 - 1.0 / self.lorentz_factor() ** 2)
 
+    def emittance(self, dispersion=False):
+        if not dispersion:
+            emittance_x = self._emittance_without_dispersion(self._moment_xx, self._moment_xxp, self._moment_xpxp)
+            emittance_y = self._emittance_without_dispersion(self._moment_yy, self._moment_yyp, self._moment_ypyp)
+        else:
+            emittance_x = self._emittance_with_dispersion(self._moment_xx, self._moment_xxp, self._moment_xpxp, self._energy_spread, self._dispersion_x, self._dispersionp_x)
+            emittance_y = self._emittance_with_dispersion(self._moment_yy, self._moment_yyp, self._moment_ypyp, self._energy_spread, self._dispersion_y, self._dispersionp_y)
+
+        return emittance_x, emittance_y
+
     #
     # dictionnary interface, info etc
     #
     def has_dispersion(self):
-        return  not(self._dispersion_x == 0 and \
-                self._dispersion_y == 0 and \
-                self._dispersionp_x == 0 and \
-                self._dispersionp_y == 0)
+        return (self._dispersion_x != 0 or
+                self._dispersion_y != 0 or
+                self._dispersionp_x != 0 or
+                self._dispersionp_y != 0)
 
     #
     # backcompatibility (deprecated)
     #
     def get_twiss_no_dispersion_all(self):
+        self.__send_deprectation_warning("get_twiss_no_dispersion_all()", "get_twiss_all(dispersion=False)")
         return self.get_twiss_all()
 
     def get_twiss_no_dispersion_horizontal(self):
+        self.__send_deprectation_warning("get_twiss_no_dispersion_horizontal()", "get_twiss_horizontal(dispersion=False)")
         return self.get_twiss_horizontal()
 
     def get_twiss_no_dispersion_vertical(self):
+        self.__send_deprectation_warning("get_twiss_no_dispersion_vertical()", "get_twiss_vertical(dispersion=False)")
         return self.get_twiss_vertical()
 
 
@@ -682,8 +733,8 @@ if __name__ == "__main__":
         print("twiss H: ", a.get_twiss_horizontal())
         print("twiss V: ", a.get_twiss_vertical())
         print("twiss H, V: ", a.get_twiss_all())
-        print("sigmas H, V: ", a.get_sigmas_all(no_dispersion=False))
-        print("moments H, V: ", a.get_moments_all(no_dispersion=False))
+        print("sigmas H, V: ", a.get_sigmas_all(dispersion=True))
+        print("moments H, V: ", a.get_moments_all(dispersion=True))
 
     if 1: # moments, sigmas
 
@@ -691,22 +742,22 @@ if __name__ == "__main__":
         a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=2.0, current=0.5, energy_spread=0.00095)
         a.set_moments_all(1e-6, 0, 9e-6, 16e-6, 0, 36e-6)
         print("has_dispersion: ", a.has_dispersion())
-        print("moments: ", a.get_moments_all(no_dispersion=False))
-        print("sigmas: ", a.get_sigmas_all(no_dispersion=False))
+        print("moments: ", a.get_moments_all(dispersion=True))
+        print("sigmas: ", a.get_sigmas_all(dispersion=True))
 
         print(">>>> set sigmas (alpha=0): 1e-6,2e-6,3e-6")
         a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=2.0, current=0.5, energy_spread=0.00095)
         a.set_sigmas_all(1e-6, 2e-6, 3e-6, 4e-6)
         print("has_dispersion: ", a.has_dispersion())
-        print("moments: ", a.get_moments_all(no_dispersion=False))
-        print("sigmas: ", a.get_sigmas_all(no_dispersion=False))
+        print("moments: ", a.get_moments_all(dispersion=True))
+        print("sigmas: ", a.get_sigmas_all(dispersion=True))
 
         print(">>>> set moments (alpha!=0): 1e-6,4e-6,9e-6,16e-6,25e-6,36e-6")
         a = ElectronBeam.initialize_as_pencil_beam(energy_in_GeV=2.0, current=0.5, energy_spread=0.00095)
         a.set_moments_all(1e-6, 4e-6, 9e-6, 16e-6, 25e-6, 36e-6)
         print("has_dispersion: ", a.has_dispersion())
-        print("moments: ", a.get_moments_all(no_dispersion=False))
-        print("sigmas: ", a.get_sigmas_all(no_dispersion=False))
+        print("moments: ", a.get_moments_all(dispersion=True))
+        print("sigmas: ", a.get_sigmas_all(dispersion=True))
 
     if 1:  # ESRF-ID01 (checked vs Accelerator Tools)
 
@@ -737,11 +788,11 @@ if __name__ == "__main__":
         # yy = 2.6589e-11
         # yyp = 1.0488e-14
         # ypyp = 3.7609e-12
-        print("moments (with dispersion): ", a.get_moments_all(no_dispersion=False))
-        print("moments (without dispersion): ", a.get_moments_all(no_dispersion=True))
+        print("moments (with dispersion): ", a.get_moments_all(dispersion=True))
+        print("moments (without dispersion): ", a.get_moments_all(dispersion=False))
         # sigma x = 3.1199e-05
         # sigma x' = 4.5183e-06
         # sigma y = 5.1565e-06
         # sigma y' = 1.9393e-06
-        print("sigmas (with dispersion): ", a.get_sigmas_all(no_dispersion=False))
-        print("sigmas (without dispersion): ", a.get_sigmas_all(no_dispersion=True))
+        print("sigmas (with dispersion): ", a.get_sigmas_all(dispersion=True))
+        print("sigmas (without dispersion): ", a.get_sigmas_all(dispersion=False))
