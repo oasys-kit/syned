@@ -9,7 +9,7 @@ except AttributeError:
 
 NAME = 'syned'
 
-VERSION = '1.0.42'
+VERSION = '1.0.43'
 ISRELEASED = True
 
 DESCRIPTION = 'SYNED (SYNchrotron Elements Dictionary) kernel library'
@@ -23,14 +23,14 @@ MAINTAINER = 'L Rebuffi and M Sanchez del Rio'
 MAINTAINER_EMAIL = 'srio@esrf.eu'
 LICENSE = 'GPLv3'
 
-KEYWORDS = (
+KEYWORDS = [
     'dictionary',
     'glossary',
     'synchrotron'
     'simulation',
-)
+]
 
-CLASSIFIERS = (
+CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
     'Environment :: Plugins',
@@ -44,7 +44,7 @@ CLASSIFIERS = (
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
     'Intended Audience :: Developers',
-)
+]
 
 INSTALL_REQUIRES = (
     'setuptools',
