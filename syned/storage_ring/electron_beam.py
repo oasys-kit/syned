@@ -130,8 +130,8 @@ class ElectronBeam(SynedObject):
 
     @classmethod
     def _emittance_with_dispersion(cls, moment_ss, moment_sa, moment_aa,  energy_spread, dispersion_s, dispersion_a):
-        return numpy.sqrt((moment_ss  + (dispersion_s *  energy_spread) ** 2) * (moment_aa + (dispersion_a * energy_spread) ** 2) -
-                          (moment_sa + (dispersion_s *  dispersion_a * energy_spread ** 2) ** 2))
+        return numpy.sqrt((moment_ss + (dispersion_s * energy_spread) ** 2) * (moment_aa + (dispersion_a * energy_spread) ** 2) -
+                          (moment_sa + dispersion_s * dispersion_a * energy_spread ** 2) ** 2)
 
     @classmethod
     def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
