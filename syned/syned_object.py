@@ -1,4 +1,5 @@
 import copy
+import warnings
 from collections import OrderedDict
 try:
     import json_tricks as json # to save numpy arrays
@@ -262,3 +263,12 @@ class SynedObject(object):
 
         """
         return copy.deepcopy(self)
+
+    @classmethod
+    def _send_deprectation_warning(cls, function_name_use, new_function_use):
+        warnings.warn(
+            f"{function_name_use} is deprecated and will be removed in a future version. "
+            f"Use {new_function_use} instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )

@@ -4,8 +4,6 @@ Base class for electron beams.
 This class is intentionally shorten for simplicity.
 Usually we would need to consider also the electron distribution within the beam.
 """
-import warnings
-
 from syned.syned_object import SynedObject
 import scipy.constants as codata
 import numpy
@@ -132,8 +130,8 @@ class ElectronBeam(SynedObject):
 
     @classmethod
     def _emittance_with_dispersion(cls, moment_ss, moment_sa, moment_aa,  energy_spread, dispersion_s, dispersion_a):
-        return numpy.sqrt((moment_ss  - (dispersion_s *  energy_spread) ** 2) *(moment_aa - (dispersion_a * energy_spread) ** 2) -
-                          (moment_sa - (dispersion_s *  dispersion_a * energy_spread ** 2) ** 2))
+        return numpy.sqrt((moment_ss  + (dispersion_s *  energy_spread) ** 2) * (moment_aa + (dispersion_a * energy_spread) ** 2) -
+                          (moment_sa + (dispersion_s *  dispersion_a * energy_spread ** 2) ** 2))
 
     @classmethod
     def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
@@ -166,14 +164,6 @@ class ElectronBeam(SynedObject):
 
         return moment_ss_disp, moment_sa_disp, moment_aa_disp
 
-    @classmethod
-    def __send_deprectation_warning(cls, function_name_use, new_function_use):
-        warnings.warn(
-            f"{function_name_use} is deprecated and will be removed in a future version. "
-            f"Use {new_function_use} instead.",
-            DeprecationWarning,
-            stacklevel=2
-        )
 
     # --- GETTERS
     #     # ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -556,7 +546,7 @@ class ElectronBeam(SynedObject):
         etap_x = kwargs.get("etap_x", None)
 
         if eta_x is not None or etap_x is not None:
-            self.__send_deprectation_warning("Setting dispersion parameters with set_twiss_horizontal(..., eta_x, etap_x)",
+            self._send_deprectation_warning("Setting dispersion parameters with set_twiss_horizontal(..., eta_x, etap_x)",
                                              "set_dispersion_horizontal(eta_x, etap_x) separately")
             self.set_dispersion_vertical(0.0 if eta_x is None else eta_x,
                                          0.0 if etap_x is None else etap_x)
@@ -592,7 +582,7 @@ class ElectronBeam(SynedObject):
         etap_y = kwargs.get("etap_y", None)
 
         if eta_y is not None or etap_y is not None:
-            self.__send_deprectation_warning("Setting dispersion parameters with set_twiss_vertical(..., eta_y, etap_y)",
+            self._send_deprectation_warning("Setting dispersion parameters with set_twiss_vertical(..., eta_y, etap_y)",
                                              "set_dispersion_vertical(eta_y, etap_y) separately")
             self.set_dispersion_vertical(0.0 if eta_y is None else eta_y,
                                          0.0 if etap_y is None else etap_y)
@@ -679,15 +669,15 @@ class ElectronBeam(SynedObject):
     # backcompatibility (deprecated)
     #
     def get_twiss_no_dispersion_all(self):
-        self.__send_deprectation_warning("get_twiss_no_dispersion_all()", "get_twiss_all(dispersion=False)")
+        self._send_deprectation_warning("get_twiss_no_dispersion_all()", "get_twiss_all(dispersion=False)")
         return self.get_twiss_all()
 
     def get_twiss_no_dispersion_horizontal(self):
-        self.__send_deprectation_warning("get_twiss_no_dispersion_horizontal()", "get_twiss_horizontal(dispersion=False)")
+        self._send_deprectation_warning("get_twiss_no_dispersion_horizontal()", "get_twiss_horizontal(dispersion=False)")
         return self.get_twiss_horizontal()
 
     def get_twiss_no_dispersion_vertical(self):
-        self.__send_deprectation_warning("get_twiss_no_dispersion_vertical()", "get_twiss_vertical(dispersion=False)")
+        self._send_deprectation_warning("get_twiss_no_dispersion_vertical()", "get_twiss_vertical(dispersion=False)")
         return self.get_twiss_vertical()
 
 
