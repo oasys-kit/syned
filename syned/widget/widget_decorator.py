@@ -24,14 +24,14 @@ class WidgetDecorator(object):
             if not multi_input:
                 from orangewidget.widget import Input
 
-                return Input(name="SynedData",
+                return Input(name="Syned Data",
                              type=Beamline,
                              id="SynedData",
                              default=True, auto_summary=False)
             else:
                 from orangewidget.widget import MultiInput
 
-                return MultiInput(name="SynedData",
+                return MultiInput(name="Syned Data",
                                   type=Beamline,
                                   id="SynedData",
                                   default=True, auto_summary=False)
