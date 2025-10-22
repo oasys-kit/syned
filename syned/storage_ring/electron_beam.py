@@ -4,9 +4,13 @@ Base class for electron beams.
 This class is intentionally shorten for simplicity.
 Usually we would need to consider also the electron distribution within the beam.
 """
-from syned.syned_object import SynedObject
 import scipy.constants as codata
 import numpy
+import warnings
+
+from syned.util import deprecated
+from syned.syned_object import SynedObject
+
 
 class ElectronBeam(SynedObject):
     def __init__(self,
@@ -136,17 +140,27 @@ class ElectronBeam(SynedObject):
     @classmethod
     def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
         emittance = cls._emittance_without_dispersion(moment_ss, moment_sa, moment_aa)
-        alpha     = -moment_sa / emittance
-        beta      = moment_ss / emittance
-        gamma     = (1 + alpha**2) / beta
+        if emittance == 0.0:
+            warnings.warn(message="All moments are 0.0 and the calculation is not possible. \u03b5 = \u03b1 = \u03b2 = \u03b3 = 0.0 is returned.",
+                          category=UserWarning, stacklevel=2)
+            return 0.0, 0.0, 0.0, 0.0
+        else:
+            alpha     = -moment_sa / emittance
+            beta      = moment_ss / emittance
+            gamma     = (1 + alpha**2) / beta
 
-        alpha = 0.0 if alpha == 0 else alpha # to avoid -0.0
+            alpha = 0.0 if alpha == 0 else alpha # to avoid -0.0
 
-        return emittance, alpha, beta, gamma
+            return emittance, alpha, beta, gamma
 
     @classmethod
     def _get_moments_from_twiss_without_dispersion(cls, emittance, alpha, beta):
-        gamma = (1 + alpha ** 2) / beta
+        if beta == 0:
+            warnings.warn(message="With \u03b2 = 0.0 the calculation of \u03b3 is not possible. \u03b3 = 0.0 is used.",
+                          category=UserWarning, stacklevel=2)
+            gamma = 0.0
+        else:
+            gamma = (1 + alpha ** 2) / beta
 
         moment_ss = beta * emittance
         moment_sa = -alpha * emittance
@@ -168,7 +182,7 @@ class ElectronBeam(SynedObject):
     # --- GETTERS
     #     # ---------------------------------------------------------------------------------------------------------------------------------------------
     #
-    def get_sigmas_horizontal(self, dispersion=False):
+    def get_sigmas_horizontal(self, dispersion=True):
         """
         Returns the sigmas in horizontal direction.
 
@@ -183,7 +197,7 @@ class ElectronBeam(SynedObject):
 
         return numpy.sqrt(moment_xx), numpy.sqrt(moment_xpxp)
 
-    def get_sigmas_vertical(self, dispersion=False):
+    def get_sigmas_vertical(self, dispersion=True):
         """
         Returns the sigmas in vertical direction.
 
@@ -197,7 +211,7 @@ class ElectronBeam(SynedObject):
 
         return numpy.sqrt(moment_yy), numpy.sqrt(moment_ypyp)
 
-    def get_sigmas_all(self, dispersion=False):
+    def get_sigmas_all(self, dispersion=True):
         """
         Returns all sigmas.
 
@@ -213,7 +227,7 @@ class ElectronBeam(SynedObject):
 
         return sigma_x, sigmap_x, sigma_y, sigmap_y
 
-    def get_moments_horizontal(self, dispersion=False):
+    def get_moments_horizontal(self, dispersion=True):
         """
         Returns the moments in the horizontal direction.
 
@@ -231,7 +245,7 @@ class ElectronBeam(SynedObject):
                                                                     self._dispersion_x,
                                                                     self._dispersionp_x)
 
-    def get_moments_vertical(self, dispersion=False):
+    def get_moments_vertical(self, dispersion=True):
         """
         Returns the moments in the vertical direction.
 
@@ -250,7 +264,7 @@ class ElectronBeam(SynedObject):
                                                                    self._dispersion_y,
                                                                    self._dispersionp_y)
 
-    def get_moments_all(self, dispersion=False):
+    def get_moments_all(self, dispersion=True):
         """
         Returns all moments.
 
@@ -542,16 +556,16 @@ class ElectronBeam(SynedObject):
         self._moment_xpxp   = moment_xpxp
 
         # RETROCOMPATIBILITY
-        eta_x = kwargs.get("eta_x", None)
-        etap_x = kwargs.get("etap_x", None)
+        eta_x  = kwargs.get("eta_x", 0.0)
+        etap_x = kwargs.get("etap_x", 0.0)
 
-        if eta_x is not None or etap_x is not None:
-            self._send_deprectation_warning("Setting dispersion parameters with set_twiss_horizontal(..., eta_x, etap_x)",
-                                             "set_dispersion_horizontal(eta_x, etap_x) separately")
-            self.set_dispersion_vertical(0.0 if eta_x is None else eta_x,
-                                         0.0 if etap_x is None else etap_x)
-
-        self.set_dispersion_horizontal(eta_x, etap_x)
+        if eta_x != 0.0 or etap_x != 0.0:
+            warnings.warn(message="Setting dispersion parameters with `set_twiss_horizontal(..., eta_x, etap_x)` is deprecated "
+                                  "and will be removed in a future version. "
+                                  "Use `set_dispersion_horizontal(eta_x, etap_x)` separately instead.",
+                          category=DeprecationWarning, stacklevel=2)
+            self.set_dispersion_horizontal(0.0 if eta_x is None else eta_x,
+                                           0.0 if etap_x is None else etap_x)
 
     def set_twiss_vertical(self, emittance_y, alpha_y, beta_y, **kwargs):
         """
@@ -578,12 +592,15 @@ class ElectronBeam(SynedObject):
         self._moment_ypyp   = moment_ypyp
 
         # RETROCOMPATIBILITY
-        eta_y  = kwargs.get("eta_y", None)
-        etap_y = kwargs.get("etap_y", None)
+        eta_y  = kwargs.get("eta_y", 0.0)
+        etap_y = kwargs.get("etap_y", 0.0)
 
-        if eta_y is not None or etap_y is not None:
-            self._send_deprectation_warning("Setting dispersion parameters with set_twiss_vertical(..., eta_y, etap_y)",
-                                             "set_dispersion_vertical(eta_y, etap_y) separately")
+        if eta_y != 0.0 or etap_y != 0.0:
+            warnings.warn(message="Setting dispersion parameters with `set_twiss_vertical(..., eta_y, etap_y)` is deprecated "
+                                  "and will be removed in a future version. "
+                                  "Use `set_dispersion_vertical(eta_y, etap_y)` separately instead.",
+                          category=DeprecationWarning, stacklevel=2)
+
             self.set_dispersion_vertical(0.0 if eta_y is None else eta_y,
                                          0.0 if etap_y is None else etap_y)
 
@@ -646,7 +663,7 @@ class ElectronBeam(SynedObject):
         """
         return numpy.sqrt(1.0 - 1.0 / self.lorentz_factor() ** 2)
 
-    def emittance(self, dispersion=False):
+    def emittance(self, dispersion=True):
         if not dispersion:
             emittance_x = self._emittance_without_dispersion(self._moment_xx, self._moment_xxp, self._moment_xpxp)
             emittance_y = self._emittance_without_dispersion(self._moment_yy, self._moment_yyp, self._moment_ypyp)
@@ -668,17 +685,14 @@ class ElectronBeam(SynedObject):
     #
     # backcompatibility (deprecated)
     #
-    def get_twiss_no_dispersion_all(self):
-        self._send_deprectation_warning("get_twiss_no_dispersion_all()", "get_twiss_all(dispersion=False)")
-        return self.get_twiss_all()
+    @deprecated("Use `get_twiss_all()` instead")
+    def get_twiss_no_dispersion_all(self): return self.get_twiss_all()
 
-    def get_twiss_no_dispersion_horizontal(self):
-        self._send_deprectation_warning("get_twiss_no_dispersion_horizontal()", "get_twiss_horizontal(dispersion=False)")
-        return self.get_twiss_horizontal()
+    @deprecated("Use `get_twiss_horizontal()` instead")
+    def get_twiss_no_dispersion_horizontal(self): return self.get_twiss_horizontal()
 
-    def get_twiss_no_dispersion_vertical(self):
-        self._send_deprectation_warning("get_twiss_no_dispersion_vertical()", "get_twiss_vertical(dispersion=False)")
-        return self.get_twiss_vertical()
+    @deprecated("Use `get_twiss_vertical()` instead")
+    def get_twiss_no_dispersion_vertical(self): return self.get_twiss_vertical()
 
 
 if __name__ == "__main__":
@@ -779,10 +793,10 @@ if __name__ == "__main__":
         # yyp = 1.0488e-14
         # ypyp = 3.7609e-12
         print("moments (with dispersion): ", a.get_moments_all(dispersion=True))
-        print("moments (without dispersion): ", a.get_moments_all(dispersion=False))
+        print("moments (without dispersion): ", a.get_moments_all(dispersion=True))
         # sigma x = 3.1199e-05
         # sigma x' = 4.5183e-06
         # sigma y = 5.1565e-06
         # sigma y' = 1.9393e-06
         print("sigmas (with dispersion): ", a.get_sigmas_all(dispersion=True))
-        print("sigmas (without dispersion): ", a.get_sigmas_all(dispersion=False))
+        print("sigmas (without dispersion): ", a.get_sigmas_all(dispersion=True))
