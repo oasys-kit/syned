@@ -130,16 +130,18 @@ class ElectronBeam(SynedObject):
 
     @classmethod
     def _emittance_without_dispersion(cls, moment_ss, moment_sa, moment_aa):
-        return numpy.sqrt(moment_ss * moment_aa - moment_sa**2)
+        return float(numpy.sqrt(moment_ss * moment_aa - moment_sa**2))
 
     @classmethod
     def _emittance_with_dispersion(cls, moment_ss, moment_sa, moment_aa,  energy_spread, dispersion_s, dispersion_a):
-        return numpy.sqrt((moment_ss + (dispersion_s * energy_spread) ** 2) * (moment_aa + (dispersion_a * energy_spread) ** 2) -
-                          (moment_sa + dispersion_s * dispersion_a * energy_spread ** 2) ** 2)
+        return float(numpy.sqrt((moment_ss + (dispersion_s * energy_spread) ** 2) *
+                                (moment_aa + (dispersion_a * energy_spread) ** 2) -
+                                (moment_sa + dispersion_s * dispersion_a * energy_spread ** 2) ** 2))
 
     @classmethod
     def _get_twiss_from_moments(cls, moment_ss, moment_sa, moment_aa):
         emittance = cls._emittance_without_dispersion(moment_ss, moment_sa, moment_aa)
+
         if emittance == 0.0:
             warnings.warn(message="All moments are 0.0 and the calculation is not possible. \u03b5 = \u03b1 = \u03b2 = \u03b3 = 0.0 is returned.",
                           category=UserWarning, stacklevel=2)
@@ -168,7 +170,7 @@ class ElectronBeam(SynedObject):
 
         moment_sa = 0.0 if moment_sa == 0 else moment_sa  # to avoid -0.0
 
-        return moment_ss, moment_sa, moment_aa
+        return float(moment_ss), float(moment_sa), float(moment_aa)
 
     @classmethod
     def _get_moments_with_dispersion(cls, moment_ss, moment_sa, moment_aa, energy_spread, dispersion_s, dispersion_a):
@@ -176,7 +178,7 @@ class ElectronBeam(SynedObject):
         moment_sa_disp = moment_sa + dispersion_s * dispersion_a * (energy_spread ** 2)
         moment_aa_disp = moment_aa + (dispersion_a * energy_spread) ** 2
 
-        return moment_ss_disp, moment_sa_disp, moment_aa_disp
+        return float(moment_ss_disp), float(moment_sa_disp), float(moment_aa_disp)
 
 
     # --- GETTERS
@@ -195,7 +197,7 @@ class ElectronBeam(SynedObject):
 
         moment_xx, _, moment_xpxp = self.get_moments_horizontal(dispersion)
 
-        return numpy.sqrt(moment_xx), numpy.sqrt(moment_xpxp)
+        return float(numpy.sqrt(moment_xx)), float(numpy.sqrt(moment_xpxp))
 
     def get_sigmas_vertical(self, dispersion=True):
         """
@@ -209,7 +211,7 @@ class ElectronBeam(SynedObject):
         """
         moment_yy, _, moment_ypyp = self.get_moments_vertical(dispersion)
 
-        return numpy.sqrt(moment_yy), numpy.sqrt(moment_ypyp)
+        return float(numpy.sqrt(moment_yy)), float(numpy.sqrt(moment_ypyp))
 
     def get_sigmas_all(self, dispersion=True):
         """
@@ -237,7 +239,7 @@ class ElectronBeam(SynedObject):
             ( <x^2>, <x x'>, <x'^2>)
 
         """
-        if not dispersion: return self._moment_xx, self._moment_xxp, self._moment_xpxp
+        if not dispersion: return float(self._moment_xx), float(self._moment_xxp), float(self._moment_xpxp)
         else:              return self._get_moments_with_dispersion(self._moment_xx,
                                                                     self._moment_xxp,
                                                                     self._moment_xpxp,
@@ -256,7 +258,7 @@ class ElectronBeam(SynedObject):
 
         """
 
-        if not dispersion: return self._moment_yy, self._moment_yyp, self._moment_ypyp
+        if not dispersion: return float(self._moment_yy), float(self._moment_yyp), float(self._moment_ypyp)
         else:              return self._get_moments_with_dispersion(self._moment_yy,
                                                                    self._moment_yyp,
                                                                    self._moment_ypyp,
