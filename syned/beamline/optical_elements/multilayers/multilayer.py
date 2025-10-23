@@ -1,5 +1,3 @@
-# TODO: move this to syned
-
 from syned.beamline.shape import SurfaceShape
 from syned.beamline.optical_element_with_surface_shape import OpticalElementsWithSurfaceShape
 
