@@ -3,53 +3,53 @@ Functions to read/write syned objects in json files.
 
 Notes
 -----
-The elements that are not explicitely imported in the code that follows, but they MUST be imported
-to define the objects at run time.
-To import more elements, yoy can use the exec_command keyword.
-
+Common syned classes are imported at module level so they are available when
+loading json files.  To load objects from other packages (e.g. shadow4), pass
+their import statements via the ``exec_commands`` keyword, or use
+:func:`get_exec_commands_for_package` to generate them automatically.
 """
-from syned.storage_ring.electron_beam import ElectronBeam
-from syned.storage_ring.magnetic_structures.undulator import Undulator
-from syned.storage_ring.magnetic_structures.wiggler import Wiggler
-from syned.storage_ring.magnetic_structures.bending_magnet import BendingMagnet
-from syned.storage_ring.magnetic_structure import MagneticStructure
-from syned.beamline.optical_elements.ideal_elements.screen import Screen
-from syned.beamline.optical_elements.ideal_elements.ideal_lens import IdealLens
-from syned.beamline.optical_elements.absorbers.filter import Filter
-from syned.beamline.optical_elements.absorbers.slit import Slit
-from syned.beamline.optical_elements.absorbers.beam_stopper import BeamStopper
-from syned.beamline.optical_elements.absorbers.holed_filter import HoledFilter
-from syned.beamline.optical_elements.mirrors.mirror import Mirror
-from syned.beamline.optical_elements.crystals.crystal import Crystal
-from syned.beamline.optical_elements.gratings.grating import Grating
-from syned.beamline.optical_elements.gratings.grating import GratingVLS
-from syned.beamline.optical_elements.gratings.grating import GratingBlaze
-from syned.beamline.optical_elements.gratings.grating import GratingLamellar
-
-from syned.beamline.shape import BoundaryShape
-from syned.beamline.shape import Rectangle, Ellipse, Circle
-from syned.beamline.shape import MultiplePatch
-from syned.beamline.shape import DoubleRectangle, DoubleEllipse, DoubleCircle
-
-from syned.beamline.shape import SurfaceShape
-from syned.beamline.shape import Conic, Plane, Sphere, SphericalCylinder
-from syned.beamline.shape import Ellipsoid, EllipticalCylinder
-from syned.beamline.shape import Paraboloid, ParabolicCylinder
-from syned.beamline.shape import Hyperboloid, HyperbolicCylinder
-from syned.beamline.shape import Toroid
-
-from syned.storage_ring.light_source import LightSource
-from syned.storage_ring.empty_light_source import EmptyLightSource
-
-from syned.beamline.beamline import Beamline
-from syned.beamline.beamline_element import BeamlineElement
-from syned.beamline.element_coordinates import ElementCoordinates
-
-from collections import OrderedDict
 
 import json_tricks # to save numpy arrays
+import pkgutil, importlib, inspect
 
 from urllib.request import urlopen
+
+import syned
+
+def get_exec_commands_for_package(package):
+    """
+    Build a string of import statements for all classes defined in a package.
+
+    Walks every submodule of ``package`` with pkgutil and collects classes
+    whose ``__module__`` matches the submodule name (i.e. classes defined
+    there, not re-exported ones).  The resulting string can be passed as
+    ``exec_commands`` to the json loaders so they can instantiate objects by
+    class name.
+
+    Parameters
+    ----------
+    package : module
+        The top-level package to inspect (e.g. ``import mypackage; get_exec_commands_for_package(mypackage)``).
+
+    Returns
+    -------
+    str
+        Newline-separated ``from <module> import <Class>, ...`` statements.
+    """
+    lines = []
+    for _, modname, _ in pkgutil.walk_packages(
+            path=package.__path__,
+            prefix=package.__name__ + '.',
+            onerror=lambda x: None):
+        try:
+            module = importlib.import_module(modname)
+            names = [name for name, obj in inspect.getmembers(module, inspect.isclass)
+                     if obj.__module__ == modname]
+            if names:
+                lines.append("from {} import {}".format(modname, ", ".join(names)))
+        except Exception:
+            pass
+    return "\n".join(lines)
 
 def load_from_json_file(file_name, exec_commands=None):
     """
@@ -60,13 +60,18 @@ def load_from_json_file(file_name, exec_commands=None):
     file_name : str
         The file name.
     exec_commands : str
-        The commands (typically import...) to be executed before accesing the file.
+        The commands (typically import...) to be executed before accessing the file.
 
     Returns
     -------
     instance of SynedObject
 
     """
+    if exec_commands is None:
+        exec_commands = get_exec_commands_for_package(syned)
+    else:
+        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
+
     f = open(file_name)
     text = f.read()
     f.close()
@@ -88,6 +93,10 @@ def load_from_json_url(file_url, exec_commands=None):
     instance of SynedObject
 
     """
+    if exec_commands is None:
+        exec_commands = get_exec_commands_for_package(syned)
+    else:
+        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
     u = urlopen(file_url)
     ur = u.read()
     url = ur.decode(encoding='UTF-8')
@@ -109,6 +118,10 @@ def load_from_json_text(text, exec_commands=None):
     instance of SynedObject
 
     """
+    if exec_commands is None:
+        exec_commands = get_exec_commands_for_package(syned)
+    else:
+        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
     return load_from_json_dictionary_recurrent(json_tricks.loads(text), exec_commands=exec_commands)
 
 def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
@@ -179,18 +192,15 @@ def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
         return tmp1
 
 
-if __name__ == "__main__":
+'''if __name__ == "__main__":
 
-    file_url = "http://ftp.esrf.fr/pub/scisoft/syned/lightsources/ESRF_ID01_EBS_PPU35_22.json"
+    file_url = "https://raw.githubusercontent.com/oasys-esrf-kit/modelling_team_scripts_and_workspaces/refs/heads/main/id20/ESRF_ID20_EBS_CPMU19_2.5m.json"
     syned_obj = load_from_json_url(file_url)
     print(syned_obj.info())
 
 
-    #
-    # file_url = "/home/manuel/Oasys/ALSU-IR-BM.json"
-    # syned_obj = load_from_json_file(file_url)
-    # print(syned_obj.info())
 
-    # file_url = "/home/manuel/Oasys/bl.json"
-    # syned_obj = load_from_json_file(file_url)
-    # print(syned_obj.info())
+    file_url = "/home/srio/Oasys2/tmp_sy.json"
+    syned_obj = load_from_json_file(file_url)
+    print(syned_obj.info())'''
+
