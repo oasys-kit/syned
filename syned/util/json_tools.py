@@ -5,8 +5,9 @@ Notes
 -----
 Common syned classes are imported at module level so they are available when
 loading json files.  To load objects from other packages (e.g. shadow4), pass
-their import statements via the ``exec_commands`` keyword, or use
-:func:`get_exec_commands_for_package` to generate them automatically.
+their import statements via the ``exec_commands`` keyword, or supply a list of
+package modules via ``extra_packages`` and the import statements will be
+generated automatically with :func:`get_exec_commands_for_package`.
 """
 
 import json_tricks # to save numpy arrays
@@ -51,7 +52,17 @@ def get_exec_commands_for_package(package):
             pass
     return "\n".join(lines)
 
-def load_from_json_file(file_name, exec_commands=None):
+def _build_exec_commands(exec_commands, extra_packages):
+    """Combine exec_commands string with auto-generated imports for syned and any extra_packages."""
+    parts = [get_exec_commands_for_package(syned)]
+    if exec_commands is not None:
+        parts.append(exec_commands)
+    if extra_packages is not None:
+        for pkg in extra_packages:
+            parts.append(get_exec_commands_for_package(pkg))
+    return "\n".join(parts)
+
+def load_from_json_file(file_name, exec_commands=None, extra_packages=None):
     """
     Function to load a syned object from a json file.
 
@@ -59,25 +70,29 @@ def load_from_json_file(file_name, exec_commands=None):
     ----------
     file_name : str
         The file name.
-    exec_commands : str
-        The commands (typically import...) to be executed before accessing the file.
+    exec_commands : str, optional
+        Import statements to execute before deserializing (e.g. for classes
+        outside of syned).
+    extra_packages : list of module, optional
+        Additional packages whose classes should be made available during
+        deserialization.  Import statements are generated automatically via
+        :func:`get_exec_commands_for_package`.  Example::
+
+            import shadow4
+            obj = load_from_json_file("beamline.json", extra_packages=[shadow4])
 
     Returns
     -------
     instance of SynedObject
 
     """
-    if exec_commands is None:
-        exec_commands = get_exec_commands_for_package(syned)
-    else:
-        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
-
+    cmds = _build_exec_commands(exec_commands, extra_packages)
     f = open(file_name)
     text = f.read()
     f.close()
-    return load_from_json_text(text, exec_commands=exec_commands)
+    return load_from_json_text(text, exec_commands=cmds)
 
-def load_from_json_url(file_url, exec_commands=None):
+def load_from_json_url(file_url, exec_commands=None, extra_packages=None):
     """
     Function to load a syned object from a remote json file.
 
@@ -85,24 +100,25 @@ def load_from_json_url(file_url, exec_commands=None):
     ----------
     file_url : str
         The URL with the file name.
-    exec_commands : str
-        The commands (typically import...) to be executed before accesing the file.
+    exec_commands : str, optional
+        Import statements to execute before deserializing.
+    extra_packages : list of module, optional
+        Additional packages whose classes should be made available during
+        deserialization.  Import statements are generated automatically via
+        :func:`get_exec_commands_for_package`.
 
     Returns
     -------
     instance of SynedObject
 
     """
-    if exec_commands is None:
-        exec_commands = get_exec_commands_for_package(syned)
-    else:
-        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
+    cmds = _build_exec_commands(exec_commands, extra_packages)
     u = urlopen(file_url)
     ur = u.read()
     url = ur.decode(encoding='UTF-8')
-    return load_from_json_text(url, exec_commands=exec_commands)
+    return load_from_json_text(url, exec_commands=cmds)
 
-def load_from_json_text(text, exec_commands=None):
+def load_from_json_text(text, exec_commands=None, extra_packages=None):
     """
     Function to load a syned object from a json txt.
 
@@ -110,19 +126,20 @@ def load_from_json_text(text, exec_commands=None):
     ----------
     text : str
         The text with the corresponding info.
-    exec_commands : str
-        The commands (typically import...) to be executed before accesing the file.
+    exec_commands : str, optional
+        Import statements to execute before deserializing.
+    extra_packages : list of module, optional
+        Additional packages whose classes should be made available during
+        deserialization.  Import statements are generated automatically via
+        :func:`get_exec_commands_for_package`.
 
     Returns
     -------
     instance of SynedObject
 
     """
-    if exec_commands is None:
-        exec_commands = get_exec_commands_for_package(syned)
-    else:
-        exec_commands = exec_commands + "\n" + get_exec_commands_for_package(syned)
-    return load_from_json_dictionary_recurrent(json_tricks.loads(text), exec_commands=exec_commands)
+    cmds = _build_exec_commands(exec_commands, extra_packages)
+    return load_from_json_dictionary_recurrent(json_tricks.loads(text), exec_commands=cmds)
 
 def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
     """
@@ -198,9 +215,15 @@ def load_from_json_dictionary_recurrent(jsn, verbose=False, exec_commands=None):
     syned_obj = load_from_json_url(file_url)
     print(syned_obj.info())
 
-
-
     file_url = "/home/srio/Oasys2/tmp_sy.json"
     syned_obj = load_from_json_file(file_url)
-    print(syned_obj.info())'''
+    print(syned_obj.info())
+
+    # Usage example with extra packages:
+    import shadow4, wofry
+    file_url = "/home/srio/Oasys2/tmp0.json"
+    syned_obj = load_from_json_file(file_url, extra_packages=[shadow4])
+    print(syned_obj)
+    # or multiple packages:
+    obj = load_from_json_file(file_url, extra_packages=[shadow4, wofry])'''
 
