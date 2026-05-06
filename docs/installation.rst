@@ -19,7 +19,7 @@ Use pip to install syned: run this command in your terminal
 From sources
 ------------
 
-The sources for crystalpy can be downloaded from the `Github repo`_.
+The sources for syned can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
@@ -32,7 +32,7 @@ Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
-    $ python setup.py build install
+    $ pip install -e .
 
 
 .. _Github repo: https://github.com/oasys-kit/syned

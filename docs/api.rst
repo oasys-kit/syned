@@ -108,6 +108,7 @@ optical elements
    syned.beamline.optical_elements.ideal_elements.ideal_element
    syned.beamline.optical_elements.ideal_elements.screen
    syned.beamline.optical_elements.ideal_elements.ideal_lens
+   syned.beamline.optical_elements.ideal_elements.ideal_fzp
 
 
 * ``syned.beamline.optical_elements.absorbers`` absorber, beam_stopper, filter, holed_filter, slit
@@ -142,6 +143,13 @@ optical elements
 
    syned.beamline.optical_elements.mirrors.mirror
 
+* ``syned.beamline.optical_elements.multilayers`` multilayer
+
+.. autosummary::
+   :toctree: generated/
+
+   syned.beamline.optical_elements.multilayers.multilayer
+
 * ``syned.beamline.optical_elements.refractors`` interface, lens, crl
 
 .. autosummary::
@@ -173,7 +181,7 @@ geometrical shapes
       syned.beamline.shape.Sphere
       syned.beamline.shape.SphericalCylinder
       syned.beamline.shape.Ellipsoid
-      syned.beamline.shape.EllipticCylinder
+      syned.beamline.shape.EllipticalCylinder
       syned.beamline.shape.Hyperboloid
       syned.beamline.shape.HyperbolicCylinder
       syned.beamline.shape.Paraboloid
@@ -203,3 +211,13 @@ geometrical shapes
       syned.beamline.shape.Convexity
       syned.beamline.shape.Direction
       syned.beamline.shape.Side
+
+
+widget
+------
+``syned.widget`` GUI decorator utilities
+
+.. autosummary::
+   :toctree: generated/
+
+   syned.widget.widget_decorator
