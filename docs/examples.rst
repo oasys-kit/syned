@@ -5,5 +5,6 @@ Examples
 .. toctree::
    :maxdepth: 1
 
-   Example of a beamline defined in syned <example_beamline.ipynb>
-   Example of a double slit in a beamline <example_double_slit.ipynb>
+   Beamline defined in syned <example_beamline.ipynb>
+   Double slit in a beamline <example_double_slit.ipynb>
+   JSON serialisation and deserialisation <example_json_input_output.ipynb>
