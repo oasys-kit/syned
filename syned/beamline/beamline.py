@@ -136,20 +136,3 @@ class Beamline(SynedObject):
 
         return self._beamline_elements_list[index]
 
-    # TODO: remove: probably this is not needed, as the deepcopy in SynedObject makes the work.
-    def duplicate(self):
-        """
-        Returns a copy of the beamline element instance.
-
-        Returns
-        -------
-        BeamlineElement  instance
-            A copy of the object instance.
-
-        """
-        beamline_elements_list = []
-        for beamline_element in self._beamline_elements_list:
-            beamline_elements_list.append(beamline_element)
-
-        return Beamline(light_source=self._light_source,
-                        beamline_elements_list = beamline_elements_list)
