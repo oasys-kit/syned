@@ -40,7 +40,7 @@ class HoledFilter(Absorber):
 
 
         # support text containg name of variable, help text and unit. Will be stored in self._support_dictionary
-        self._set_support_text([
+        self._add_support_text([
                     ("material"      , "Material (symbol, formula or name)",    "" ),
                     ("thickness"     , "Thickness ",                            "m" ),
             ] )
