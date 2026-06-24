@@ -136,6 +136,24 @@ class FilterBox(SynedObject):
         for block, sel in zip(self._filter_blocks_list, selection):
             block.set_selection(sel)
 
+    def duplicate_using_selected_only(self):
+        """Return a new FilterBox where each block keeps only its selected foil.
+
+        Each FilterBlock is reduced to a single foil (its current selection) with
+        the new block's selection set to 0. The original box is left unchanged.
+
+        Returns
+        -------
+        FilterBox
+
+        Raises
+        ------
+        ValueError
+            If any block has no foil selected (its selection is None).
+        """
+        return FilterBox(filter_blocks_list=[block.duplicate_using_selected_only()
+                                             for block in self._filter_blocks_list])
+
     @classmethod
     def from_plane_json_dict(cls, att_dic):
         """Construct a FilterBox from a plain (non-syned) attenuator dictionary.
@@ -182,8 +200,8 @@ if __name__ == "__main__":
         #
         # syned_file_name = "/home/srio/OASYS2.0/modelling_team_scripts_and_workspaces/id11/WATTDOG/SPECTRA/id11_wattdog_attenuators_2028_syned_no_density.json"
 
-        # syned_file_name = "/home/srio/OASYS2.0/modelling_team_scripts_and_workspaces/id11/WATTDOG/SPECTRA/id11_wattdog_attenuators_2028_syned.json"
-        syned_file_name = "/tmp_14_days/srio/tmp.json"
+        # syned_file_name = "T:\srio\id11_wattdog_attenuators_2028_syned.json"
+        syned_file_name = "C:/Users/srio/Oasys2/id19_attenuators_box_syned.json"
 
         is_remote = 0
         from syned.util.json_tools import load_from_json_file, load_from_json_url
