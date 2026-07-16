@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "syned"
+version = "1.0.57"
+description = "SYNED (SYNchrotron Elements Dictionary) kernel library"
+readme = "README.md"
+
+# ---------------------------------------------------------------------------
+# TODO: PICK ONE. The old setup.py declared GPLv3, but the LICENSE file in this
+# repo is the MIT License. These are not compatible claims -- see chat notes.
+# ---------------------------------------------------------------------------
+license = "MIT"
+# license = "GPL-3.0-or-later"    # <- use this instead if GPLv3 is correct,
+#                                 #    and replace the LICENSE file with GPLv3 text
+license-files = ["LICENSE"]
+
+authors = [
+    { name = "Manuel Sanchez del Rio", email = "srio@esrf.eu" },
+    { name = "Luca Rebuffi", email = "lrebuffi@anl.gov" },
+]
+maintainers = [
+    { name = "Luca Rebuffi", email = "lrebuffi@anl.gov" },
+    { name = "Manuel Sanchez del Rio", email = "srio@esrf.eu" },
+]
+keywords = [
+    "dictionary",
+    "glossary",
+    "synchrotron",
+    "simulation",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Plugins",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "setuptools",
+    "numpy",
+    "scipy",
+    "json-tricks",
+]
+
+[project.urls]
+Homepage = "https://github.com/oasys-kit/syned"
+Download = "https://github.com/oasys-kit/syned"
+Documentation = "https://syned.readthedocs.io/"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+packages = [
+    "syned",
+    "syned.beamline",
+    "syned.beamline.optical_elements",
+    "syned.beamline.optical_elements.absorbers",
+    "syned.beamline.optical_elements.crystals",
+    "syned.beamline.optical_elements.gratings",
+    "syned.beamline.optical_elements.ideal_elements",
+    "syned.beamline.optical_elements.mirrors",
+    "syned.beamline.optical_elements.refractors",
+    "syned.storage_ring",
+    "syned.storage_ring.magnetic_structures",
+    "syned.util",
+    "syned.widget",
+]
