@@ -4,6 +4,8 @@ from syned.beamline.optical_element_with_surface_shape import OpticalElementsWit
 class DiffractionGeometry:
     BRAGG = 0
     LAUE = 1
+    BRAGG_T = 2     #SSLS:YXJ
+    LAUE_T = 3      #SSLS:YXJ
 
 class Crystal(OpticalElementsWithSurfaceShape):
     """
